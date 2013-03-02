@@ -1,0 +1,11 @@
+Java code using Apache PDFBox API. 
+Converts pdf with bookmarks to chapterwise text files.
+
+AccessBookmarks.java code does the following:
+1) Prints the entire index of any pdf file. Path of input file is actually taken as user input but is currently hardcoded for faster testing. 
+2) Extracts text between 2 particular bookmarks and writes it to a textfile.
+
+
+Todo:
+1) make the function recursive instead of iterative to handle any number or levels of bookmarks. 
+2) write each leaf bookmarks contents to textfile. All output textfiles should be in a directory structure same as bookmarks tree structure.
