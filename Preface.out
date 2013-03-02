@@ -1,0 +1,85 @@
+Preface
+The past few years document the following fact: The Web has irrevocably recastthe face of computing and programmers unwilling to master its environment willbe left behind.
+The preceding is a strong statement. It is also true. More and more, applications
+must interface to the Web. It no longer matters much what the application is, near
+universal Web access is dragging, pushing, and coaxing programmers to program for
+the online world, and Java is the language that many will use to do it. Frankly, fluency
+in Java is no longer an option for the professional programmer, it is a requirement. This
+book will help you acquire it.
+Aside from being the preeminent language of the Internet, Java is important for
+another reason: it has altered the course of computer language development. Many of
+the features first mainstreamed by Java are now finding their way into other languages.
+For example, the new C# language is strongly influenced by Java. Knowledge of Java
+opens the door to the latest innovations in programming. Put directly, Java is one of the
+world’s most important computer languages.
+xxv
+A Book for All Programmers
+To use this book does not require any previous programming experience. However,
+if you come from a C/C++ background, then you will be able to advance a bit more
+rapidly. As most readers will know, Java is similar, in form and spirit, to C/C++. Thus,
+knowledge of those langauges helps, but is not necessary. Even if you have never
+programmed before, you can learn to program in Java using this book.
+What’s Inside
+This book covers all aspects of the Java programming language. Part 1 presents an
+in-depth tutorial of the Java language. It begins with the basics, including such things
+as data types, control statements, and classes. Part 1 also discusses Java’s
+exception-handling mechanism, multithreading subsystem, packages, and interfaces.
+Part 2 examines the standard Java library. As you will learn, much of Java’s power
+is found in its library. Topics include strings, I/O, networking, the standard utilities,
+the Collections Framework, applets, GUI-based controls, and imaging.
+Part 3 looks at some issues relating to the Java development environment, including
+an overview of Java Beans, Servlets, and Swing.
+Part 4 presents a number of high-powered Java applets that serve as extended
+examples of the way Java can be applied. The final applet, called Scrabblet, is a complete,
+multiuser networked game. It shows how to handle some of the toughest issues involved
+in Web-based programming.
+What’s New in the Fifth Edition
+The differences between this and the previous editions of this book mostly involve those
+features added by Java 2, version 1.4. Of the many new features found in version 1.4,
+perhaps the most important are the assert keyword, the channel-based I/O subsystem,
+chained exceptions, and networking enhancements. This fifth edition has been fully
+updated to reflect those and other additions. New features are clearly noted in the text,
+as are features added by previous releases.
+This fifth edition also updates and restores the Sevlets chapter. Previously
+this chapter relied upon the now out-dated JSDK (Java Servlets Developers Kit)
+to develop and test servlets. It now uses Apache Tomcat, which is the currently
+recommended tool.
+Don’t Forget: Code on the Web
+Remember, the source code for all of the examples and projects in this book is available
+free-of-charge on the Web at www.osborne.com.
+xxvi J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Special Thanks
+Special thanks to Patrick Naughton. Patrick was one of the creators of the Java
+language. He also helped write the first edition of this book. For example, much of
+the material in chapters 17, 18, 23, 29, 30, 31, and 32 was initially provided by Patrick.
+His insights, expertise, and energy contributed greatly to the success of this book.
+Thanks also go to Joe O'Neil for providing the initial drafts for chapters 24, 25, 26,
+and 27. Joe has helped on several of my books and, as always, his efforts are appreciated.
+HERBERT SCHILDT
+May 25, 2002
+Mahomet, Illinois
+P r e f a c e xxvii
+For Further Study
+Java 2: The Complete Reference is your gateway to the Herb Schildt series of programming
+books. Here are some others that you will find of interest:
+To learn more about Java programming, we recommend the following:
+Java 2: A Beginner's Guide
+Java 2 Programmer's Reference
+To learn about C++, you will find these books especially helpful:
+C++: The Complete Reference
+C++: A Beginner's Guide
+Teach Yourself C++
+C++ From the Ground Up
+STL Programming From the Ground Up
+To learn about C#, we suggest the following Schildt books:
+C#: A Beginner's Guide
+C#: The Complete Reference
+If you want to learn more about the C language, the foundation of all modern
+programming, then the following titles will be of interest:
+C: The Complete Reference
+Teach Yourself C
+When you need solid answers, fast, turn to Herbert Schildt,
+the recognized authority on programming.
+xxviii J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Part I
+The Java Language

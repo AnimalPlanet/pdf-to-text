@@ -1,0 +1,315 @@
+Appendix A
+Using Java’s
+Documentation
+Comments
+1133
+As explained in Part I, Java supports three types of comments. The first two arethe // and the /* */. The third type is called a documentation comment. It beginswith the character sequence /**. It ends with */. Documentation comments allow
+you to embed information about your program into the program itself. You can then
+use the javadoc utility program to extract the information and put it into an HTML file.
+Documentation comments make it convenient to document your programs. You have
+almost certainly seen documentation generated with javadoc, because that is the way
+the Java API library was documented by Sun.
+The javadoc Tags
+The javadoc utility recognizes the following tags:
+Tag Meaning
+@author Identifies the author of a class.
+@deprecated Specifies that a class or member is deprecated.
+{@docRoot} Specifies the path to the root directory of the current
+documentation (added by Java 2, version 1.3).
+@exception Identifies an exception thrown by a method.
+{@inheritDoc} Inherits a comment from the immediate superclass. (Added by
+Java 2, version 1.4, but not currently implemented.)
+{@link} Inserts an in-line link to another topic.
+{@linkplain} Inserts an in-line link to another topic, but the link is displayed
+in a plain-text font. (Added by Java 2, version 1.4.)
+@param Documents a method’s parameter.
+@return Documents a method’s return value.
+@see Specifies a link to another topic.
+@serial Documents a default serializable field.
+@serialData Documents the data written by the writeObject( )
+or writeExternal( ) methods.
+@serialField Documents an ObjectStreamField component.
+@since States the release when a specific change was introduced.
+@throws Same as @exception.
+{@value} Displays the value of a constant, which must be a static field.
+(Added by Java 2, version 1.4.)
+@version Specifies the version of a class.
+1134 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+As you can see, all document tags begin with an at sign (@). You may also use
+other, standard HTML tags in a documentation comment. However, some tags, such as
+headings, should not be used, because they disrupt the look of the HTML file produced
+by javadoc.
+You can use documentation comments to document classes, interfaces, fields,
+constructors, and methods. In all cases, the documentation comment must immediately
+precede the item being documented. When you are documenting a variable, the
+documentation tags you can use are @see, @since, @serial, @serialField, {@value},
+and @deprecated. For classes, you can use @see, @author, @since, @deprecated, and
+@version. Methods can be documented with @see, @return, @param, @since,
+@deprecated, @throws, @serialData, {@inheritDoc}, and @exception. A {@link},
+{@docRoot}, or {@linkplain} tag can be used anywhere. Each tag is examined next.
+@author
+The @author tag documents the author of a class. It has the following syntax:
+@author description
+Here, description will usually be the name of the person who wrote the class. The
+@author tag can be used only in documentation for a class. You may need to specify
+the -author option when executing javadoc in order for the @author field to be
+included in the HTML documentation.
+@deprecated
+The @deprecated tag specifies that a class or a member is deprecated. It is recommended
+that you include @see or {@link} tags to inform the programmer about available
+alternatives. The syntax is the following:
+@deprecated description
+Here, description is the message that describes the deprecation. Information specified by
+the @deprecated tag is recognized by the compiler and is included in the .class file that
+is generated. Therefore, the programmer can be given this information when compiling
+Java source files. The @deprecated tag can be used in documentation for variables,
+methods, and classes.
+{@docRoot}
+{@docRoot} specifies the path to the root directory of the current documentation.
+@exception
+The @exception tag describes an exception to a method. It has the following syntax:
+@exception exception-name explanation
+A p p e n d i x A : U s i n g J a v a ’ s D o c u m e n t a t i o n C o m m e n t s 1135
+Here, the fully qualified name of the exception is specified by exception-name;
+explanation is a string that describes how the exception can occur. The @exception
+tag can only be used in documentation for a method.
+{@inheritDoc}
+Inherits a comment from the immediate surperclass. (Not currently implemented by
+Java 2, version 1.4)
+{@link}
+The {@link} tag provides an in-line link to additional information. It has the following
+syntax:
+{@link name text}
+Here, name is the name of a class or method to which a link is added, and text is the
+string that is displayed.
+{@linkplain}
+Inserts an in-line link to another topic. The link is displayed in plain-text font. Otherwise,
+it is similar to {@link}.
+@param
+The @param tag documents a parameter to a method. It has the following syntax:
+@param parameter-name explanation
+Here, parameter-name specifies the name of a parameter to a method. The meaning of
+that parameter is described by explanation. The @param tag can be used only in
+documentation for a method.
+@return
+The @return tag describes the return value of a method. It has the following syntax:
+@return explanation
+Here, explanation describes the type and meaning of the value returned by a method.
+The @return tag can be used only in documentation for a method.
+@see
+The @see tag provides a reference to additional information. Its most commonly used
+forms are shown here.
+1136 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+@see anchor
+@see pkg.class#member text
+In the first form, anchor is a link to an absolute or relative URL. In the second form,
+pkg.class#member specifies the name of the item, and text is the text displayed for that
+item. The text parameter is optional, and if not used, then the item specified by
+pkg.class#member is displayed. The member name, too, is optional. Thus, you can
+specify a reference to a package, class, or interface in addition to a reference to a
+specific method or field. The name can be fully qualified or partially qualified.
+However, the dot that precedes the member name (if it exists) must be replaced by
+a hash character.
+@serial
+The @serial tag defines the comment for a default serializable field. It has the
+following syntax:
+@serial description
+Here, description is the comment for that field.
+@serialData
+The @serialData tag documents the data written by the writeObject( ) and writeExternal( )
+methods. It has the following syntax:
+@serialData description
+Here, description is the comment for that data.
+@serialField
+The @serialField tag provides comments for an ObjectStreamField component. It has
+the following syntax:
+@serialField name type description
+Here, name is the name of the field, type is its type, and description is the comment for
+that field.
+@since
+The @since tag states that a class or member was introduced in a specific release. It has
+the following syntax:
+@since release
+A p p e n d i x A : U s i n g J a v a ’ s D o c u m e n t a t i o n C o m m e n t s 1137
+Here, release is a string that designates the release or version in which this feature
+became available. The @since tag can be used in documentation for variables, methods,
+and classes.
+@throws
+The @throws tag has the same meaning as the @exception tag.
+{@value}
+Displays the value of a constant, which must be a static field.
+@version
+The @version tag specifies the version of a class. It has the following syntax:
+@version info
+Here, info is a string that contains version information, typically a version number,
+such as 2.2. The @version tag can be used only in documentation for a class. You may
+need to specify the -version option when executing javadoc in order for the @version
+field to be included in the HTML documentation.
+The General Form of a Documentation
+Comment
+After the beginning /**, the first line or lines become the main description of your class,
+variable, or method. After that, you can include one or more of the various @ tags. Each
+@ tag must start at the beginning of a new line or follow an asterisk (*) that is at the
+start of a line. Multiple tags of the same type should be grouped together. For example,
+if you have three @see tags, put them one after the other.
+Here is an example of a documentation comment for a class:
+/**
+* This class draws a bar chart.
+* @author Herbert Schildt
+* @version 3.2
+*/
+What javadoc Outputs
+The javadoc program takes as input your Java program’s source file and outputs
+several HTML files that contain the program’s documentation. Information about each
+1138 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+class will be in its own HTML file. javadoc will also output an index and a hierarchy
+tree. Other HTML files can be generated. Since different implementations of javadoc
+may work differently, you will need to check the instructions that accompany your
+Java development system for details specific to your version.
+An Example that Uses Documentation
+Comments
+Following is a sample program that uses documentation comments. Notice the way
+each comment immediately precedes the item that it describes. After being processed
+by javadoc, the documentation about the SquareNum class will be found in
+SquareNum.html.
+import java.io.*;
+/**
+* This class demonstrates documentation comments.
+* @author Herbert Schildt
+* @version 1.2
+*/
+public class SquareNum {
+/**
+* This method returns the square of num.
+* This is a multiline description.  You can use
+* as many lines as you like.
+* @param num The value to be squared.
+* @return num squared.
+*/
+public double square(double num) {
+return num * num;
+}
+/**
+* This method inputs a number from the user.
+* @return The value input as a double.
+* @exception IOException On input error.
+* @see IOException
+*/
+public double getNumber() throws IOException {
+// create a BufferedReader using System.in
+InputStreamReader isr = new InputStreamReader(System.in);
+A p p e n d i x A : U s i n g J a v a ’ s D o c u m e n t a t i o n C o m m e n t s 1139
+BufferedReader inData = new BufferedReader(isr);
+String str;
+str = inData.readLine();
+return (new Double(str)).doubleValue();
+}
+/**
+* This method demonstrates square().
+* @param args Unused.
+* @return Nothing.
+* @exception IOException On input error.
+* @see IOException
+*/
+public static void main(String args[])
+throws IOException
+{
+SquareNum ob = new SquareNum();
+double val;
+System.out.println("Enter value to be squared: ");
+val = ob.getNumber();
+val = ob.square(val);
+System.out.println("Squared value is " + val);
+}
+}
+1140 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Index
+& (bitwise AND), 80, 82
+& (Boolean logical AND), 92, 94
+&& (short-circuit AND), 92
+* (multiplication), 31, 74
+* (regular expression quantifier),
+861
+* (used in import statement), 233
+@ tags (javadoc), 1134–1138
+| (bitwise OR), 80, 82
+| (Boolean logical OR), 92
+|| (short-circuit OR), 92
+[ ], 38, 861, 866
+^ (bitwise exclusive OR), 80, 82, 83
+^ (Boolean logical exclusive OR), 92
+:,  123
+, (comma), 38, 116–117
+{ }, 27, 28, 35, 38, 63, 254
+=, 31, 94–95
+= = (relational operator), 90, 91
+versus equals( ), 359
+= = (Boolean operator), 92
+!, 92
+!=, 90, 91, 92
+/, 74
+/* */, 27
+/** */, 38, 1134
+//, 27–28
+<, 91
+<<, 80, 84–86
+<=, 91
+–, 74
+– –, 35, 74, 78–80
+%, 74, 76
+( ), 38, 96–98
+. (dot operator), 132, 140, 177–178
+. (regular expression wildcard
+character), 861, 865
+. (separator), 38, 232, 233
++ (addition), 74
++ (concatenation operator), 31, 185,
+352–353, 372, 373
++ (regular expression quantifier),
+861, 864–865
+++, 34–35, 74, 78–80
+? (regular expression quantifier),
+861, 865–866
+?:, 92, 95–96
+>, 90
+>>, 80, 86–87
+>>>, 80, 87–89
+>=, 91
+; (semicolon), 29, 38, 110
+~, 80, 82
+A
+abs( ), 159
+abstract type modifier, 216, 220
+Abstract Window Toolkit (AWT),
+314, 329, 331, 628, 632, 688, 736
+and applet architecture,
+631–632
+classes, table of, 688–691
+components, extending,
+790–797
+creating stand-alone
+windows with, 702–704
+AbstractButton class, 927
+AbstractCollection class, 448
+AbstractList class, 448
+AbstractMap class, 466, 467
+AbstractSequentialList class, 448
+AbstractSet class, 449
+accept( ), 543, 545, 602
+Access control, 172–176
+example program, 229–232
+and packages, 224, 227–228
+Access specifiers, 28, 172, 227–228
+Accessibility API, 948
+acos( ), 420
+ActionEvent class, 657, 658–659,
+739, 752, 777
+ActionListener interface, 669, 670,
+739, 752, 777
+actionPerformed( ), 670, 739
+Adapter classes, 680–682
+add( ), 443, 445, 446, 447, 454, 455,
+692, 736–737, 748, 751, 767, 772,
+777
+addAll( ), 443, 445, 446
+1141

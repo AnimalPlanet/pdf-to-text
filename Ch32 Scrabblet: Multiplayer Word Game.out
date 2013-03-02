@@ -1,0 +1,4831 @@
+Chapter 32
+Scrabblet: A Multiplayer
+Word Game
+1069
+Scrabblet is a complete multiplayer, networked, client/server game. It is the mostcomplicated applet in this book, and it handles some of the thorniest issues in Javaprogramming. Scrabblet consists of more than 1,400 lines of code in 11 classes.
+Two of these classes are part of the server side of the applet. The other nine are
+downloaded to a web browser and act as the simulation of the game. All of the code
+elements used in the game have been described in detail in this book. In this chapter,
+we will dissect each class and show how easy it is to build a multiplayer game.
+Network Security Concerns
+Most applets on the Net today don’t do much with the network after they have
+been downloaded. One of the reasons is that networking has been made more difficult
+in Java out of security concerns. Most Java applet environments, such as Netscape
+Navigator and Microsoft Internet Explorer, severely restrict an applet’s use of the
+network. This situation is created by TCP/IP’s lack of authentication in its most basic
+protocols. This inherent limitation of the Internet is managed carefully by corporations
+that want to protect their proprietary data through the use of firewalls. A firewall is a
+computer that sits between a private network and the rest of the Internet. All Internet
+connections flow through it, and it is able to filter and reject connections and packets,
+both incoming and outgoing. This way, if a program on the outside of the firewall
+attempts to attach to an internal network port, the firewall can block it. If it weren’t for
+the firewall, system administrators would have to audit the security of each machine
+on their internal network. In the case of a firewall-protected network, only the firewall
+needs to be secure, and every machine inside is considered “friendly” and left
+unprotected from every other machine inside.
+This is where Java could have posed a security threat. If Java-enabled browsers
+allowed applets to connect to arbitrary Internet addresses, then an applet could act as
+a proxy to some malicious program on the outside of the firewall. Once an applet had
+been downloaded and automatically run by the web browser, it could then connect to
+the neighboring computers and servers. These computers would not expect anything
+hostile to come from an internal computer, so they would accept the connections. The
+applet would then be free to steal sensitive data and transmit it back through the
+firewall to the malicious Internet host.
+Because of this scenario, applets are only allowed to make network connections
+to exactly one host: the one they were loaded from. This restricts the applet from
+snooping around the internal network. One of the many well-publicized “Java security
+attacks” from researchers at Princeton University was a way of tricking a Java run-time
+system into allowing an applet to open network sockets on otherwise forbidden
+machines. Thankfully, this problem was very difficult to reproduce and has
+subsequently been addressed.
+What does security have to do with a multiplayer game? Plenty. The easiest way to
+program a multiplayer game would be to have the players communicate directly with
+1070 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+each other, in a “peer-to-peer” network. This way, playing the game would not rely on
+having any particular server software running. Unfortunately, the applet is only able to
+connect back to the server that it was loaded from. This means that two players have to
+communicate all of their messages to each other via the server.
+In this chapter, you will see the source code to a simple server, which manages a list
+of connected clients and passes messages between those clients. For the most part, this
+server knows nothing about the game being played. It just passes the messages blithely
+from point A to point B. This function is handled by two classes, Server and
+ClientConnection. They will be described at the end of this chapter.
+The Game
+Before users can play a multiplayer game, they must choose somebody to play against.
+Rather than forcing a phone call to arrange a game, this applet takes a different approach.
+When it is first run, it prompts the user to enter his or her name (see Figure 32-1). This
+name is passed to the server, which broadcasts the player’s name to all other potential
+competitors. The user then sees a list of all available players (see Figure 32-2), selects
+one, and clicks on the Challenge button. Currently, there is no way to confirm or deny
+a challenge; they are automatically accepted. Once a challenge is made, both players
+see the game board appear, and all other competitors simply see both players’ names
+disappear from the available list.
+It is quite an easy game to play, but it is very difficult to win against a skilled
+opponent. Players are presented with a 15×15 grid of squares and given a set of seven
+square tiles with letters of the alphabet engraved on them (see Figure 32-3). These tiles
+are selected at random from a bag of 100 tiles. The tiles can be clicked on with the
+mouse and dragged to a destination square on the grid. If the spot is already occupied,
+the tile is returned to its original position. Tiles may be adjusted on the board during a
+turn, but not when the turn is over.
+The first player starts by placing several tiles in a line on the board to form a word
+in the English language. The first word must cover the center square. Subsequent
+words must touch at least one tile already played on the board. The player clicks on the
+Done button to end the turn. If a player can’t find a valid word, the player can pass by
+clicking on Done twice in a row without having any tiles on the board. The two players
+take turns placing words until all of the tiles are used.
+The board shown in Figure 32-3 is for smaller displays, and thus the multiplier
+squares are marked with simple characters. 2L doubles the value of the letter on that
+square. 3L triples the letter’s value. 2W means the whole word gets double the points;
+3W means triple the word score. If you make the applet big enough, it will use more
+descriptive labels for these squares, as shown in Figure 32-4.
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1071
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+1072 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 32-1. The user must type in his or her name to begin
+Figure 32-2. The list of competitors
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1073
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Figure 32-3. Patrick and Herb are ready to play against each other
+Figure 32-4. Everything is clearer with a larger applet (650x700)
+Scoring
+Scores are assessed at the end of each turn. Each tile has a small number engraved on
+its face next to the letter. This score may be multiplied by two or three, depending on
+the value (color) of the square on which it was placed. The entire sum for a word may
+also be multiplied by two or three if any letter in the word covers the appropriate
+square. If a word comes in contact with any other tiles to form additional words, they
+are counted separately. If a player uses all seven tiles in a single turn, an additional 50
+points are awarded. At the end of the game, the player with the highest score wins.
+Figure 32-5 shows an example of a board after a few turns have been taken. Patrick
+started with SIRE, worth eight points. That came from the four one-point tiles and the
+double-word score on the center tile. Next, Herb played HIRE, using the I from SIRE.
+This was worth seven points, the sum of the four tiles involved. Notice that Herb got
+credit for reusing Patrick’s I but not the double-word score underneath it. At the point
+shown in Figure 32-5, Patrick has played GREAT and is about to click the Done button
+to complete his turn. Notice that the tiles in play are brighter than those that have
+already been played (see Figure 32-6).
+At any time during play, the players may converse by typing in the text entry area
+at the top of the applet (see Figure 32-7). These messages will appear one at a time in
+the other player’s browser’s status line, typically at the bottom of the browser (see
+Figure 32-8).
+1074 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 32-5. Scrabblet early in a game
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1075
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Figure 32-6. Herb is about to place the D to make HEATED
+Figure 32-7. Patrick is complaining about being stuck with the Q without the U
+One last word about game play before we get into the source code. The way to win
+at this game is to come up with words that score in one direction and also make words
+in the other direction. These secondary words tend to be short, two-letter words, but
+they add up. In Figure 32-9, Patrick places the Y in DEITY, which will score 21 points
+because he gets a face value of 9 doubled to 18, plus he gets to count the word AD,
+which runs vertically, for 3 points. Remember that all of the words played with each
+turn need to be real words. Eventually, this game will need either an undo for disputed
+words or an automatic dictionary checker to resolve conflicts.
+The Source Code
+Now that you know how to play the game, it is time to examine the source code for the
+game. Since several of the classes are quite long, we will sprinkle comments throughout
+the code rather than leaving the code till the end.
+The APPLET Tag
+The APPLET tag for this game is simple. Just name the main class and set the size.
+That’s it. There aren’t any <param> tags for Scrabblet. Remember, the bigger you
+1076 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 32-8. Herb replies. Notice Patrick’s last message at the bottom
+make the applet, the nicer the board looks. The aspect ratio should be a little taller than
+it is wide.
+<applet code=Scrabblet.class width=400 height=450>
+</applet>
+Scrabblet.java
+The main applet class is found in Scrabblet.java. At almost 300 lines, this is a fairly
+complicated applet class, even though most of the game logic is left to the Board class,
+found later in this chapter.
+We start with the usual collection of import statements, loading almost every
+standard Java package. Then we declare Scrabblet to be a subclass of Applet that
+implements ActionListener.
+import java.io.*;
+import java.net.*;
+import java.awt.*;
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1077
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Figure 32-9. Patrick scores in two directions!
+import java.awt.event.*;
+import java.applet.*;
+public class Scrabblet extends Applet implements ActionListener {
+Next comes the declaration of a large collection of instance variables. The server
+is our connection to the web server running our game server. This machine’s name
+is stored in serverName. The bag represents the shared bag of letters for our game.
+Our opponent has his or her own copy of the bag, which is initialized with the same
+random sequence of tiles so the two bags stay in synch. The board is our copy of the
+playing board. Our opponent also has a copy of the board, and the game keeps them
+in synch after each turn.
+If the network server can’t be accessed, the single flag is set, and the applet plays
+the game in single-player mode. The boolean ourturn is true whenever it is our turn to
+play. If a player can’t find a valid word, the player can pass by clicking on Done twice
+in a row without having any tiles on the board. The seen_pass variable is used to mark
+if the first Done has been clicked on.
+To manage the synchronization of the remote player’s board, we keep a copy of the
+tiles selected in theirs. Seeing what the other person has in his or her tray is cheating,
+so no hacking this applet to display the contents of theirs! The two strings, name and
+others_name, hold our name and our opponent’s name, respectively.
+private ServerConnection server;
+private String serverName;
+private Bag bag;
+private Board board;
+private boolean single = false;
+private boolean ourturn;
+private boolean seen_pass = false;
+private Letter theirs[] = new Letter[7];
+private String name;
+private String others_name;
+Next, we declare eight variables used to manage the user interface. These are all
+AWT components that must be manipulated by the applet in some way. topPanel
+holds the prompt and the namefield for getting the user’s name at start-up. The done
+button is used to signify that you are done with your turn. The chat TextField is used
+to enter chat messages. idList is used to display available opponents. The challenge
+button is used to attach us to our opponent. The ican Canvas holds the name and
+copyright notice at start-up.
+1078 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+private Panel topPanel;
+private Label prompt;
+private TextField namefield;
+private Button done;
+private TextField chat;
+private List idList;
+private Button challenge;
+private Canvas ican;
+init( )
+The init( ) method is called once and simply sets up the BorderLayout, figures out
+what Internet host the applet came from, and creates the splash screen canvas.
+public void init() {
+setLayout(new BorderLayout());
+serverName = getCodeBase().getHost();
+if (serverName.equals(""))
+serverName = "localhost";
+ican = new IntroCanvas();
+}
+start( )
+The start( ) method is called whenever the browser redisplays the page in which the
+applet is found. The large try block at the beginning is used to catch the case where the
+network connection fails. If we succeed in making a new ServerConnection and we’ve
+never run start( ) before, we then set up the screen to prompt for the user’s name.
+While we are there, we put the splash screen, ican, in the center of the window. In the
+case where name is not null, that means the user left the page and has now returned.
+We presume we’ve already got the user’s name and jump right to nameEntered( ),
+the method that is called when the user types return in the name entry field. The
+validate( ) at the end makes sure all of the AWT components are updated properly.
+If an exception was thrown, we presume that the net connection failed and go into
+single-player mode. The call to start_game( ) gets things rolling.
+public void start() {
+try {
+showStatus("Connecting to " + serverName);
+server = new ServerConnection(this, serverName);
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1079
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+server.start();
+showStatus("Connected: " + serverName);
+if (name == null) {
+prompt = new Label("Enter your name here:");
+namefield = new TextField(20);
+namefield.addActionListener(this);
+topPanel = new Panel();
+topPanel.setBackground(new Color(255, 255, 200));
+topPanel.add(prompt);
+topPanel.add(namefield);
+add("North", topPanel);
+add("Center", ican);
+} else {
+if (chat != null) {
+remove(chat);
+remove(board);
+remove(done);
+}
+nameEntered(name);
+}
+validate();
+} catch (Exception e) {
+single = true;
+start_Game((int)(0x7fffffff * Math.random()));
+}
+}
+stop( )
+The stop( ) method is called whenever the user leaves the page with the applet. Here,
+we just tell the server that we’ve left. We re-create the network connection in start( ) if
+the user returns to the page later.
+public void stop() {
+if (!single)
+server.quit();
+}
+1080 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+add( )
+The add( ) method is called by the ServerConnection whenever a new player enters
+the game. We add the player’s name to our List object. Pay special attention to the
+formatting of the string in add( ). We use that later to extract certain IDs from the list.
+void add(String id, String hostname, String name) {
+delete(id); // in case it is already there.
+idList.add("(" + id + ")  " + name + "@" + hostname);
+showStatus("Choose a player from the list");
+}
+delete( )
+The delete( ) method is called when a player no longer wants to be identified as
+available for play. This happens when a player quits or decides to play with someone
+else. Here, we hunt down the id string in our list by extracting the values inside
+parentheses. If there are no more names on the list (and we aren’t playing the game
+already: bag == null), then we display a special message telling the user to hang out
+until someone comes to make a challenge.
+void delete(String id) {
+for (int i = 0; i < idList.getItemCount(); i++) {
+String s = idList.getItem(i);
+s = s.substring(s.indexOf("(") + 1, s.indexOf(")"));
+if (s.equals(id)) {
+idList.remove(i);
+break;
+}
+}
+if (idList.getItemCount() == 0 && bag == null)
+showStatus("Wait for other players to arrive.");
+}
+getName( )
+The getName( ) method is very similar to delete( ), except it simply extracts the name
+part of the item and returns it. If the id is not found, then null is returned.
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1081
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+private String getName(String id) {
+for (int i = 0; i < idList.getItemCount(); i++) {
+String s = idList.getItem(i);
+String id1 = s.substring(s.indexOf("(") + 1, s.indexOf(")"));
+if (id1.equals(id)) {
+return s.substring(s.indexOf(" ") + 3, s.indexOf("@"));
+}
+}
+return null;
+}
+challenge( )
+The challenge( ) method is called by the ServerConnection whenever another player
+challenges us to a game. We could have made this method more complicated, so that it
+would prompt the user to accept or refuse the challenge, but instead the challenge is
+automatically accepted. Notice that the random seed we use to start the game is passed
+back to the other player in the accept( ) method. This is used by both sides to initialize
+the random state of the tile bag to ensure a synchronous game. We call server.delete( )
+to ensure that we are no longer solicited by other players wanting to play against us.
+Notice also that we cede the starting turn to the challenger by setting ourturn to false.
+// we've been challenged to a game by "id".
+void challenge(String id) {
+ourturn = false;
+int seed = (int)(0x7fffffff * Math.random());
+others_name = getName(id);   // who was it?
+showStatus("challenged by " + others_name);
+// put some confirmation here...
+server.accept(id, seed);
+server.delete();
+start_Game(seed);
+}
+accept( )
+accept( ) is the method called on the remote side in response to the server.accept( )
+call just mentioned. Just as the other player deleted himself or herself from the list of
+1082 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+available players, so must we call server.delete( ). We take the first turn by setting
+ourturn to true.
+// our challenge was accepted.
+void accept(String id, int seed) {
+ourturn = true;
+others_name = getName(id);
+server.delete();
+start_Game(seed);
+}
+chat( )
+The chat( ) method is called by the server whenever the opponent types in his or her
+chat window. In this implementation, the method simply shows the chat message in
+the browser’s status message. In the future, it might be nice to log these into a
+TextArea.
+void chat(String id, String s) {
+showStatus(others_name + ": " + s);
+}
+move( )
+The move( ) method is called once for each tile your opponent plays. It looks through
+the letters saved in theirs to find the one used. If the square is already occupied, the tile
+is returned to the player’s tray. Otherwise, the opponent’s letter is moved onto the
+board permanently. Next, the tile is replaced in theirs by bag.takeOut( ). If the bag is
+empty, a status message appears. The board is repainted to show the new tiles on it.
+Note that no scoring is done based on the placement of these tiles. The applet waits
+until turn( ) is called to give the score.
+// the other guy moved, and placed 'letter' at (x, y).
+void move(String letter, int x, int y) {
+for (int i = 0; i < 7; i++) {
+if (theirs[i] != null && theirs[i].getSymbol().equals(letter)) {
+Letter already = board.getLetter(x, y);
+if (already != null) {
+board.moveLetter(already, 15, 15); // on the tray.
+}
+board.moveLetter(theirs[i], x, y);
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1083
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+board.commitLetter(theirs[i]);
+theirs[i] = bag.takeOut();
+if (theirs[i] == null)
+showStatus("No more letters");
+break;
+}
+}
+board.repaint();
+}
+turn( )
+The turn( ) method is called after all of the opponent’s tiles are moved. The remote
+instance of Scrabblet computes the score and sends it to us, so our copy doesn’t have
+to redo it. Then the score is reported in the status line, and the setEnabled method
+allows us to take a turn. othersTurn( ) tells the board about the score. The board will
+reflect the new score at this point.
+void turn(int score, String words) {
+showStatus(others_name + " played: " + words + " worth " +
+score);
+done.setEnabled(true);
+board.othersTurn(score);
+}
+quit( )
+When the other side quits cleanly, quit( ) is called. It removes the AWT components of
+the game and jumps right back into nameEntered( ), described next, to get connected
+back into the player list.
+void quit(String id) {
+showStatus(others_name + " just quit.");
+remove(chat);
+remove(board);
+remove(done);
+nameEntered(name);
+}
+1084 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+nameEntered( )
+The nameEntered( ) method is called from actionPerformed( ) whenever ENTER is
+pressed in the original prompt for the user’s name. Any AWT components that might
+be in the way are removed, and then a new List object, idList, is created to store the
+names of the other players. The method also adds a button at the top named challenge,
+then notifies the server that we are here by calling setName( ).
+private void nameEntered(String s) {
+if (s.equals(""))
+return;
+name = s;
+if (ican != null)
+remove(ican);
+if (idList != null)
+remove(idList);
+if (challenge != null)
+remove(challenge);
+idList = new List(10, false);
+add("Center", idList);
+challenge = new Button("Challenge");
+challenge.addActionListener(this);
+add("North", challenge);
+validate();
+server.setName(name);
+showStatus("Wait for other players to arrive.");
+if (topPanel != null)
+remove(topPanel);
+}
+wepick( ) and theypick( )
+The methods wepick( ) and theypick( ) are simply used to start off the game by
+picking the seven tiles for each player. It is important that the caller do these in the
+right order on each side of the challenge, depending on who goes first. The call to
+bag.takeOut( ) gets a single letter permanently out of the shared bag. The call to
+board.addLetter( ) places the tile on our tray. For the other side, theypick( ) simply
+saves the letters in theirs.
+private void wepick() {
+for (int i = 0; i < 7; i++) {
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1085
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Letter l = bag.takeOut();
+board.addLetter(l);
+}
+}
+private void theypick() {
+for (int i = 0; i < 7; i++) {
+Letter l = bag.takeOut();
+theirs[i] = l;
+}
+}
+start_Game( )
+In single-player mode, start_Game( ) pops up the splash screen in a Frame window.
+It then creates a playing board, passing in no parameters to the constructor, which
+indicates single-player mode.
+In head-to-head mode, we remove the selection list components and add the chat
+window to the applet. We then add the board and Done button to the applet. Next, we
+create the bag, and if it is ourturn, wepick( ) is first, then theypick( ). In the case where
+we don’t have the first turn, we disable the board and the Done button, and theypick( )
+is first. We then force the board to repaint, which initializes it.
+private void start_Game(int seed) {
+if (single) {
+Frame popup = new Frame("Scrabblet");
+popup.setSize(400, 300);
+popup.add("Center", ican);
+popup.setResizable(false);
+popup.show();
+board = new Board();
+showStatus("no server found, playing solo");
+ourturn = true;
+} else {
+remove(idList);
+remove(challenge);
+board = new Board(name, others_name);
+chat = new TextField();
+chat.addActionListener(this);
+add("North", chat);
+1086 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+showStatus("playing against " + others_name);
+}
+add("Center", board);
+done = new Button("Done");
+done.addActionListener(this);
+add("South", done);
+validate();
+bag = new Bag(seed);
+if (ourturn) {
+wepick();
+if (!single)
+theypick();
+} else {
+done.setEnabled(false);
+theypick();
+wepick();
+}
+board.repaint();
+}
+challenge_them( )
+The challenge_them( ) method is called when the challenge button is clicked. It simply
+takes the player you had selected in the idList and sends him or her a challenge( )
+message. It removes the list and button to be ready for the game to start.
+private void challenge_them() {
+String s = idList.getSelectedItem();
+if (s == null) {
+showStatus("Choose a player from the list then press Challenge");
+} else {
+remove(challenge);
+remove(idList);
+String destid = s.substring(s.indexOf('(')+1,
+s.indexOf(')'));
+showStatus("challenging: " + destid);
+server.challenge(destid);  // accept will get called if
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1087
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+// they accept.
+validate();
+}
+}
+our_turn( )
+When the Done button is clicked, our_turn( ) is called. First, it checks to see if we’ve
+placed tiles in valid locations by calling board.findwords( ) and storing the result in
+word. If word is null, then something is amiss with the tiles, and the method shows
+that in the status line. If word is ““, then it knows that there were no tiles in play at the
+time. In single-player mode, this is ignored. In competition mode, if we click Done
+twice in a row without any tiles in play, we will pass our turn to our opponent.
+If you have played tiles and they are in legal positions, you have finished your turn,
+so ourturn( ) commits the letters to the board. Notice that commit( ) takes the server as
+a parameter. It will use this to tell the remote side about the position of each new letter.
+Then the method replaces the letters you used. In multiplayer mode, we disable
+ourselves and call server.turn( ) to tell the other player it is his or her turn.
+private void our_turn() {
+String word = board.findwords();
+if (word == null) {
+showStatus("Illegal letter positions");
+} else {
+if ("".equals(word)) {
+if (single)
+return;
+if (seen_pass) {
+done.setEnabled(false);
+server.turn("pass", 0);
+showStatus("You passed");
+seen_pass = false;
+} else {
+showStatus("Press done again to pass");
+seen_pass = true;
+return;
+}
+} else {
+seen_pass = false;
+}
+showStatus(word);
+1088 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+board.commit(server);
+for (int i = 0; i < 7; i++) {
+if (board.getTray(i) == null) {
+Letter l = bag.takeOut();
+if (l == null)
+showStatus("No more letters");
+else
+board.addLetter(l);
+}
+}
+if (!single) {
+done.setEnabled(false);
+server.turn(word, board.getTurnScore());
+}
+board.repaint();
+}
+}
+actionPerformed( )
+The actionPerformed( ) method is used to grab input from the various components the
+applet uses. It handles the Challenge and Done buttons, as well as the name entry field
+and the chat entry field.
+public void actionPerformed(ActionEvent ae) {
+Object source = ae.getSource();
+if(source == chat) {
+server.chat(chat.getText());
+chat.setText("");
+}
+else if(source == challenge) {
+challenge_them();
+}
+else if(source == done) {
+our_turn();
+}
+else if(source == namefield) {
+TextComponent tc = (TextComponent)source;
+nameEntered(tc.getText());
+}
+}
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1089
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+IntroCanvas.java
+The IntroCanvas subclass of Canvas is very simple. It just overrides paint( ) to draw
+the name of the applet and a brief copyright notice. It creates some custom colors and
+fonts. The display strings are held in static variables simply for clarity.
+import java.awt.*;
+import java.awt.event.*;
+class IntroCanvas extends Canvas {
+private Color pink = new Color(255, 200, 200);
+private Color blue = new Color(150, 200, 255);
+private Color yellow = new Color(250, 220, 100);
+private int w, h;
+private int edge = 16;
+private static final String title = "Scrabblet";
+private static final String name =
+"Copyright 1999 - Patrick Naughton";
+private static final String book =
+"Chapter 32 from 'Java: The Complete Reference'";
+private Font namefont, titlefont, bookfont;
+IntroCanvas() {
+setBackground(yellow);
+titlefont = new Font("SansSerif", Font.BOLD, 58);
+namefont = new Font("SansSerif", Font.BOLD, 18);
+bookfont = new Font("SansSerif", Font.PLAIN, 12);
+addMouseListener(new MyMouseAdapter());
+}
+d( )
+The private method d( ) is a convenience method that paints centered text with an
+optional isometric offset. This is used to give the main title a highlight/shadow effect
+by drawing a white string up and to the left by 1, a black string down and to the right
+by 1, and then drawing the string one last time in pink, not offset at all.
+private void d(Graphics g, String s, Color c, Font f, int y,
+int off) {
+g.setFont(f);
+FontMetrics fm = g.getFontMetrics();
+g.setColor(c);
+1090 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+g.drawString(s, (w - fm.stringWidth(s)) / 2 + off, y + off);
+}
+public void paint(Graphics g) {
+Dimension d = getSize();
+w = d.width;
+h = d.height;
+g.setColor(blue);
+g.fill3DRect(edge, edge, w - 2 * edge, h - 2 * edge, true);
+d(g, title, Color.black, titlefont, h / 2, 1);
+d(g, title, Color.white, titlefont, h / 2, -1);
+d(g, title, pink, titlefont, h / 2, 0);
+d(g, name, Color.black, namefont, h * 3 / 4, 0);
+d(g, book, Color.black, bookfont, h * 7 / 8, 0);
+}
+mousePressed( )
+In the following code fragment, notice that MyMouseAdapter is an inner class that
+extends MouseAdapter. It overrides the mousePressed( ) method to cause this canvas’
+parent to hide( ) if it is clicked on. This is only useful in single-player mode to dismiss
+the pop-up frame.
+class MyMouseAdapter extends MouseAdapter {
+public void mousePressed(MouseEvent me) {
+((Frame)getParent()).setVisible(false);
+}
+}
+}
+Board.java
+The Board class encapsulates most of the game logic as well as the look and feel of the
+board. It is the biggest class in the game, weighing in at over 500 lines of code. There
+are several private variables that store the game state. The 15×15 array of Letters
+named board is used to store the tiles on each square of the board. The tray array holds
+the Letters that are currently on our tray. Remember that the Scrabblet applet class
+holds the seven Letters from our opponent. The Point objects orig and here are used to
+remember letter positions. The name and others_name variables are used simply to
+display names for the scoreboard. In single-player mode, both will be null. The two
+players’ scores are stored in total_score and others_score, while our last turn’s result is
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1091
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+stored in turn_score. The two constructors set up the names of the players, or leave
+them blank in single-player mode.
+import java.awt.*;
+import java.awt.event.*;
+class Board extends Canvas {
+private Letter board[][] = new Letter[15][15];
+private Letter tray[] = new Letter[7];
+private Point orig = new Point(0,0);
+private Point here = new Point(0,0);
+private String name;
+private int total_score = 0;
+private int turn_score = 0;
+private int others_score = 0;
+private String others_name = null;
+Board(String our_name, String other_name) {
+name = our_name;
+others_name = other_name;
+addMouseListener(new MyMouseAdapter());
+addMouseMotionListener(new MyMouseMotionAdapter());
+}
+Board() {
+addMouseListener(new MyMouseAdapter());
+addMouseMotionListener(new MyMouseMotionAdapter());
+}
+othersTurn( ), getTurnScore( ), and getTray( )
+These three methods are used to control the access to several private variables.
+First, othersTurn( ) is called by the applet when the other player finishes a turn. It
+increments the player’s score and repaints that area of the board to reflect the change.
+The getTurnScore( ) method simply returns the saved last turn’s score, after making
+sure the scoreboard is painted with the correct value. The applet uses this method to
+pass the score to our opponent, where it will eventually call othersTurn( ) on the
+remote machine. The getTray( ) method simply provides a read-only access to the
+private tray array.
+1092 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+void othersTurn(int score) {
+others_score += score;
+paintScore();
+repaint();
+}
+int getTurnScore() {
+paintScore();
+return turn_score;
+}
+Letter getTray(int i) {
+return tray[i];
+}
+addLetter( )
+The addLetter( ) method is used to place a letter on the tray. The letter is placed in the
+first slot that is empty. If the method can’t find an empty slot, it returns false.
+synchronized boolean addLetter(Letter l) {
+for (int i = 0; i < 7; i++) {
+if (tray[i] == null) {
+tray[i] = l;
+moveLetter(l, i, 15);
+return true;
+}
+}
+return false;
+}
+existingLetterAt( )
+The private method existingLetterAt( ) is used to check a board position to see if it has
+a letter in it that is not currently in play. This is used by findwords( ) next to make sure
+that at least one letter in a turn is touching an already existing letter.
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1093
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+private boolean existingLetterAt(int x, int y) {
+Letter l = null;
+return (x >= 0 && x <= 14 && y >= 0 && y <= 14
+&& (l = board[y][x]) != null && l.recall() == null);
+}
+findwords( )
+findwords( ) is a very large method used to examine the state of the board for a legal
+turn. If the rules for letter placement are broken, then null is returned. If no tiles were
+in play, then ““ is returned. If all of the tiles played in this turn are legal, then the list of
+words they formed is returned as a string containing the space-separated words. The
+instance variables turn_score and total_score are updated to reflect the value of the
+words that were just played.
+First findwords( ) counts the tiles at play, ntiles, storing them in a separate array
+called atplay. Next, it looks at the first two tiles (if more than one was played) to
+determine if they are vertically or horizontally oriented. Then it inspects all of the other
+tiles at play, to make sure they are along the same line. If any of the tiles is out of that
+row or column, the method returns null.
+synchronized String findwords() {
+String res = "";
+turn_score = 0;
+int ntiles = 0;
+Letter atplay[] = new Letter[7];
+for (int i = 0; i < 7; i++) {
+if (tray[i] != null && tray[i].recall() != null) {
+atplay[ntiles++] = tray[i];
+}
+}
+if (ntiles == 0)
+return res;
+boolean horizontal = true; // if there's one tile,
+// call it horizontal
+boolean vertical = false;
+if (ntiles > 1) {
+int x = atplay[0].x;
+int y = atplay[0].y;
+horizontal = atplay[1].y == y;
+1094 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+vertical = atplay[1].x == x;
+if (!horizontal && !vertical) // diagonal...
+return null;
+for (int i = 2; i < ntiles; i++) {
+if (horizontal && atplay[i].y != y
+|| vertical && atplay[i].x != x)
+return null;
+}
+}
+Next, it looks at each tile to be sure that at least one of them is touching an existing
+tile on one of its four sides. A special case is made for the beginning of the game: if the
+center tile is covered and more than one tile is played, it is legal.
+// make sure that at least one played tile is
+// touching at least one existing tile.
+boolean attached = false;
+for (int i = 0; i < ntiles; i++) {
+Point p = atplay[i].recall();
+int x = p.x;
+int y = p.y;
+if ((x == 7 && y == 7 && ntiles > 1) ||
+existingLetterAt(x-1, y) || existingLetterAt(x+1, y) ||
+existingLetterAt(x, y-1) || existingLetterAt(x, y+1)) {
+attached = true;
+break;
+}
+}
+if (!attached) {
+return null;
+}
+This next loop iterates over every letter in the main word, (i == –1), then comes
+back again for each letter (i == 0..ntiles), which might also create a word orthogonal to
+the main direction, which is managed via horizontal.
+// we use -1 to mean check the major direction first
+// then 0..ntiles checks for words orthogonal to it.
+for (int i = -1; i < ntiles; i++) {
+Point p = atplay[i==-1?0:i].recall(); // where is it?
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1095
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+int x = p.x;
+int y = p.y;
+int xinc, yinc;
+if (horizontal) {
+xinc = 1;
+yinc = 0;
+} else {
+xinc = 0;
+yinc = 1;
+}
+int mult = 1;
+String word = "";
+int word_score = 0;
+The method then picks each tile and moves left or up from it to find the first tile
+in each word. Once at the beginning of the word, it moves right or down from it,
+inspecting every letter. It counts the letters in letters_seen. For each letter, it determines
+the point contribution based on the bonus multiplier beneath it. If the square is played
+for the first time, the multiplier value is applied; otherwise the tile is counted at face
+value. This score is accumulated in word_score.
+// here we back up to the top/left-most letter
+while (x >= xinc && y >= yinc &&
+board[y-yinc][x-xinc] != null) {
+x -= xinc;
+y -= yinc;
+}
+int n = 0;
+int letters_seen = 0; // letters we've just played.
+Letter l;
+while (x < 15 && y < 15 && (l = board[y][x]) != null) {
+word += l.getSymbol();
+int lscore = l.getPoints();
+if (l.recall() != null) {  // one we just played...
+Color t = tiles[y < 8 ? y : 14 - y][x < 8 ? x : 14 - x];
+if (t == w3)
+mult *= 3;
+else if (t == w2)
+1096 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+mult *= 2;
+else if (t == l3)
+lscore *= 3;
+else if (t == l2)
+lscore *= 2;
+if (i == -1) {
+letters_seen++;
+}
+}
+word_score += lscore;
+n++;
+x += xinc;
+y += yinc;
+}
+word_score *= mult;
+One last error check is done on the main word only. Since the loop ends whenever
+it hits a blank square or the edge of the board, it should cover all of the freshly played
+tiles, as well as some previously played ones. If it sees fewer tiles, then there must have
+been a gap in them, which is an illegal position, so it returns null. If that test is passed,
+it checks to see if all seven tiles were played, awarding a 50-point bonus if they were.
+After inspecting the main word, findwords( ) inverts the sense of horizontal and looks
+for orthogonal words on the subsequent passes.
+if (i == -1) {     // first pass...
+// if we didn't see all the letters, then there was a gap,
+// which is an illegal tile position.
+if (letters_seen != ntiles) {
+return null;
+}
+if (ntiles == 7) {
+turn_score += 50;
+}
+// after the first pass, switch to looking the other way.
+horizontal = !horizontal;
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1097
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+As findwords( ) walks across the word, it needs to make sure that it only scores
+letters that form at least two-letter words. In this case, it adds the word_score to the
+turn_score and appends this word to the result string. Once all of the letters have been
+inspected, it totals the score and returns.
+if (n < 2)  // don't count single letters twice.
+continue;
+turn_score += word_score;
+res += word + " ";
+}
+total_score += turn_score;
+return res;
+}
+commit( ) and commitLetter( )
+The commit( ) and commitLetter( ) methods commit the letters that were tentatively
+placed on the board. These letters are removed from the tray and painted in a darker
+color on the board. As each letter is committed, commit( ) notifies the server of the
+position of each letter by calling move( ) so that the opponent’s board can be updated.
+synchronized void commit(ServerConnection s) {
+for (int i = 0 ; i < 7 ; i++) {
+Point p;
+if (tray[i] != null && (p = tray[i].recall()) != null) {
+if (s != null)  // there's a server connection
+s.move(tray[i].getSymbol(), p.x, p.y);
+commitLetter(tray[i]);  // marks this as not in play.
+tray[i] = null;
+}
+}
+}
+void commitLetter(Letter l) {
+if (l != null && l.recall() != null) {
+l.paint(offGraphics, Letter.DIM);
+l.remember(null);   // marks this as not in play.
+}
+}
+1098 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+update( ) and paint( )
+Many private variables are declared here to provide easy access to the dimensions of
+the board. This code also declares two offscreen buffers, one to be used as the image of
+the board and all of the permanently set tiles and another to use as a double buffer for
+the display. The update( ) method simply calls paint( ) to avoid flicker. The paint( )
+method makes a quick call to checksize( ) to make sure all of the buffers have been
+created, then checks to see if we are dragging a letter around by means of pick != null.
+If so, then paint( ) makes a copy of the offscreen graphics context and clips it to the
+bounds of the letter it is painting, x0, y0, w0, h0. Next, it clips the onscreen graphics
+context to the same rectangle. This will minimize the number of pixels it will have to
+move for each move of the mouse.
+To paint, we copy the background image, offscreen, then call paint on each
+letter in the tray with the setting of NORMAL. We paint the letter we are dragging
+around in the BRIGHT mode. Finally, we copy the double buffer image,
+offscreen2, to the screen.
+private Letter pick;  // the letter being dragged around.
+private int dx, dy;   // offset to topleft corner of pick.
+private int lw, lh;   // letter width and height.
+private int tm, lm;   // top and left margin.
+private int lt;       // line thickness (between tiles).
+private int aw, ah;   // letter area size.
+private Dimension offscreensize;
+private Image offscreen;
+private Graphics offGraphics;
+private Image offscreen2;
+private Graphics offGraphics2;
+public void update(Graphics g) {
+paint(g);
+}
+public synchronized void paint(Graphics g) {
+Dimension d = checksize();
+Graphics gc = offGraphics2;
+if (pick != null) {
+gc = gc.create();
+gc.clipRect(x0, y0, w0, h0);
+g.clipRect(x0, y0, w0, h0);
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1099
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+gc.drawImage(offscreen, 0, 0, null);
+for (int i = 0 ; i < 7 ; i++) {
+Letter l = tray[i];
+if (l != null && l != pick)
+l.paint(gc, Letter.NORMAL);
+}
+if (pick != null)
+pick.paint(gc, Letter.BRIGHT);
+g.drawImage(offscreen2, 0, 0, null);
+}
+LetterHit( )
+LetterHit( ) returns the letter that is under the point x,y and returns null if no letter
+is there.
+Letter LetterHit(int x, int y) {
+for (int i = 0; i < 7; i++) {
+if (tray[i] != null && tray[i].hit(x, y)) {
+return tray[i];
+}
+}
+return null;
+}
+unplay( )
+This simple method removes a letter from play that was placed on the board but was
+not yet committed.
+private void unplay(Letter let) {
+Point p = let.recall();
+if (p != null) {
+board[p.y][p.x] = null;
+let.remember(null);
+}
+}
+1100 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+moveToTray( )
+The moveToTray( ) method is just a simple convenience to compute the screen position
+of a letter in a given tray slot.
+private void moveToTray(Letter l, int i) {
+int x = lm + (lw + lt) * i;
+int y = tm + ah - 2 * lt;
+l.move(x, y);
+}
+dropOnTray( )
+The dropOnTray( ) method is used whenever we drop a letter over the tray area or off
+the board anywhere. This allows us to shuffle the contents of the tray as well as simply
+return tiles from the board.
+private void dropOnTray(Letter l, int x) {
+unplay(l); // unhook where we were.
+// find out what slot this letter WAS in.
+int oldx = 0;
+for (int i = 0 ; i < 7 ; i++) {
+if (tray[i] == l) {
+oldx = i;
+break;
+}
+}
+// if the slot we dropped on was empty,
+// find the rightmost occupied slot.
+if (tray[x] == null) {
+for (int i = 6 ; i >= 0 ; i--) {
+if (tray[i] != null) {
+x = i;
+break;
+}
+}
+}
+// if the slot we dropped on was from a tile already
+// played on the board, just swap slots with it.
+if (tray[x].recall() != null) {
+tray[oldx] = tray[x];
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1101
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+} else {
+// we are just rearranging a tile already on the tray.
+if (oldx < x) {   // shuffle left.
+for (int i = oldx ; i < x ; i++) {
+tray[i] = tray[i+1];
+if (tray[i].recall() == null)
+moveToTray(tray[i], i);
+}
+} else {          // shuffle right.
+for (int i = oldx ; i > x ; i--) {
+tray[i] = tray[i-1];
+if (tray[i].recall() == null)
+moveToTray(tray[i], i);
+}
+}
+}
+tray[x] = l;
+moveToTray(l, x);
+}
+getLetter( )
+getLetter( ) is a simple read-only wrapper on the board array.
+Letter getLetter(int x, int y) {
+return board[y][x];
+}
+moveLetter( )
+The moveLetter( ) method handles the cases where we want to move tiles to board
+positions or set them on the tray. If the x,y position is out of range for the board, then
+the tray is used. When a letter is moved to the board, it must be a blank slot, otherwise
+the letter is sent back to the value stored in orig.
+void moveLetter(Letter l, int x, int y) {
+if (y > 14 || x > 14 || y < 0 || x < 0) {
+// if we are off the board.
+if (x > 6)
+x = 6;
+if (x < 0)
+1102 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+x = 0;
+dropOnTray(l, x);
+} else {
+if (board[y][x] != null) {
+x = orig.x;
+y = orig.y;
+} else {
+here.x = x;
+here.y = y;
+unplay(l);
+board[y][x] = l;
+l.remember(here);
+// turn it back into pixels
+x = lm + (lw + lt) * x;
+y = tm + (lh + lt) * y;
+}
+l.move(x, y);
+}
+}
+checksize( )
+This method has a misleading name. checksize( ) does a lot more than verify the size of
+the applet, but it is convenient to do this kind of initialization once, when we confirm
+the size of the applet. This method contains the drawing code for the main board
+pattern. It paints all of the squares, including the colors and the bonus score text.
+private Color bg = new Color(175, 185, 175);
+private Color w3 = new Color(255, 50, 100);
+private Color w2 = new Color(255, 200, 200);
+private Color l3 = new Color(75, 75, 255);
+private Color l2 = new Color(150, 200, 255);
+private Color tiles[][] = {
+{w3, bg, bg, l2, bg, bg, bg, w3},
+{bg, w2, bg, bg, bg, l3, bg, bg},
+{bg, bg, w2, bg, bg, bg, l2, bg},
+{l2, bg, bg, w2, bg, bg, bg, l2},
+{bg, bg, bg, bg, w2, bg, bg, bg},
+{bg, l3, bg, bg, bg, l3, bg, bg},
+{bg, bg, l2, bg, bg, bg, l2, bg},
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1103
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+{w3, bg, bg, l2, bg, bg, bg, w2}
+};
+private Dimension checksize() {
+Dimension d = getSize();
+int w = d.width;
+int h = d.height;
+if (w < 1 || h < 1)
+return d;
+if ((offscreen == null) ||
+(w != offscreensize.width) ||
+(h != offscreensize.height)) {
+System.out.println("updating board: " + w + " x " + h + "\r");
+offscreen = createImage(w, h);
+offscreensize = d;
+offGraphics = offscreen.getGraphics();
+offscreen2 = createImage(w, h);
+offGraphics2 = offscreen2.getGraphics();
+offGraphics.setColor(Color.white);
+offGraphics.fillRect(0,0,w,h);
+// lt is the thickness of the white lines between tiles.
+// gaps is the sum of all the whitespace.
+// lw, lh are the dimensions of the tiles.
+// aw, ah are the dimensions of the entire board
+// lm, tm are the left and top margin to center aw, ah in the applet.
+lt = 1 + w / 400;
+int gaps = lt * 20;
+lw = (w - gaps) / 15;
+lh = (h - gaps - lt * 2) / 16; // compensating for tray height;
+aw = lw * 15 + gaps;
+ah = lh * 15 + gaps;
+lm = (w - aw) / 2 + lt;
+tm = (h - ah - (lt * 2 + lh)) / 2 + lt;
+1104 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+offGraphics.setColor(Color.black);
+offGraphics.fillRect(lm,tm,aw-2*lt,ah-2*lt);
+lm += lt;
+tm += lt;
+offGraphics.setColor(Color.white);
+offGraphics.fillRect(lm,tm,aw-4*lt,ah-4*lt);
+lm += lt;
+tm += lt;
+int sfh = (lh > 30) ? lh / 4 : lh / 2;
+Font font = new Font("SansSerif", Font.PLAIN, sfh);
+offGraphics.setFont(font);
+for (int j = 0, y = tm; j < 15; j++, y += lh + lt) {
+for (int i = 0, x = lm; i < 15; i++, x += lw + lt) {
+Color c = tiles[j < 8 ? j : 14 - j][i < 8 ? i : 14 - i];
+offGraphics.setColor(c);
+offGraphics.fillRect(x, y, lw, lh);
+offGraphics.setColor(Color.black);
+if (lh > 30) {
+String td = (c == w2 || c == l2) ? "DOUBLE" :
+(c == w3 || c == l3) ? "TRIPLE" : null;
+String wl = (c == l2 || c == l3) ? "LETTER" :
+(c == w2 || c == w3) ? "WORD" : null;
+if (td != null) {
+center(offGraphics, td, x, y + 2 + sfh, lw);
+center(offGraphics, wl, x, y + 2 * (2 + sfh), lw);
+center(offGraphics, "SCORE", x, y + 3 * (2 + sfh), lw);
+}
+} else {
+String td = (c == w2 || c == l2) ? "2" :
+(c == w3 || c == l3) ? "3" : null;
+String wl = (c == l2 || c == l3) ? "L" :
+(c == w2 || c == w3) ? "W" : null;
+if (td != null) {
+center(offGraphics, td + wl, x,
+y + (lh - sfh) * 4 / 10 + sfh, lw);
+}
+}
+}
+}
+Color c = new Color(255, 255, 200);
+offGraphics.setColor(c);
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1105
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+offGraphics.fillRect(lm, tm + ah - 3 * lt, 7 * (lw + lt), lh +
+2 * lt);
+Letter.resize(lw, lh);
+// if we already have some letters, place them.
+for (int i = 0; i < 7; i++) {
+if (tray[i] != null) {
+moveToTray(tray[i], i);
+}
+}
+paintScore();
+}
+return d;
+}
+center( )
+center( ) is a convenience routine that checksize( ) uses to center the “Double Letter
+Score” text.
+private void center(Graphics g, String s, int x, int y, int w) {
+x += (w - g.getFontMetrics().stringWidth(s)) / 2;
+g.drawString(s, x, y);
+}
+paintScore( )
+The paintScore( ) method paints the two players’ scores or just the one score in
+single-player mode.
+private void paintScore() {
+int x = lm + (lw + lt) * 7 + lm;
+int y = tm + ah - 3 * lt;
+int h = lh + 2 * lt;
+Font font = new Font("TimesRoman", Font.PLAIN, h/2);
+offGraphics.setFont(font);
+FontMetrics fm = offGraphics.getFontMetrics();
+offGraphics.setColor(Color.white);
+offGraphics.fillRect(x, y, aw, h);
+offGraphics.setColor(Color.black);
+1106 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+if (others_name == null) {
+int y0 = (h - fm.getHeight()) / 2 + fm.getAscent();
+offGraphics.drawString("Score: " + total_score, x, y + y0);
+} else {
+h/=2;
+int y0 = (h - fm.getHeight()) / 2 + fm.getAscent();
+offGraphics.drawString(name + ": " + total_score, x, y + y0);
+offGraphics.drawString(others_name + ": " + others_score,
+x, y + h + y0);
+}
+}
+private int x0, y0, w0, h0;
+selectLetter( )
+The selectLetter( ) method checks the mouse position to see if the cursor is over a letter.
+If so, it stores that in pick and computes how far the mouse was from the upper-left
+corner of the letter, which is stored in dx, dy. It also remembers the original position of
+this letter in orig.
+private void selectLetter(int x, int y) {
+pick = LetterHit(x, y);
+if(pick != null) {
+dx = pick.x - x;
+dy = pick.y - y;
+orig.x = pick.x;
+orig.y = pick.y;
+}
+repaint();
+}
+dropLetter( )
+In dropLetter( ), the user has dropped the letter if he or she was carrying one. It
+determines which square on the board the letter was over when it was dropped. It then
+calls moveLetter( ) to attempt to move the letter to that square.
+private void dropLetter(int x, int y) {
+if(pick != null) {
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1107
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+// find the center of the tile
+x += dx + lw / 2;
+y += dy + lh / 2;
+// find the tile index
+x = (x - lm) / (lw + lt);
+y = (y - tm) / (lh + lt);
+moveLetter(pick, x, y);
+pick = null;
+repaint();
+}
+}
+dragLetter( )
+The dragLetter( ) method is handled differently than the other mouse-related events.
+This is mainly due to performance considerations. The goal is to have as smooth an
+interaction with the user as possible. dragLetter( ) goes to some length to compute the
+bounding box of where the tile was before this drag plus where it is now. It then
+directly calls paint(getGraphics( )). This is nonstandard Java applet programming, but
+it performs much more reliably.
+private void dragLetter(int x, int y) {
+if (pick != null) {
+int ox = pick.x;
+int oy = pick.y;
+pick.move(x + dx, y + dy);
+x0 = Math.min(ox, pick.x);
+y0 = Math.min(oy, pick.y);
+w0 = pick.w + Math.abs(ox - pick.x);
+h0 = pick.h + Math.abs(oy - pick.y);
+paint(getGraphics());
+}
+}
+mousePressed( )
+In the following code fragment, notice that MyMouseAdapter is an inner class that
+extends MouseAdapter. It overrides the mousePressed( ) and mouseReleased( )
+methods.
+1108 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The mousePressed( ) method invokes the selectLetter( ) method to do the
+necessary processing. The x and y coordinates of the current mouse position are
+obtained from the argument supplied to the mousePressed( ) method.
+class MyMouseAdapter extends MouseAdapter {
+public void mousePressed(MouseEvent me) {
+selectLetter(me.getX(), me.getY());
+}
+mouseReleased( )
+The mouseReleased( ) method invokes the dropLetter( ) method to do the necessary
+processing. The x and y coordinates of the current mouse position are obtained from
+the argument supplied to the mouseReleased( ) method.
+public void mouseReleased(MouseEvent me) {
+dropLetter(me.getX(), me.getY());
+}
+}
+mouseDragged( )
+In the following code fragment, notice that MyMouseMotionAdapter is an inner class
+that extends MouseMotionAdapter. It overrides the mouseDragged( ) method.
+The mouseDragged( ) method invokes the dragLetter( ) method to do the necessary
+processing. The x and y coordinates of the current mouse position are obtained from
+the argument supplied to the mouseDragged( ) method.
+class MyMouseMotionAdapter extends MouseMotionAdapter {
+public synchronized void mouseDragged(MouseEvent me) {
+dragLetter(me.getX(), me.getY());
+}
+}
+}
+Bag.java
+The Bag class is very clean compared with Board. It is a simple abstraction for the bag
+of letters. When you create a Bag, you pass in a random seed, which allows you to
+create two bags that are random but the same by passing in the same random seed. The
+random number generator is stored in rand. There are two somewhat strange arrays of
+integers, named letter_counts and letter_points. Both arrays are 27 slots long. They
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1109
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+represent the blank tile in slot 0, and A through Z in 1 through 26. The letter_counts
+array says how many of each letter are in a full bag. For example, letter_counts[1] is 9,
+which says there are nine A tiles in the bag. Similarly, the letter_points array maps
+each letter to its point value. The A tiles are worth only 1 point, and the lone Z is worth
+10. There are 100 letters stored in the array called letters. The number of letters actually
+left in the bag during game play is stored in n.
+import java.util.Random;
+class Bag {
+private Random rand;
+private int letter_counts[] = {
+2, 9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2,
+6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1
+};
+private int letter_points[] = {
+0, 1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3,
+1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10
+};
+private Letter letters[] = new Letter[100];
+private int n = 0;
+Bag( )
+The Bag constructor takes the seed and makes a Random object out of it. It then scans
+through the letter_counts array, making the right number of new Letter objects, being
+careful to replace the blank tile with an asterisk. It then calls putBack( ) for each letter,
+to put them in the bag.
+Bag(int seed) {
+rand = new Random(seed);
+for (int i = 0; i < letter_counts.length; i++) {
+for (int j = 0; j < letter_counts[i]; j++) {
+Letter l = new Letter(i == 0 ? '*' : (char)('A' + i - 1),
+letter_points[i]);
+putBack(l);
+}
+}
+}
+1110 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+takeOut( )
+This next method is slightly clever and a little inefficient, but in a noncritical way.
+takeOut( ) picks a random number between 0 and n –1. It then extracts the letter at
+that offset from the letters array. It closes the hole over that slot in letters using
+System.arraycopy( ). Then it decrements n and returns the letter.
+synchronized Letter takeOut() {
+if (n == 0)
+return null;
+int i = (int)(rand.nextDouble() * n);
+Letter l = letters[i];
+if (i != n - 1)
+System.arraycopy(letters, i + 1, letters, i, n - i - 1);
+n--;
+return l;
+}
+putBack( )
+The putBack( ) method is used by the constructor to put the tiles in the bag originally.
+It could also be used by a future game enhancement that would let players trade in
+tiles they were unhappy with in exchange for losing a turn. It simply puts the letter
+back at the end of the array.
+synchronized void putBack(Letter l) {
+letters[n++] = l;
+}
+}
+Letter.java
+The Letter class is fairly clean in that it doesn’t know anything about the game or the
+board. It merely encapsulates the position and visual rendering of a single letter. It uses
+several static variables to hold information about fonts and sizes. This is done so that
+the applet doesn’t end up with 100 fonts in memory at once. This has the side effect
+that a browser page cannot contain two instances of the Scrabblet applet if they each
+have different sizes. The second one to initialize will overwrite the values in these
+static variables.
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1111
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+The w and h variables hold the constant width and height of every letter. The font
+and smfont variables are the AWT font objects for the big letter and the smaller point
+value. The ints y0 and ys0 store the offset of the baseline of the letter and the points,
+respectively. A few constants are provided to be passed back into paint( ) to describe
+which color state to paint in: NORMAL, DIM, and BRIGHT mode.
+import java.awt.*;
+class Letter {
+static int w, h;
+private static Font font, smfont;
+private static int y0, ys0;
+private static int lasth = -1;
+static final int NORMAL = 0;
+static final int DIM = 1;
+static final int BRIGHT = 2;
+colors[ ], mix( ), gain( ), and clamp( )
+The colors array is initialized statically with nine color objects—three sets of three
+colors. The mix( ) method is used to take a set of RGB values like 250, 220, 100 and turn
+them into three colors, which can be used to provide 3-D–like highlights and lowlights.
+The mix( ) method calls on gain( ) to boost or decimate the brightness of a given color
+and calls on clamp( ) to make sure it remains in the legal range.
+private static Color colors[][] = {
+mix(250, 220, 100),   // normal
+mix(200, 150, 80),    // dim
+mix(255, 230, 150)    // bright
+};
+private static Color mix(int r, int g, int b)[] {
+Color arr[] = new Color[3];
+arr[NORMAL] = new Color(r, g, b);
+arr[DIM] = gain(arr[0], .71);
+arr[BRIGHT] = gain(arr[0], 1.31);
+return arr;
+}
+private static int clamp(double d) {
+return (d < 0) ? 0 : ((d > 255) ? 255 : (int) d);
+}
+1112 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+private static Color gain(Color c, double f) {
+return new Color(
+clamp(c.getRed() * f),
+clamp(c.getGreen() * f),
+clamp(c.getBlue() * f));
+}
+Instance Variables
+The valid flag is used to make sure that all of the sizing variables are set up exactly
+once, the first time this Letter is painted. There are several variables cached here to
+keep from having to do lots of computation each time the applet paints—such as, x0,
+w0, xs0, ws0, and gap—which are all explained in the following comments. The tile
+Point object is used to remember which square on the 15×15 board this Letter is on. If
+this variable is null, then the Letter is not on the board. The x,y pair is used to exactly
+locate the Letter.
+private boolean valid = false;
+// quantized tile position of Letter. (just stored here).
+private Point tile = null;
+int x, y;               // position of Letter.
+private int x0;         // offset of symbol on tile.
+private int w0;         // width in pixels of symbol.
+private int xs0;        // offset of points on tile.
+private int ws0;        // width in pixels of points.
+private int gap = 1;    // pixels between symbol and points.
+Letter( ), getSymbol( ), and getPoints( )
+The symbol is a string that holds the letter displayed, and points is the point value of
+this letter. These are both initialized by the only constructor and returned by the
+wrapper methods getSymbol( ) and getPoints( ), respectively.
+private String symbol;
+private int points;
+Letter(char s, int p) {
+symbol = "" + s;
+points = p;
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1113
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+String getSymbol() {
+return symbol;
+}
+int getPoints() {
+return points;
+}
+move( ), remember( ), and recall( )
+The move( ) method is used to tell this tile where to draw. The remember( ) method,
+however, is more complicated. It can be called with a null, which means that this tile
+should “forget” where it was. This indicates that the letter is not in play. Otherwise, it
+tells which coordinate on the board this letter is occupying. This state is inspected by a
+call to recall( ).
+void move(int x, int y) {
+this.x = x;
+this.y = y;
+}
+void remember(Point t) {
+if (t == null) {
+tile = t;
+} else {
+tile = new Point(t.x, t.y);
+}
+}
+Point recall() {
+return tile;
+}
+resize( )
+The resize( ) method is called once by the board in order to tell every letter how big to
+be. Remember, w and h are static, so this affects all Letter instances at once.
+static void resize(int w0, int h0) {
+w = w0;
+h = h0;
+}
+1114 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+hit( )
+The hit( ) method returns true if the xp,yp pair passed in falls inside the bounds of
+this Letter.
+boolean hit(int xp, int yp) {
+return (xp >= x && xp < x + w && yp >= y && yp < y + h);
+}
+validate( )
+The validate( ) method is used to load the fonts to find out how big the letters are,
+to decide where to paint them. This information is cached in the private variables
+discussed earlier. The results of these calculations are used next in paint( ).
+private int font_ascent;
+void validate(Graphics g) {
+FontMetrics fm;
+if (h != lasth) {
+font = new Font("SansSerif", Font.BOLD, (int)(h * .6));
+g.setFont(font);
+fm = g.getFontMetrics();
+font_ascent = fm.getAscent();
+y0 = (h - font_ascent) * 4 / 10 + font_ascent;
+smfont = new Font("SansSerif", Font.BOLD, (int)(h * .3));
+g.setFont(smfont);
+fm = g.getFontMetrics();
+ys0 = y0 + fm.getAscent() / 2;
+lasth = h;
+}
+if (!valid) {
+valid = true;
+g.setFont(font);
+fm = g.getFontMetrics();
+w0 = fm.stringWidth(symbol);
+g.setFont(smfont);
+fm = g.getFontMetrics();
+ws0 = fm.stringWidth("" + points);
+int slop = w - (w0 + gap + ws0);
+x0 = slop / 2;
+if (x0 < 1)
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1115
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+x0 = 1;
+xs0 = x0 + w0 + gap;
+if (points > 9)
+xs0--;
+}
+}
+paint( )
+The paint( ) method is called by the board. It passes in an integer, i, which is one of
+NORMAL, BRIGHT, or DIM from this class. That is used as an index into the colors
+array to select the base color. A sequence of rectangles is filled to create the appearance
+of a 3-D highlighted and shadowed button. If points is greater than zero, indicating a
+nonblank letter, then the main letter is drawn, and its point value is drawn next to it.
+void paint(Graphics g, int i) {
+Color c[] = colors[i];
+validate(g);
+g.setColor(c[NORMAL]);
+g.fillRect(x, y, w, h);
+g.setColor(c[BRIGHT]);
+g.fillRect(x, y, w - 1, 1);
+g.fillRect(x, y + 1, 1, h - 2);
+g.setColor(Color.black);
+g.fillRect(x, y + h - 1, w, 1);
+g.fillRect(x + w - 1, y, 1, h - 1);
+g.setColor(c[DIM]);
+g.fillRect(x + 1, y + h - 2, w - 2, 1);
+g.fillRect(x + w - 2, y + 1, 1, h - 3);
+g.setColor(Color.black);
+if (points > 0) {
+g.setFont(font);
+g.drawString(symbol, x + x0, y + y0);
+g.setFont(smfont);
+g.drawString("" + points, x + xs0, y + ys0);
+}
+}
+}
+1116 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+ServerConnection.java
+The last class in the client side of this applet is ServerConnection, which encapsulates
+the communication with the server and our opponent. There are several variables
+declared at the beginning of the class. The socket port number to attach to on the server
+is 6564. CRLF is the Internet constant string representing end-of-line. The I/O streams
+from and to the server are in and out, respectively. The unique ID by which this
+connection is known on the server is stored in id. The ID that we are connected to as
+an opponent is stored in toid. The Scrabblet applet we are connecting for is scrabblet.
+import java.io.*;
+import java.net.*;
+import java.util.*;
+class ServerConnection implements Runnable {
+private static final int port = 6564;
+private static final String CRLF = "\r\n";
+private BufferedReader in;
+private PrintWriter out;
+private String id, toid = null;
+private Scrabblet scrabblet;
+ServerConnection( )
+The ServerConnection constructor takes the name of an Internet site to attach to and
+attempts to open a socket to the right port on that host. If that succeeds, it wraps an
+InputStreamReader and a BufferedReader around the input and a PrintWriter around
+the output. If the connection fails, an exception is thrown to the caller.
+public ServerConnection(Scrabblet sc, String site) throws
+IOException {
+scrabblet = sc;
+Socket server = new Socket(site, port);
+in = new BufferedReader(new
+InputStreamReader(server.getInputStream()));
+out = new PrintWriter(server.getOutputStream(), true);
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1117
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+readline( )
+The readline( ) method is merely a convenience function that converts the IOException
+from a readLine( ) into a simple null return.
+private String readline() {
+try {
+return in.readLine();
+} catch (IOException e) {
+return null;
+}
+}
+setName( ) and delete( )
+The setName( ) method tells the server to associate this name with us, and the delete( )
+method is used to remove us from any lists the server is keeping.
+void setName(String s) {
+out.println("name " + s);
+}
+void delete() {
+out.println("delete " + id);
+}
+setTo( ) and send( )
+The setTo( ) method binds the ID of the opponent. Future send( ) calls will go to this
+player.
+void setTo(String to) {
+toid = to;
+}
+void send(String s) {
+if (toid != null)
+out.println("to " + toid + " " + s);
+}
+1118 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+challenge( ), accept( ), chat( ), move( ), turn( ), and quit( )
+The following short methods send one-line messages from this client to the server,
+which will in turn send those messages on to our opponent. The challenge message is
+used to initiate starting a game, and accept is sent in response to a challenge. For each
+letter that moves, the move message is sent, and then the turn message is sent at the
+end of each turn. If the client quits or leaves the page with the applet on it, it sends the
+quit message.
+void challenge(String destid) {
+setTo(destid);
+send("challenge " + id);
+}
+void accept(String destid, int seed) {
+setTo(destid);
+send("accept " + id + " " + seed);
+}
+void chat(String s) {
+send("chat " + id + " " + s);
+}
+void move(String letter, int x, int y) {
+send("move " + letter + " " + x + " " + y);
+}
+void turn(String words, int score) {
+send("turn " + score + " " + words);
+}
+void quit() {
+send("quit " + id);  // tell other player
+out.println("quit"); // unhook
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1119
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+start( )
+The next method simply starts the thread that manages the client side of the network.
+// reading from server...
+private Thread t;
+void start() {
+t = new Thread(this);
+t.start();
+}
+Keywords
+The static variables and static block shown here are used to initialize the keys
+Hashtable with a mapping between the strings in keystrings and their position in
+the array—for example, keys.get(“move”) == MOVE. The lookup( ) method takes
+care of unpacking the Integer objects into the right int, with –1 meaning the keyword
+was not found.
+private static final int ID = 1;
+private static final int ADD = 2;
+private static final int DELETE = 3;
+private static final int MOVE = 4;
+private static final int CHAT = 5;
+private static final int QUIT = 6;
+private static final int TURN = 7;
+private static final int ACCEPT = 8;
+private static final int CHALLENGE = 9;
+private static Hashtable keys = new Hashtable();
+private static String keystrings[] = {
+"", "id", "add", "delete", "move", "chat",
+"quit", "turn", "accept", "challenge"
+};
+static {
+1120 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+for (int i = 0; i < keystrings.length; i++)
+keys.put(keystrings[i], new Integer(i));
+}
+private int lookup(String s) {
+Integer i = (Integer) keys.get(s);
+return i == null ? -1 : i.intValue();
+}
+run( )
+run( ) is the main loop of the game’s connection to the server. It goes into a blocking
+call to readline( ) that will return with a String whenever a line of text comes from the
+server. It uses a StringTokenizer to break the line into words. The switch statement
+dispatches us to the right code, based on the first word in the input line. Each of the
+keywords in the protocol parses the input line differently, and most of them make
+method calls back into the Scrabblet class to do their work.
+public void run() {
+String s;
+StringTokenizer st;
+while ((s = readline()) != null) {
+st = new StringTokenizer(s);
+String keyword = st.nextToken();
+switch (lookup(keyword)) {
+default:
+System.out.println("bogus keyword: " + keyword + "\r");
+break;
+case ID:
+id = st.nextToken();
+break;
+case ADD: {
+String id = st.nextToken();
+String hostname = st.nextToken();
+String name = st.nextToken(CRLF);
+scrabblet.add(id, hostname, name);
+}
+break;
+case DELETE:
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1121
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+scrabblet.delete(st.nextToken());
+break;
+case MOVE: {
+String ch = st.nextToken();
+int x = Integer.parseInt(st.nextToken());
+int y = Integer.parseInt(st.nextToken());
+scrabblet.move(ch, x, y);
+}
+break;
+case CHAT: {
+String from = st.nextToken();
+scrabblet.chat(from, st.nextToken(CRLF));
+}
+break;
+case QUIT: {
+String from = st.nextToken();
+scrabblet.quit(from);
+}
+break;
+case TURN: {
+int score = Integer.parseInt(st.nextToken());
+scrabblet.turn(score, st.nextToken(CRLF));
+}
+break;
+case ACCEPT: {
+String from = st.nextToken();
+int seed = Integer.parseInt(st.nextToken());
+scrabblet.accept(from, seed);
+}
+break;
+case CHALLENGE: {
+String from = st.nextToken();
+scrabblet.challenge(from);
+}
+break;
+}
+}
+}
+}
+1122 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The Server Code
+These last two classes are not part of this applet. Rather, they must be installed and
+run separately on the web server that the applet classes are to be loaded from. This
+will require the security rights to install and run so-called daemon processes on the
+web site, which not many people have. Fortunately, most users of this game will not
+be setting up their own servers; more likely, they will just play games connected to
+existing ones.
+Server.java
+Server is the main class for the server side of Scrabblet. Once this is installed on the
+web server, you have to run it using the command-line Java interpreter for that system,
+as shown here:
+C:\java\Scrabblet> java Server
+Once running, Server will respond with the following message:
+Server listening on port 6564
+The Server class starts out by declaring a few variables. The port has to be the same
+number, 6564, as we saw in ServerConnection. The idcon Hashtable is used to store
+all of the connections to all of the clients. We use a hash table rather than an array to
+manage frequent insertion and deletion, which require lots of array copying. The id is
+incremented for each new connection. This corresponds to the id instance variable we
+saw earlier in the client.
+import java.net.*;
+import java.io.*;
+import java.util.*;
+public class Server implements Runnable {
+private int port = 6564;
+private Hashtable idcon = new Hashtable();
+private int id = 0;
+static final String CRLF = "\r\n";
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1123
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+addConnection( )
+The addConnection( ) method is called every time a new client connects to our applet.
+This method creates a new instance of ClientConnection, described next, to manage
+the client. It passes in a reference to this Server, the socket the client connected with,
+and the current value of id. Finally, it increments the id to have it ready for the next
+connection.
+synchronized void addConnection(Socket s) {
+ClientConnection con = new ClientConnection(this, s, id);
+// we will wait for the ClientConnection to do a clean
+// handshake setting up its "name" before calling
+// set() below, which makes this connection "live."
+id++;
+}
+set( )
+The set( ) method is called from ClientConnection in response to the client telling
+us its “name.” set( ) tracks all of the connections in the idcon hash table, and first it
+removes this id from the table so that it won’t get duplicates if the client sends its
+name twice. The method calls setBusy(false) to signify that this connection is available
+to play a game. Then it walks through all of the other connections by enumerating the
+keys of the idcon hash table. For all nonbusy connections (those players waiting for
+an opponent), set( ) sends an “add” protocol message so they will all know about this
+connection.
+synchronized void set(String the_id, ClientConnection con) {
+idcon.remove(the_id) ;  // make sure we're not in there twice.
+con.setBusy(false);
+// tell this one about the other clients.
+Enumeration e = idcon.keys();
+while (e.hasMoreElements()) {
+String id = (String)e.nextElement();
+ClientConnection other = (ClientConnection) idcon.get(id);
+if (!other.isBusy())
+con.write("add " + other + CRLF);
+}
+idcon.put(the_id, con);
+broadcast(the_id, "add " + con);
+}
+1124 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+sendto( )
+sendto( ) is called in response to a “to” protocol message. It writes whatever is in the
+body string directly to the connection identified by dest.
+synchronized void sendto(String dest, String body) {
+ClientConnection con = (ClientConnection)idcon.get(dest);
+if (con != null) {
+con.write(body + CRLF);
+}
+}
+broadcast( )
+The broadcast( ) method is used to send a single message, in body, to every single
+connection except the one identified in exclude (typically, the sender).
+synchronized void broadcast(String exclude, String body) {
+Enumeration e = idcon.keys();
+while (e.hasMoreElements()) {
+String id = (String)e.nextElement();
+if (!exclude.equals(id)) {
+ClientConnection con = (ClientConnection) idcon.get(id);
+con.write(body + CRLF);
+}
+}
+}
+delete( )
+The delete( ) method is used to tell all of the connected clients to forget they ever heard
+of the_id. This is used by clients that are engaged in a game to remove themselves from
+other players’ eligibility lists.
+synchronized void delete(String the_id) {
+broadcast(the_id, "delete " + the_id);
+}
+kill( )
+The kill( ) method is called whenever a client explicitly quits, sending the “quit”
+message, or when a client simply dies if the browser quits.
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1125
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+synchronized void kill(ClientConnection c) {
+if (idcon.remove(c.getId()) == c) {
+delete(c.getId());
+}
+}
+run( )
+The run( ) method is the main loop of the server. It creates a new socket on port 6564
+and goes into an infinite loop accepting socket connections from clients. It calls
+addConnection( ) with each socket that it accepts.
+public void run() {
+try {
+ServerSocket acceptSocket = new ServerSocket(port);
+System.out.println("Server listening on port " + port);
+while (true) {
+Socket s = acceptSocket.accept();
+addConnection(s);
+}
+} catch (IOException e) {
+System.out.println("accept loop IOException: " + e);
+}
+}
+main( )
+main( ) is, of course, the method run by the Java command-line interpreter. It creates a
+new instance of Server and launches a new Thread to run it.
+public static void main(String args[]) {
+new Thread(new Server()).start();
+try {
+Thread.currentThread().join();
+} catch (InterruptedException e) { }
+}
+}
+1126 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+ClientConnection.java
+This class is the mirror image of ServerConnection in the applet. One of these is
+created for each client. Its job is to manage all of the I/O to and from a client. The
+private instance variables hold all of the states about this client. The Socket is stored in
+sock. The buffered reader and output streams are stored in in and out. The host name
+of the client machine is kept in host. A reference to the Server instance that created this
+client is held in server. The name of the player on this client is stored in name, while
+the player’s automatically assigned ID number is held in id. The busy Boolean variable
+stores whether or not this client is actively engaged in a game.
+import java.net.*;
+import java.io.*;
+import java.util.*;
+class ClientConnection implements Runnable {
+private Socket sock;
+private BufferedReader in;
+private OutputStream out;
+private String host;
+private Server server;
+private static final String CRLF = "\r\n";
+private String name = null;    // for humans
+private String id;
+private boolean busy = false;
+ClientConnection( )
+The constructor saves the reference to the server and socket and remembers the unique
+ID. We wrap an InputStreamReader and a BufferedReader around the input so that it
+can call readLine( ) on it. Then it writes the id back to the client to let it know what
+number it is. Finally, it creates and starts a new Thread to handle this connection.
+public ClientConnection(Server srv, Socket s, int i) {
+try {
+server = srv;
+sock = s;
+in = new BufferedReader(new
+InputStreamReader(s.getInputStream()));
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1127
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+out = s.getOutputStream();
+host = s.getInetAddress().getHostName();
+id = "" + i;
+// tell the new one who it is...
+write("id " + id + CRLF);
+new Thread(this).start();
+} catch (IOException e) {
+System.out.println("failed ClientConnection " + e);
+}
+}
+toString( )
+We override toString( ) so that we can have a clean representation of this connection
+for logging.
+public String toString() {
+return id + " " + host + " " + name;
+}
+getHost( ), getId( ), isBusy( ), and setBusy( )
+We wrap host, id, and busy in public methods to allow read-only access.
+public String getHost() {
+return host;
+}
+public String getId() {
+return id;
+}
+public boolean isBusy() {
+return busy;
+}
+public void setBusy(boolean b) {
+busy = b;
+}
+1128 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+close( )
+The close( ) method is called if the client explicitly quits or if we get an exception
+reading from the socket. We call kill( ) in the server, which removes us from any lists.
+Then we close the socket, which also closes both the input and output streams.
+public void close() {
+server.kill(this);
+try {
+sock.close();   // closes in and out too.
+} catch (IOException e) { }
+}
+write( )
+To write a string to a stream, we have to convert it to an array of bytes, using
+getBytes( ).
+public void write(String s) {
+byte buf[];
+buf = s.getBytes();
+try {
+out.write(buf, 0, buf.length);
+} catch (IOException e) {
+close();
+}
+}
+readline( )
+The readline( ) method merely converts the IOException from readLine( ) into a null
+return value.
+private String readline() {
+try {
+return in.readLine();
+} catch (IOException e) {
+return null;
+}
+}
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1129
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Keywords
+This section is very similar to the same part of the ServerConnection class, which
+represents the other end of the wire. The static variables and static block shown here
+are used to initialize the keys Hashtable with a mapping between the strings in
+keystrings and their position in the array—for example, keys.get(“quit”) == QUIT.
+The lookup( ) method takes care of unpacking the Integer objects into the right int,
+with –1 meaning the keyword was not found.
+static private final int NAME = 1;
+static private final int QUIT = 2;
+static private final int TO = 3;
+static private final int DELETE = 4;
+static private Hashtable keys = new Hashtable();
+static private String keystrings[] = {
+"", "name", "quit", "to", "delete"
+};
+static {
+for (int i = 0; i < keystrings.length; i++)
+keys.put(keystrings[i], new Integer(i));
+}
+private int lookup(String s) {
+Integer i = (Integer) keys.get(s);
+return i == null ? -1 : i.intValue();
+}
+run( )
+run( ) has the loop that manages all of the communication with this client. It uses a
+StringTokenizer to parse the input lines, keying off of the first word in each line. The
+lookup( ) method just shown is used to look up these first words in the keys hash
+table. We then switch, based on the integer value of the keyword. The NAME
+message comes from clients when they first gain a human identity. We call set( ) in
+the server to get this connection set up. The QUIT message is sent when the client
+wants to end its server session. The TO message contains a destination ID and a
+message body to be sent to that client. We call sendto( ) in the server to pass the
+message along. The last message is DELETE, which is sent by clients that want to
+continue being connected but no longer want to have their names listed as available
+to play. run( ) sets the busy flag and calls delete( ) in the server, which notifies the
+clients that we don’t want to be called.
+1130 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+public void run() {
+String s;
+StringTokenizer st;
+while ((s = readline()) != null) {
+st = new StringTokenizer(s);
+String keyword = st.nextToken();
+switch (lookup(keyword)) {
+default:
+System.out.println("bogus keyword: " + keyword + "\r");
+break;
+case NAME:
+name = st.nextToken() +
+(st.hasMoreTokens() ? " " + st.nextToken(CRLF) : "");
+System.out.println("[" + new Date() + "] " + this + "\r");
+server.set(id, this);
+break;
+case QUIT:
+close();
+return;
+case TO:
+String dest = st.nextToken();
+String body = st.nextToken(CRLF);
+server.sendto(dest, body);
+break;
+case DELETE:
+busy = true;
+server.delete(id);
+break;
+}
+}
+close();
+}
+}
+Enhancing Scrabblet
+This applet represents a complete client/server, multiplayer board game. In the future,
+the code in Server and ServerConnection could be extended in many ways. It could be
+used to support other turn-based games. It could track and maintain a high-score list
+for each game. It could be dynamically extensible to understand new protocol verbs.
+C h a p t e r 3 2 : S c r a b b l e t : A M u l t i p l a y e r W o r d G a m e 1131
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+One such example for the game described in this chapter would be to have a lookup
+function that checked a series of submitted words against a dictionary stored on the
+server. The server could then be the arbiter for such disputes as whether xyzy is a valid
+word. You could also construct a word robot, which would reside on the server but act
+like another player and use the dictionary to generate the best word placement from its
+current set of seven letters. It could even use a list of pithy quotes to throw into the chat
+window after each move. You might want to try making some of these enhancements
+yourself.
+This applet is intended for entertainment and educational purposes. Any similarity
+to any and all commercial products is merely coincidental.
+1132 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Appendix A
+Using Java’s
+Documentation
+Comments
+1133
+As explained in Part I, Java supports three types of comments. The first two arethe // and the /* */. The third type is called a documentation comment. It beginswith the character sequence /**. It ends with */. Documentation comments allow
+you to embed information about your program into the program itself. You can then
+use the javadoc utility program to extract the information and put it into an HTML file.
+Documentation comments make it convenient to document your programs. You have
+almost certainly seen documentation generated with javadoc, because that is the way
+the Java API library was documented by Sun.
+The javadoc Tags
+The javadoc utility recognizes the following tags:
+Tag Meaning
+@author Identifies the author of a class.
+@deprecated Specifies that a class or member is deprecated.
+{@docRoot} Specifies the path to the root directory of the current
+documentation (added by Java 2, version 1.3).
+@exception Identifies an exception thrown by a method.
+{@inheritDoc} Inherits a comment from the immediate superclass. (Added by
+Java 2, version 1.4, but not currently implemented.)
+{@link} Inserts an in-line link to another topic.
+{@linkplain} Inserts an in-line link to another topic, but the link is displayed
+in a plain-text font. (Added by Java 2, version 1.4.)
+@param Documents a method’s parameter.
+@return Documents a method’s return value.
+@see Specifies a link to another topic.
+@serial Documents a default serializable field.
+@serialData Documents the data written by the writeObject( )
+or writeExternal( ) methods.
+@serialField Documents an ObjectStreamField component.
+@since States the release when a specific change was introduced.
+@throws Same as @exception.
+{@value} Displays the value of a constant, which must be a static field.
+(Added by Java 2, version 1.4.)
+@version Specifies the version of a class.
+1134 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+As you can see, all document tags begin with an at sign (@). You may also use
+other, standard HTML tags in a documentation comment. However, some tags, such as
+headings, should not be used, because they disrupt the look of the HTML file produced
+by javadoc.
+You can use documentation comments to document classes, interfaces, fields,
+constructors, and methods. In all cases, the documentation comment must immediately
+precede the item being documented. When you are documenting a variable, the
+documentation tags you can use are @see, @since, @serial, @serialField, {@value},
+and @deprecated. For classes, you can use @see, @author, @since, @deprecated, and
+@version. Methods can be documented with @see, @return, @param, @since,
+@deprecated, @throws, @serialData, {@inheritDoc}, and @exception. A {@link},
+{@docRoot}, or {@linkplain} tag can be used anywhere. Each tag is examined next.
+@author
+The @author tag documents the author of a class. It has the following syntax:
+@author description
+Here, description will usually be the name of the person who wrote the class. The
+@author tag can be used only in documentation for a class. You may need to specify
+the -author option when executing javadoc in order for the @author field to be
+included in the HTML documentation.
+@deprecated
+The @deprecated tag specifies that a class or a member is deprecated. It is recommended
+that you include @see or {@link} tags to inform the programmer about available
+alternatives. The syntax is the following:
+@deprecated description
+Here, description is the message that describes the deprecation. Information specified by
+the @deprecated tag is recognized by the compiler and is included in the .class file that
+is generated. Therefore, the programmer can be given this information when compiling
+Java source files. The @deprecated tag can be used in documentation for variables,
+methods, and classes.
+{@docRoot}
+{@docRoot} specifies the path to the root directory of the current documentation.
+@exception
+The @exception tag describes an exception to a method. It has the following syntax:
+@exception exception-name explanation
+A p p e n d i x A : U s i n g J a v a ’ s D o c u m e n t a t i o n C o m m e n t s 1135
+Here, the fully qualified name of the exception is specified by exception-name;
+explanation is a string that describes how the exception can occur. The @exception
+tag can only be used in documentation for a method.
+{@inheritDoc}
+Inherits a comment from the immediate surperclass. (Not currently implemented by
+Java 2, version 1.4)
+{@link}
+The {@link} tag provides an in-line link to additional information. It has the following
+syntax:
+{@link name text}
+Here, name is the name of a class or method to which a link is added, and text is the
+string that is displayed.
+{@linkplain}
+Inserts an in-line link to another topic. The link is displayed in plain-text font. Otherwise,
+it is similar to {@link}.
+@param
+The @param tag documents a parameter to a method. It has the following syntax:
+@param parameter-name explanation
+Here, parameter-name specifies the name of a parameter to a method. The meaning of
+that parameter is described by explanation. The @param tag can be used only in
+documentation for a method.
+@return
+The @return tag describes the return value of a method. It has the following syntax:
+@return explanation
+Here, explanation describes the type and meaning of the value returned by a method.
+The @return tag can be used only in documentation for a method.
+@see
+The @see tag provides a reference to additional information. Its most commonly used
+forms are shown here.
+1136 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+@see anchor
+@see pkg.class#member text
+In the first form, anchor is a link to an absolute or relative URL. In the second form,
+pkg.class#member specifies the name of the item, and text is the text displayed for that
+item. The text parameter is optional, and if not used, then the item specified by
+pkg.class#member is displayed. The member name, too, is optional. Thus, you can
+specify a reference to a package, class, or interface in addition to a reference to a
+specific method or field. The name can be fully qualified or partially qualified.
+However, the dot that precedes the member name (if it exists) must be replaced by
+a hash character.
+@serial
+The @serial tag defines the comment for a default serializable field. It has the
+following syntax:
+@serial description
+Here, description is the comment for that field.
+@serialData
+The @serialData tag documents the data written by the writeObject( ) and writeExternal( )
+methods. It has the following syntax:
+@serialData description
+Here, description is the comment for that data.
+@serialField
+The @serialField tag provides comments for an ObjectStreamField component. It has
+the following syntax:
+@serialField name type description
+Here, name is the name of the field, type is its type, and description is the comment for
+that field.
+@since
+The @since tag states that a class or member was introduced in a specific release. It has
+the following syntax:
+@since release
+A p p e n d i x A : U s i n g J a v a ’ s D o c u m e n t a t i o n C o m m e n t s 1137
+Here, release is a string that designates the release or version in which this feature
+became available. The @since tag can be used in documentation for variables, methods,
+and classes.
+@throws
+The @throws tag has the same meaning as the @exception tag.
+{@value}
+Displays the value of a constant, which must be a static field.
+@version
+The @version tag specifies the version of a class. It has the following syntax:
+@version info
+Here, info is a string that contains version information, typically a version number,
+such as 2.2. The @version tag can be used only in documentation for a class. You may
+need to specify the -version option when executing javadoc in order for the @version
+field to be included in the HTML documentation.
+The General Form of a Documentation
+Comment
+After the beginning /**, the first line or lines become the main description of your class,
+variable, or method. After that, you can include one or more of the various @ tags. Each
+@ tag must start at the beginning of a new line or follow an asterisk (*) that is at the
+start of a line. Multiple tags of the same type should be grouped together. For example,
+if you have three @see tags, put them one after the other.
+Here is an example of a documentation comment for a class:
+/**
+* This class draws a bar chart.
+* @author Herbert Schildt
+* @version 3.2
+*/
+What javadoc Outputs
+The javadoc program takes as input your Java program’s source file and outputs
+several HTML files that contain the program’s documentation. Information about each
+1138 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+class will be in its own HTML file. javadoc will also output an index and a hierarchy
+tree. Other HTML files can be generated. Since different implementations of javadoc
+may work differently, you will need to check the instructions that accompany your
+Java development system for details specific to your version.
+An Example that Uses Documentation
+Comments
+Following is a sample program that uses documentation comments. Notice the way
+each comment immediately precedes the item that it describes. After being processed
+by javadoc, the documentation about the SquareNum class will be found in
+SquareNum.html.
+import java.io.*;
+/**
+* This class demonstrates documentation comments.
+* @author Herbert Schildt
+* @version 1.2
+*/
+public class SquareNum {
+/**
+* This method returns the square of num.
+* This is a multiline description.  You can use
+* as many lines as you like.
+* @param num The value to be squared.
+* @return num squared.
+*/
+public double square(double num) {
+return num * num;
+}
+/**
+* This method inputs a number from the user.
+* @return The value input as a double.
+* @exception IOException On input error.
+* @see IOException
+*/
+public double getNumber() throws IOException {
+// create a BufferedReader using System.in
+InputStreamReader isr = new InputStreamReader(System.in);
+A p p e n d i x A : U s i n g J a v a ’ s D o c u m e n t a t i o n C o m m e n t s 1139
+BufferedReader inData = new BufferedReader(isr);
+String str;
+str = inData.readLine();
+return (new Double(str)).doubleValue();
+}
+/**
+* This method demonstrates square().
+* @param args Unused.
+* @return Nothing.
+* @exception IOException On input error.
+* @see IOException
+*/
+public static void main(String args[])
+throws IOException
+{
+SquareNum ob = new SquareNum();
+double val;
+System.out.println("Enter value to be squared: ");
+val = ob.getNumber();
+val = ob.square(val);
+System.out.println("Squared value is " + val);
+}
+}
+1140 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Index
+& (bitwise AND), 80, 82
+& (Boolean logical AND), 92, 94
+&& (short-circuit AND), 92
+* (multiplication), 31, 74
+* (regular expression quantifier),
+861
+* (used in import statement), 233
+@ tags (javadoc), 1134–1138
+| (bitwise OR), 80, 82
+| (Boolean logical OR), 92
+|| (short-circuit OR), 92
+[ ], 38, 861, 866
+^ (bitwise exclusive OR), 80, 82, 83
+^ (Boolean logical exclusive OR), 92
+:,  123
+, (comma), 38, 116–117
+{ }, 27, 28, 35, 38, 63, 254
+=, 31, 94–95
+= = (relational operator), 90, 91
+versus equals( ), 359
+= = (Boolean operator), 92
+!, 92
+!=, 90, 91, 92
+/, 74
+/* */, 27
+/** */, 38, 1134
+//, 27–28
+<, 91
+<<, 80, 84–86
+<=, 91
+–, 74
+– –, 35, 74, 78–80
+%, 74, 76
+( ), 38, 96–98
+. (dot operator), 132, 140, 177–178
+. (regular expression wildcard
+character), 861, 865
+. (separator), 38, 232, 233
++ (addition), 74
++ (concatenation operator), 31, 185,
+352–353, 372, 373
++ (regular expression quantifier),
+861, 864–865
+++, 34–35, 74, 78–80
+? (regular expression quantifier),
+861, 865–866
+?:, 92, 95–96
+>, 90
+>>, 80, 86–87
+>>>, 80, 87–89
+>=, 91
+; (semicolon), 29, 38, 110
+~, 80, 82
+A
+abs( ), 159
+abstract type modifier, 216, 220
+Abstract Window Toolkit (AWT),
+314, 329, 331, 628, 632, 688, 736
+and applet architecture,
+631–632
+classes, table of, 688–691
+components, extending,
+790–797
+creating stand-alone
+windows with, 702–704
+AbstractButton class, 927
+AbstractCollection class, 448
+AbstractList class, 448
+AbstractMap class, 466, 467
+AbstractSequentialList class, 448
+AbstractSet class, 449
+accept( ), 543, 545, 602
+Access control, 172–176
+example program, 229–232
+and packages, 224, 227–228
+Access specifiers, 28, 172, 227–228
+Accessibility API, 948
+acos( ), 420
+ActionEvent class, 657, 658–659,
+739, 752, 777
+ActionListener interface, 669, 670,
+739, 752, 777
+actionPerformed( ), 670, 739
+Adapter classes, 680–682
+add( ), 443, 445, 446, 447, 454, 455,
+692, 736–737, 748, 751, 767, 772,
+777
+addAll( ), 443, 445, 446
+1141
+addCookie( ), 965, 967, 975
+addElement( ), 486, 488
+addFirst( ), 453
+addImage( ), 811
+addLast( ), 453, 454
+addMouseListener( ), 676
+addMouseMotionListener( ), 676
+addTypeListener( ), 655–656
+AdjustmentEvent class, 657,
+659–660, 756
+AdjustmentListener interface, 669,
+670, 756
+adjustmentValueChanged( ), 670
+after( ), 512, 514
+Algorithms, collection, 441,
+475–480
+ALIGN, 644
+allocate( ), 850, 851–852
+ALT, 643
+AND operator
+bitwise (&), 80, 82
+Boolean logical (&), 92, 94
+short-circuit (&&), 92, 93–94
+Animation, cell, 837–841
+Apache Software Foundation, 951
+append( ), 372–373, 762
+Applet, 10, 328–331
+architecture, 632
+basics, 628–629
+colors, setting and
+obtaining, 636–638
+executing, 330–331
+and the Internet, 10
+and main( ), 29, 131, 329, 331
+outputting to console, 652
+passing parameters to,
+644–649
+request for repaint, 638–641
+skeleton, 632–635
+and socket connections, 595
+string output to, 636
+versus application, 10
+viewer, 330–331
+Applet class, 329, 628–652, 692
+methods, table of, 629–631
+applet package, 314, 328
+applet tag, 16
+APPLET tag, HTML, 330–331,
+628–629
+full syntax for, 643–644
+AppletContext interface, 628,
+649–651, 1048
+methods, table of, 650
+AppletStub interface, 628, 652
+appletviewer, 330, 628
+status window, using, 642
+Application builder tools, 887–888
+Application versus applet, 10
+AreaAveragingScaleFilter class, 821
+areFieldsSet, 514
+Arguments, 138, 143
+command-line, 188
+passing, 165–167
+Arithmetic operators, 74–80
+ArithmeticException, 252, 253, 265
+Array(s), 28, 61–70
+boundary checks, 64
+copying, 408, 411
+declaration syntax,
+alternative, 70
+dynamic, 449–451, 485
+initializing, 63–64, 68–69
+length instance variable of,
+179–181
+multidimensional, 64–70
+one-dimensional, 61–64
+of strings, 187
+and strings, 52, 70
+arraycopy( ), 408, 411
+ArrayIndexOutOfBoundsExceptio
+n, 256, 265, 482, 483
+ArrayList class, 448, 449–452, 462
+Arrays class, 480–484
+ArrayStoreException, 265
+ASCII character set, 47, 48, 51
+and the Internet, 350, 356
+asin( ), 420
+asList( ), 480
+Assembly language, 4, 5
+assert( ), 16, 39, 340–343
+Assertion, 340–344
+AssertionError, 340
+Assignment operator(s)
+=, 31, 94–95
+arithmetic (op=), 74, 76–78
+bitwise, 80, 89–90
+Boolean, 92
+atan( ), 420
+atan2( ), 420
+AudioClip interface, 628, 651
+available( ), 548
+AWT. See Abstract Window Toolkit
+AWTEvent class, 656–657
+bit mask constants, 791
+B
+B, 4, 5
+BASIC, 5
+BCPL, 5
+Bean Builder, 888, 911–920
+Bean Developer Kit (BDK), 888–891
+BeanBox, 888
+BeanDescriptor class, 907, 909–911
+BeanInfo interface, 903–904, 907,
+910–911
+Beans, Java. See Java Beans
+before( ), 512, 514
+Bell curve, 525
+Berkeley Software Distribution
+(BSD), 588
+Berners-Lee, Tim, 597
+Beyond Photography, The Digital
+Darkroom (Holzmann), 816
+binarySearch( ), 481
+BitSet class, 508–511
+methods, table of, 508–510
+Bitwise operators, 80–90
+Blocks, code. See Code blocks
+Boolean
+literals, 51
+logical operators, 92–94
+Boolean class, 401
+methods, table of, 401
+boolean data type, 42, 48–49
+and relational operators, 91
+BorderLayout class, 766–768
+Borenstein, Nat, 602
+break statement, 100, 104, 105–107,
+120–124
+as form of goto, 122–124
+Buffer class, 847–850
+methods, table of, 848
+Buffer(s), NIO, 847–850
+BufferedInputStream class, 316,
+555–557
+BufferedOutputStream class, 316,
+557
+BufferedReader class, 318–319, 320,
+321, 569–570
+BufferedWriter class, 570–571
+Buffering, double, 807–811
+Button class, 739
+extending, 792
+Buttons, Swing, 927–934
+Byte class, 387, 396, 397
+methods defined by, table
+of, 387–389
+byte data type, 42, 43, 44, 50
+ByteArrayInputStream class,
+552–553
+ByteArrayOutputStream class,
+553–554
+ByteBuffer class, 848–850, 851, 852
+get( ) and put( ) methods,
+table of, 849
+Bytecode, 11–12, 14, 26, 422
+byteValue( ), 381
+1142 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C
+C, history of, 4–6
+and Java, 4, 6, 8, 13
+C Programming Language, The
+(Kernighan and Ritchie), 5
+C++
+code, converting to Java,
+985–1003
+features not in Java, 982–983
+history of, 6–7
+and Java, 4, 7, 8, 9, 13
+Java features not in, 984–985
+C# and Java, 9
+Calendar class, 514–518, 524
+methods defined by, table
+of, 515–517
+Call-by-reference, 165, 166–167
+Call-by-value, 165–166, 167
+cancel( ), 532, 533
+Canvas class, 693
+capacity( ), 369–370
+capacityIncrement Vector data
+member, 485–486
+CardLayout class, 772–775
+Case-sensitivity and Java, 26, 28, 37
+case statement, 104, 105, 107, 108
+Casts, 57–59, 60
+using instanceof with,
+332–335
+catch block(s), 250, 253–254
+displaying exception
+description within,
+254–255
+using multiple, 255–257
+CGI (Common Gateway
+Interface), 950
+Channel(s), 550, 551, 562, 596, 602,
+847, 850–851
+char data type, 42, 47–48, 74
+Character(s), 42, 47–48
+changing case of, 367–368
+classes (regular
+expressions), 861, 866
+escape sequences, table of, 51
+extracting, 355–356
+literals, 51
+Character class, 397–401
+methods, table of, 399–400
+Character.Subset class, 380, 401
+Character.Unicode class, 380, 401
+CharArrayReader class, 566–567
+CharArrayWriter class, 567–568
+charAt( ), 186–187, 355, 371
+CharBuffer class, 436
+Charsets, 851
+CharSequence interface, 345, 380,
+436, 860
+charValue( ), 397
+Check boxes, 743–747
+Swing, 930–932
+checkAll( ), 812
+Checkbox class, 743
+extending, 793
+CheckboxGroup class, 745–747
+extending, 794
+CheckboxMenuItem class, 775, 777
+checkID( ), 812
+Choice class, 748
+extending, 795
+Choice controls, 748–750
+Class(es), 130–154
+abstract, 216–219, 220, 239
+access levels of, 228
+adapter, 680–682
+and code, 26, 228
+in collections, storing
+user-defined, 460–462
+constructor. See
+Constructor
+definition of, 20
+final, 220
+general form of, 130–131
+inner, 181–184, 682–685
+and interfaces, 235, 236–237
+libraries, 25, 39
+member. See Member, class
+name and source file
+name, 26
+nested, 181
+packages as containers for,
+224, 227
+public, 228
+scope, 54
+Class class, 416–419, 869, 872
+methods, table of, 416–417
+.class file, 26, 133
+class keyword, 27, 130
+ClassCastException, 265, 400, 443,
+445, 447, 463, 465, 471, 475, 481,
+482, 483
+ClassLoader class, 419
+methods, table of, 419
+ClassNotFoundException, 266
+CLASSPATH, 226, 227
+clear( ), 443, 445
+Client/server model, 589
+clone( ), 221, 412–415
+Cloneable interface, 380,
+412–415, 508
+CloneNotSupportedException,
+266, 412
+close( ), 314, 325
+COBOL, 5
+CODE, 643
+Code blocks, 35–37
+CODEBASE, 643
+Collection(s), 440–504
+algorithms, 475–480
+classes, 448–457
+framework overview,
+441–442
+interfaces, 440, 441–448
+and legacy classes and
+interfaces, 484
+modifiable vs unmodifiable,
+442–443
+storing user-defined classes
+in, 460–462
+and synchronization, 475, 484
+when to use, 504
+Collection interface, 442, 443–445
+methods defined by, table
+of, 443–444
+Collections class, 441, 475–480
+algorithms defined by, table
+of, 476–479
+Collection-view, 442, 464
+Color class, 712–715
+constants 636
+ColorsBeanInfo class, 903
+Combo boxes, Swing, 934–936
+Comment, 27–28
+documentation, 38,
+1134–1140
+Common Gateway interface
+(CGI), 950
+Comparable interface, 380, 436,
+512, 514, 542
+Comparator(s), 471–475
+Comparator interface, 442, 471–472
+compare( ), 471, 472–475
+compareTo( ), 359–361, 400–401,
+436, 514, 542
+compareToIgnoreCase( ), 361
+Compilation unit, 25
+compile( ), 859–860
+Compiler, Java, 26
+Compiler class, 423
+Component class, 629, 654, 691,
+736, 801
+componentAdded( ), 670
+ComponentEvent class, 657, 660
+componentHidden( ), 670
+ComponentListener interface, 669,
+670
+componentMoved( ), 670
+componentRemoved( ), 670
+I n d e x 1143
+componentResized( ), 670
+componentShown( ), 670
+concat( ), 364
+Constants, 37
+Constructor(s), 145–149
+in class hierarchy, order of
+calling, 207–208
+default, 136, 147
+object parameters for,
+163–165
+overloading, 159–162
+parameterized, 147–149
+and super, 197–202, 206
+Constructor class, 869–870
+Container class, 629, 692, 763
+ContainerEvent class, 657, 660
+ContainerListener interface,
+669, 670
+contains( ), 443, 445, 455
+containsAll( ), 443, 445
+Content pane, 923
+contentEquals( ), 368
+Context switching, 311
+rules for, 275–276
+continue statement, 100, 124–126
+Control statements, 100–127
+Controls, 736–775
+fundamentals, 736–737
+Convolution filters, 824, 831–837
+Cookie class, 963, 967–968
+methods, table of, 968–969
+Cookies, example servlet using,
+975–977
+cos( ), 420
+countStackFrames( ), 424
+createImage( ), 801
+CropImageFilter class, 821–823
+Currency class, 534–535
+methods, table of, 535
+currentThread( ), 278
+currentTimeMillis( ), 408, 410–411
+D
+Data type(s)
+casting, 57–59, 60
+class as, 130, 131
+conversion, automatic, 42,
+57, 157–159
+conversion into string
+representation, 353–354,
+366–367, 397
+promotion of, 44, 59–61
+simple, 42–43
+wrappers for simple,
+380–398
+DatagramPacket class, 624
+Datagrams, 623–626
+server/client example,
+624–626
+DatagramSocket class, 624, 626
+DataInput interface, 561
+DataInputStream class, 316
+DataOutput interface, 561
+DataOutputStream class, 316
+Date class, 512–514
+methods, table of, 512–513
+object comparisons, 514
+DateFormat class, 524, 878–879
+Decrement operator (– –), 35, 74,
+78–80
+default statement, 104
+DefaultMutableTreeNode class, 942
+Delegation event model, 654–656
+and Beans, 896–897
+event listeners, 654, 656,
+669–672
+event sources, 654, 655–656,
+668–669
+using, 673–680
+delete operator, 150
+delete( ), 374–375, 541
+deleteCharAt( ), 374–375
+deleteOnExit( ), 541
+destroy( ), 407, 632, 634, 635, 951,
+955, 956
+Destructors versus finalize( ), 151,
+1003–1007
+Dialog boxes, 782–790
+file, 788–790
+Dialog class, 783
+Dictionary class, 492–494
+abstract methods, table
+of, 493
+digit( ), 400
+Dimension class, 689, 694, 711
+Directories as File objects, 539,
+542–543
+creating, 545
+dispose( ), 783
+DLL, 339, 340
+do-while loop, 111–114
+Document/view, 531
+Domain Naming Service (DNS), 591
+DOS and Java, 25
+Dot operator (.), 132, 140, 177–178
+Double buffering, 807–811
+Double class, 381–382, 386
+methods, table of, 384–385
+double data type, 42, 46–47, 50
+doubleValue( ), 381
+Drag-and-Drop API, 948
+drawArc( ), 709–710
+drawImage( ), 802, 809
+drawLine( ), 705–706
+drawOval( ), 708
+drawPolygon( ), 710–711
+drawRect( ), 706
+drawRoundRect( ), 706–707
+drawString( ), 329, 628, 636, 724
+Dynamic link library (DLL), 339, 340
+Dynamic method dispatch,
+211–216
+DynamicBillboard applet,
+1012–1046
+E
+E (double constant), 420
+Early binding, 220
+echoCharIsSet( ), 759
+Edit control, 758
+elementAt( ), 486, 488
+elementCount Vector data
+member, 485–486
+elementData[ ] Vector data
+member, 485–486
+elements( ), 493
+else, 100–104
+empty( ), 490, 491
+EMPTY_LIST static variable, 479
+EMPTY_MAP static variable, 479
+EMPTY_SET static variable, 479
+EmptyStackException, 490, 492
+enableEvents( ), 790–791
+Encapsulation, 19–20, 24–25,
+151–152
+and access control, 172
+end( ), 860
+Endian format, 44
+endsWith( ), 358
+ensureCapacity( ), 370, 451
+entrySet( ), 463, 464, 466, 468
+enumerate( ), 427, 432
+Enumeration interface, 484–485
+program demonstrating,
+488–490
+Environment properties, list of, 412
+eolIsSignificant( ), 575
+equals( ),  186–187, 221, 357, 401,
+443, 445, 471, 472, 482, 494, 513,
+514, 594
+versus = =, 349
+equalsIgnoreCase( ), 357
+err, 318, 407
+Error class, 251, 261, 270
+Errors, run-time, 13, 14, 250
+Event, definition of, 655
+1144 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Event handling, 654–685
+and adapter classes, 680–682
+event classes, 656–668
+by extending AWT
+components, 655, 790–797
+See also Delegation event
+model
+EventListener interface, 440
+EventListenerProxy class, 441
+EventObject class, 656, 657
+EventSetDescriptor class, 908,
+910–911
+Exception class, 251, 267–269, 270
+Exception handling, 13, 14, 114,
+120, 250–271, 328
+block, general form of,
+250–251
+and chained exceptions, 16,
+250, 269–271
+and creating custom
+exceptions, 267–269
+and default exception
+handler, 251–252
+Exceptions, built-in run-time, 250,
+251, 265
+checked, table of, 266
+constructors for, 261
+unchecked
+RuntimeException, table
+of, 265–266
+exec( ), 402, 403, 406–407
+exists( ), 540
+exitValue( ), 407
+exp( ), 420
+Expressions, regular. See Regular
+expressions
+extends, 190, 246
+Externalizable interface, 578
+F
+false, 39, 48, 51, 91
+FALSE, 401
+Field class, 869–870
+fields, 514
+File(s)
+I/O, 324–328, 539–545
+pointer, 561
+source, 25–26, 131, 224
+File class, 539–545
+methods, demonstration of
+some, 540–541
+FileChannel class, 850–851
+FileDialog class, 788–789
+FileFilter interface, 539, 545
+FileInputStream class, 316, 324,
+325, 548–550
+FilenameFilter interface, 539,
+543–544
+FileNotFoundException, 325, 548,
+550, 563
+FileOutputStream, 316, 324, 325,
+326, 550–551
+FileReader class, 562–565
+FileWriter class, 565–566
+fill( ), 482–483
+fillArc( ), 709–710
+fillOval( ), 708
+fillPolygon( ), 710–711
+fillRect( ), 706
+fillRoundRect( ), 706–707
+FilteredImageSource class, 815, 821
+FilterInputStream class, 555
+FilterOutputStream class, 555
+final
+to prevent class
+inheritance, 220
+to prevent method
+overriding, 219–220
+variables, 178–179
+finalize( ), 150–151, 221
+versus C++ destructors,
+1003–1007
+finally block, 250, 263–264
+find( ), 860, 863–864, 865
+Firewall, 10, 1070
+first( ), 447, 772–773
+firstElement( ), 486, 488
+firstKey( ), 465
+Float class, 381–382, 386
+methods, table of, 382–383
+float data type, 42, 46, 50
+Floating-point(s), 42, 45–47
+literals, 50
+floatValue( ), 381
+FlowLayout class, 764–766
+flush( ), 557, 570
+FocusEvent class, 657, 661
+focusGained( ), 670
+FocusListener interface, 669, 670
+focusLost( ), 670
+Font class, 717–718, 720
+methods, table of, 718
+FontMetrics class, 724–733
+methods, table of, 724–725
+Fonts, 717–733
+creating and selecting,
+720–722
+determining available,
+719–720
+information, obtaining,
+722–723
+terminology to describe, 724
+for loop, 33–35, 36, 114–119
+variations, 117–119
+forDigit( ), 400
+format( ), 878–879
+forName( ), 869
+FORTRAN, 5, 6
+Frame class, 691, 693
+Frame window (s), 693–704
+creating stand-alone,
+702–704
+handling events in, 697–702
+within applet, creating,
+695–697
+Frank, Ed, 7
+freeMemory( ), 404, 405–406
+G
+Garbage collection, 150, 151, 405, 437
+gc( ), 404, 405–406
+GenericServlet class, 953, 955, 960
+get( ), 445, 446, 454, 464, 493
+and buffers, 849–850
+getActionCommand( ), 658, 740, 752
+getAddress( ), 594, 624
+getAdjustable( ), 659
+getAdjustmentType( ), 659, 756
+getAlignment( ), 738
+getAllByName( ), 593
+getAllFonts( ), 719
+getAppletContext( ), 650
+getAscent( ), 724, 725
+getAttribute, 966, 978
+getAttributeNames( ), 966, 978
+getAudioClip( ), 651
+getAvailableFontFamilyNames( ),
+719
+getBackground( ), 637
+getBlue( ), 713–714
+getByName( ), 593
+getBytes( ), 356, 550
+getCause( ), 267, 270
+getChannel( ), 550, 551, 562, 596,
+602, 850, 851, 853
+getChars( ), 355–356, 371–372, 565
+getChild( ), 661
+getClass( ), 221, 416, 418–419, 872
+getClickCount( ), 665
+getCodeBase( ), 648–649
+getColor( ), 714
+getComponent( ), 660
+getConstructors( ), 869
+getContainer( ), 661
+getCookies( ), 963, 976
+getData( ), 624
+getDateInstance( ), 878
+getDateTimeInstance( ), 880
+I n d e x 1145
+getDeclaredMethods( ), 872
+getDefault( ), 524
+getDescent( ), 725
+getDirectionality( ), 401
+getDirectory( ), 789
+getDisplayCountry( ), 524
+getDisplayLanguage( ), 524
+getDisplayName( ), 524
+getDocumentBase( ), 648–649, 803
+getEchoChar( ), 759
+getEventSetDescriptors( ), 903
+GetField inner class, 581
+GetFieldID( ), 339
+getFields( ), 869
+getFile( ), 789
+getFirst( ), 453
+getFont( ), 722
+getFontList( ), 720
+getForeground( ), 637
+getGraphics( ), 639, 705
+getGreen( ), 713–714
+getHeight( ), 725–726
+getHostAddress( ), 594
+getHostName( ), 594
+getID( ), 657
+getImage( ), 801–802, 803, 805
+getInetAddress( ), 595
+getInputStream( ), 407, 595
+getInsets( ), 768–769
+getInstance( ), 516, 519
+GetIntField( ), 339
+getItem( ), 663, 748, 752, 777
+getItemCount( ), 748, 752
+getItemSelectable( ), 663, 752
+getKey( ), 468
+getKeyChar( ), 664
+getKeyCode( ), 664
+getLabel( ), 739, 743, 776
+getLast( ), 453
+getLeading( ), 725
+getLength( ), 624
+getLocalGraphicsEnvironment( ),
+719
+getLocalHost( ), 593
+getLocalPort( ), 595
+getMaximum( ), 755
+getMessage( ), 261, 267
+getMethodDescriptors( ), 903
+getMethods( ), 869
+getMinimum( ), 755
+getMinimumSize( ), 764
+getModifiers( ), 658–659, 662, 872
+getModifiersEx( ), 662
+getN( ), 894, 895, 896
+getName( ), 277, 279, 540, 873, 968,
+971, 976
+getNewState( ), 668
+GetObjectClass( ), 339
+getOldState( ), 668
+getOppositeComponent( ), 661
+getOppositeWindow( ), 668
+getOutputStream( ), 407, 595
+getParameter( ), 645, 646, 803
+getParent( ), 540
+getPoint( ), 665
+getPort( ), 595, 624
+getPreferredSize( ), 764
+getPriority( ), 277, 290
+getProperties( ), 408, 498
+getProperty( ), 409, 412, 499, 500, 501
+getPropertyDescriptors( ), 903
+getRed( ), 713–714
+getRGB( ), 714
+getRuntime( ), 403, 404
+getScrollAmount( ), 666
+getScrollType( ), 666
+getSelectedCheckbox( ), 746
+getSelectedIndex( ), 748, 751
+getSelectedIndexes( ), 751
+getSelectedItem( ), 748, 751
+getSelectedItems( ), 751
+getSelectedText( ), 759
+getServletConfig( ), 956
+getServletInfo( ), 956
+getSession( ), 971, 978
+getSize( ), 694, 711
+getSource( ), 656, 741
+getStackTrace( ), 267, 435
+getState( ), 743, 777
+getStateChange( ), 663, 752
+getSuperclass( ), 417, 418–419
+getText( ), 738, 758
+getTime( ), 513, 514
+getTimeInstance( ), 879–880
+getValue( ), 468, 660, 755, 968,
+971, 976
+getWheelRotation( ), 666
+getWhen( ), 659
+getWindow( ), 668
+getWriter( ), 954
+getX( ), 665
+getY( ), 665
+GIF image format, 800
+Gosling, James, 7, 8
+Goto statement, using labeled
+break as form of, 122–124
+grabPixels( ), 818, 819
+Graphics class, 329, 636, 705
+drawing methods, 705–711
+Graphics
+context, 705
+sizing, 711–712
+GraphicsEnvironment class, 719
+GregorianCalendar class, 514,
+519–520, 524
+GridLayout class, 770–772
+group( ), 860
+GZIP file format, 536
+H
+hashCode( ), 221, 401, 494
+Hashing, 455
+HashMap class, 466, 467–468
+HashSet( ), 449, 454–456
+Hashtable class, 494–498
+and iterators, 497
+legacy methods, table of,
+495–496
+hasMoreElements( ), 485, 506, 507
+hasMoreTokens( ), 506, 507
+hasNext( ), 459
+Header file, creating, 337–338
+headMap( ), 465
+headSet( ), 447
+HEIGHT, 644
+Hexadecimals, 50
+as character values, 51
+Hierarchical abstraction and
+classification, 18–19
+and inheritance, 20, 190
+Histogram, 819
+Hoare, C.A.R., 276
+Holzmann, Gerard J., 816
+HSB color model, 713
+HSBtoRGB( ), 713
+HSPACE, 644
+HTML (Hypertext Markup
+Language), 597, 950
+file, 330
+HTTP, 597, 950
+GET requests, handling,
+971–973
+POST requests, handling,
+971, 973–974
+server example, caching
+proxy, 602–623
+server example transaction,
+589–590
+socket, 589
+and URLConnection class,
+599–601
+HttpServlet class, 963, 969, 971
+methods, table of, 969–970
+HttpServletRequest interface, 962,
+963, 978
+methods, table of, 963–964
+1146 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+HttpServletResponse interface,
+962, 965, 978
+methods, table of, 965–966
+HttpSession interface, 962, 966
+methods, table of, 966–967
+HttpSessionBindingEvent class,
+963, 971
+HttpSessionBindingListener
+interface, 962, 967
+HttpSessionEvent class, 963, 970–971
+I
+Icon interface, 924
+Icon, rollover, 927
+Identifiers, 27, 37
+IdentityHashMap class, 466, 471
+IEEEremainder( ), 422
+if statement, 31–33, 35, 100–104, 170
+and boolean variables, 101
+nested, 102
+switch statement versus, 108
+if-else-if ladder, 102–104
+IllegalAccessException, 262, 266
+IllegalArgumentException, 265,
+482, 483
+IllegalMonitorStateException, 265
+IllegalStateException, 265, 860, 966
+IllegalThreadStateException, 265
+Image class, 800, 801
+ImageConsumer interface, 800,
+817–820
+ImageFilter class, 821–837
+ImageIcon class, 923–924
+ImageMenu applet, 1048–1056
+ImageObserver interface, 800, 802,
+803–807
+ImageProducer interface, 800, 801,
+815–817
+imageUpdate( ), 803, 804–805, 807
+flags, table of, 804
+Images, 800–841
+animation of, 837–841
+creating, loading,
+displaying, 801–803
+double buffering and,
+807–811
+implements clause, 236
+import statement, 232–233
+in, 318, 407
+Increment operator (++), 34–35, 74,
+78–80
+indexOf( ), 361–363, 376–377, 445,
+446, 486, 488
+IndexOutOfBoundsException, 265
+Inet4Address class, 592, 626
+Inet6Address class, 592, 626
+InetAddress class, 592–594, 626
+Infinity (IEEE floating-point
+specification value), 385
+InheritableThreadLocal class,
+380, 432
+Inheritance, 20–22, 24–25, 176,
+190–221
+final and, 220
+and interfaces, 235,
+246–247
+multilevel, 203–207
+multiple superclass, 192,
+1001–1003
+init( ), 632, 634, 637, 951, 955, 956
+initCause( ), 267, 270
+Inline method calls, 220
+Inner classes, 181–184, 682–685
+InputEvent class, 657, 661–662
+InputStream class, 315, 316, 318,
+545, 546, 548
+methods, table of, 546–547
+objects, concatenating,
+559–560
+InputStreamReader class, 319
+insert( ), 373, 762
+Insets class, 768–770
+Instance of a class, 20, 130
+See also Object(s)
+Instance variables
+accessing, 132, 138, 140, 143
+definition of, 20, 131
+hiding, 149–150
+static, 176–178
+as unique to their object,
+131, 133
+using super to access
+hidden, 202–203
+instanceof operator, 332–335, 462
+InstantiationException, 266
+int, 30, 42, 43, 44
+and integer literals, 50
+Integer(s), 42, 43–45, 81
+literals, 50
+Integer class, 387, 396, 397
+methods, table of, 391–393
+Interface(s), 224, 235–247
+converting C++ abstract
+classes to Java, 995–999
+general form of, 235–236
+implementing, 236–239
+inheritance of, 246–247
+reference variables,
+237–239, 243
+variables, 236, 243–245
+interface keyword, 224, 235
+Internet, 4, 7, 8, 9, 11
+addresses, obtaining, 594
+addressing, 590–591
+and portability, 10, 11
+and security, 10–11,
+1070–1071
+Internet Protocol (IP)
+addresses, 590–591
+definition of, 588–589
+InterNIC (Internet root server),
+594, 596
+Interpreter, Java, 26
+and main( ), 28, 29
+InterruptedException, 266, 278
+Introspection, 894–897
+Introspector class, 908, 909–911
+I/O, 314–328, 538–585
+channel-based, 16, 847
+classes, list of, 538
+console, 29, 114, 314, 318–324
+error handling, 328
+file, 324–328, 539–545
+interfaces, list of, 539
+new. See New I/O (NIO)
+streams. See Streams
+io package. See java.io package
+IOException, 319, 325, 326, 546,
+547, 548, 558, 562, 565, 571, 578,
+580, 581, 595, 599, 601, 851
+isAbsolute( ), 541
+isAlive( ), 277, 286–289
+isAltDown( ), 662
+isAltGraphDown( ), 662
+isControlDown( ), 662
+isDirectory( ), 542
+isEditable( ), 759
+isEmpty( ), 444, 445, 493
+isEnabled( ), 776
+isFile( ), 541
+isHidden( ), 541
+isInfinite( ),  386
+isLeapYear( ), 519
+isMetaDown( ), 662
+isMulticastAddress( ), 594
+isN( ), 895
+isNaN( ), 386
+isPopupTrigger( ), 665
+isSet, 514
+isShiftDown( ), 662
+isTemporary( ), 661
+isTimeSet, 514
+ItemEvent class, 657, 662–663, 744,
+748, 777
+ItemListener interface, 669, 671,
+743, 748, 777
+ItemSelectable interface, 663
+I n d e x 1147
+itemStateChanged( ), 671, 744, 748
+Iteration statements, 109–119
+Iterator interface, 441, 442, 457–460
+methods, table of, 458
+iterator( ), 444, 445, 457, 459
+J
+Jakarta Project, 951
+JAR files, 536, 891–894
+JApplet class, 923
+Java
+API packages, table of core,
+844–846
+and C, 4, 6, 13
+and C++, 4, 7, 8, 9, 13
+and C#, 9
+design features, 12–15
+and DOS and
+Windows 3.1, 26
+history of, 4, 7–9, 15–16
+and the Internet, 4, 7, 11, 15
+as interpreted language,
+11, 14
+keywords, 38–39
+as strongly typed
+language, 42
+versions of, 15
+and Windows 95/98 and
+Windows NT, 26
+and the World Wide Web, 7,
+8, 13
+Java 2 SDK (Software
+Development Kit), 25
+Java 2D API, 733, 948
+Java Archive (JAR) files, 536,
+891–894
+Java Beans, 418, 437, 869, 886–920
+advantages of, 887
+API, 906–911
+and constrained properties,
+905
+customizers, 906
+introspection, 894–897
+using the BDK to develop,
+897–901
+using Bean Builder to
+develop, 911–920
+using bound property of,
+902–903
+.java file, 25
+Java Foundation Classes (JFC), 948
+java (Java interpreter), 26
+Java Native Interface (JNI), 336
+java package, 234
+Java Virtual Machine (JVM), 11, 12,
+14, 403
+java.applet package, 628
+java.awt package, 628, 656, 688
+classes, tables of, 688–691
+java.awt.Dimension class, 869
+java.awt.event package, 654, 656,
+669, 680
+classes, table of, 657–658
+java.awt.image package, 800,
+840–841
+java.beans package, 906–911
+classes, table of, 907–909
+interfaces, tables of, 907
+java.io package, 314, 538–539
+java.io.IOException, 114
+java.lang package, 234, 318, 380–437
+java.lang.image, 818
+java.lang.ref package, 437
+java.lang.reflect package, 437, 844,
+845, 869
+classes, table of, 870
+java.net package, 588
+classes and interfaces, list
+of, 592
+java.nio package, 436, 538, 550, 551,
+562, 596, 602, 844, 845, 847
+java.nio.channels package, 845,
+847, 850, 851
+java.nio.channles.spi package, 845,
+847
+java.nio.charset package, 846, 847,
+851
+java.nio.charset.spi package, 846,
+847
+java.rmi package, 844, 846, 874
+java.text package, 844, 846, 878
+java.util package, 440–441, 506, 656
+java.util.jar package, 506, 536
+java.util.regex package, 846, 859
+java.util.zip package, 506, 536, 892
+javac (Java compiler), 26
+javadoc utility program, 1134,
+1138–1139
+javah.exe, 337, 339
+JavaSoft, 888
+javax.imageio package, 841
+javax.servlet package, 953, 954–960
+interfaces and classes, list
+of, 955
+javax.servlet.http package, 954,
+962–971
+interfaces and classes, list
+of, 962–963
+javax.swing package, 923
+javax.swing.tree package, 923
+JButton class, 927–929
+JCheckBox class, 930–932
+JComboBox class, 934–936
+JComponent class, 924
+JFrame class, 913
+JLabel class, 914, 924–925
+jni.h, 339
+jni_md.h, 339
+join( ), 277, 286–289
+Joy, Bill, 7, 588
+JPanel class, 940
+JPEG image format, 800
+JRadioButton class, 932–934
+JscrollBar class, 915
+JScrollPane class, 939–940
+JSlider class, 914, 915
+JTabbedPane class, 936–939
+JTable class, 946–948
+JTextCompenent class, 925–926
+JTextField class, 926
+JToggleButton class, 930, 932
+JTree class, 941–942
+Jump statements, 119–127
+Just In Time (JIT) compiler, 12
+K
+Kernighan, Brian, 5
+KeyAdapter class, 681
+Keyboard events, handling, 676–680
+KeyEvent class, 658, 663–664
+KeyListener interface, 669, 671, 676
+keyPressed( ), 671, 676, 678
+keyReleased( ), 671, 676
+keys( ), 493
+keySet( ), 464
+keyTyped( ), 671, 676, 678
+Keywords, table of Java, 39
+L
+Label, 123, 125
+Swing, 924
+Label class, 737–739
+last( ), 447, 772, 773
+lastElement( ), 487, 488
+lastIndexOf( ), 361–363, 376–377,
+445, 446, 487, 488
+lastKey( ), 465
+Late binding, 220
+LaVallée, David, 1048, 1058
+Lavatron applet, 1058–1067
+Layout managers, 763–775
+LayoutManager interface, 763–764
+length( ), 186–187, 351, 369–370
+1148 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+length instance variable of arrays,
+179–181
+Lexer, 506
+Libraries, class, 25, 39
+Lindholm, Tim, 7
+LinkedHashMap class, 466, 470–471
+LinkedHashSet class, 449, 456
+LinkedList class, 448, 452–454
+list( ) and directories, 539, 542–544
+List class, 751
+extending, 795–796
+List controls, 751–754
+List interface, 442, 445–447
+methods, table of, 446
+listFiles( ), 544–545
+ListIterator interface, 442, 457–460
+methods, table of, 458
+ListResourceBundle class, 441
+Literals, 37, 50–52
+regular expression, 861
+load( ), 404, 499, 502–504
+loadLibrary( ), 337, 404
+Locale class, 523–524, 878, 880
+log( ), 420, 960
+Logical operators, Boolean, 92–94
+long, 42, 43, 45
+literal, 50
+Long class, 387, 396, 397
+methods, table of, 393–395
+lookup( ), 875
+loop( ), 651
+Loops
+do-while, 111–114
+for. See for loop
+infinite, 118–119
+nested, 119
+and polling, event, 275, 297
+while, 109–111
+M
+main( ), 28, 29, 131, 176
+and applets, 329, 331
+and command-line
+arguments, 188
+main (default name of main
+thread), 279
+MalformedURLException, 597
+Manifest files, 892
+Map interface, 463–464
+methods, table of, 463–464
+map( ), 851, 853–854, 856
+Map.Entry interface, 466
+methods, table of, 466
+MappedByteBuffer class, 848, 854
+Maps, 441, 462–471
+mark( ), 546, 548, 552, 556, 557, 559,
+569
+markSupported( ), 556, 559, 569
+Matcher class, 859, 860–861
+matcher( ), 860
+matches( ), 368, 860, 862–863,
+868–869
+Math class, 53, 159, 420–422
+rounding methods, table of,
+421
+max( ), 476, 480
+MAX_PRIORITY, 289, 423–424
+MAX_RADIX, 398
+MAX_VALUE, 382, 387, 398
+MediaTracker class, 811–815
+Member, class, 20, 158
+access, table of, 228
+Member interface, 869
+Memory
+allocation using new, 62, 63,
+134–136
+management, 13–14
+and Runtime class, 405–406
+MemoryImageSource class, 815–817
+Menu applet, Image-based,
+1048–1056
+Menu bars and menus, 775–782
+Menu class, 775, 776
+MenuBar class, 775, 776, 777
+MenuItem class, 775, 776, 777
+Messaging system, 276–277
+Method(s), 20, 131, 138–145
+abstract, 216–219
+calling, 140, 142
+dispatch, dynamic, 211–216
+factory, 593
+final, 219–220
+general form, 138
+interface, 236, 237
+native, 335–340
+overloading, 156–162
+overriding, 208–216
+and parameters, 138, 142–145
+passing object to, 166–167
+recursive, 169–172
+returning object from,
+168–169
+returning a value from,
+140–142
+scope defined by, 54–56
+static, 176–178
+synchronized, 276, 292–295
+and throws clause, 261–262
+Method class, 869–870, 872
+MIME types, 602, 950
+min( ), 477, 480
+minimumLayoutSize( ), 764
+MIN_PRIORITY, 289, 423–424
+MIN_RADIX, 398
+MIN_VALUE, 382, 387, 398
+mkdir( ), 545
+mkdirs( ), 545
+Modifier class, 872
+methods, table of, 872
+Modulus operator (%), 74–76
+Molecule Bean, 889–890
+Monitor, 276, 292
+Mouse events, handling, 673–676
+MouseAdapter class, 680, 681
+mouseClicked( ), 671, 680
+mouseDragged( ), 671, 680
+mouseEntered( ), 671
+MouseEvent class, 658, 664–665
+mouseExited( ), 671
+MouseListener interface, 669,
+671, 673
+MouseMotionAdapter class,
+680, 681
+MouseMotionListener interface,
+656, 669, 671, 673
+mouseMoved( ), 671, 680
+mousePressed( ), 671
+mouseReleased( ), 671
+MouseWheelEvent class, 658,
+665–666
+MouseWheelListener interface,
+669, 672, 673
+mouseWheelMoved( ), 672
+Multitasking, 274, 276
+Multithreaded programming, 14,
+274–311
+context switching rules for,
+275–276
+effectively using, 311
+Observable class, Observer
+interface and, 531
+and synchronization. See
+Synchronization
+and threads. See Thread(s)
+versus single-threaded
+system, 275
+MutableTreeNode interface, 942
+Mutex, 292
+N
+NAME, 644
+Name-space collisions
+instance variables and local
+variables, 149–150
+packages and, 224
+Naming class, 875
+I n d e x 1149
+NaN, 382, 385
+native modifier, 336, 339
+Naughton, Patrick, 7
+Negative numbers in Java,
+representation of, 81
+NEGATIVE_INFINITY, 382
+NegativeArraySizeException, 265
+.Net Framework, 9
+Networking, 588–626
+new, 62, 63, 134–136, 145, 147,
+260, 261
+New I/O (NIO), 844, 847–859
+copying a file using, 857–859
+reading a file using, 851–855
+writing to a file using,
+855–857
+next( ), 459, 772, 773
+nextBoolean( ), 525
+nextBytes( ), 525
+nextDouble( ), 245, 525
+nextElement( ), 485, 506, 507
+nextFloat( ), 525
+nextGaussian( ), 525
+nextInt( ), 525
+nextLong( ), 525
+nextToken( ), 506, 507, 575
+NIO. See New I/O (NIO)
+NORM_PRIORITY, 289, 423–424
+NoSuchElementException, 447,
+463, 465
+NoSuchFieldException, 266
+NoSuchMethodException, 266
+NOT operator
+bitwise unary (~), 80, 82
+Boolean logical unary (!), 92
+notepad, 406–407
+notify( ), 221, 297–298, 300–302
+notifyAll( ), 221, 297–298
+notifyObservers( ), 527, 528
+null, 39
+Null statement, 110
+NullPointerException, 261, 266,
+447, 463, 465
+Number class, 381
+NumberFormatException, 266
+O
+Oak, 7, 15
+Object(s), 20, 130, 136
+bitwise copy (clone) of,
+412–415
+creating, 132, 134–136
+initialization with
+constructor, 145, 147
+to method, passing, 166–167
+as parameters, 162–165
+returning, 168–169
+serialization of. See
+Serialization
+type at run time,
+determining, 332–335
+Object class, 220–221, 323, 412
+methods, table of, 413
+Object reference variables
+assigning, 137
+declaring, 134–136
+and dynamic method
+dispatch, 211–212
+interface, 237–239
+to superclass reference
+variable, assigning
+subclass, 196–197
+OBJECT tag, 643
+Object-oriented programming
+(OOP), 6, 18–25
+model in Java, 13
+ObjectInput interface, 580
+methods defined by, table
+of, 580–581
+ObjectInputStream class, 581
+methods defined by, table
+of, 581–583
+ObjectOutput interface, 578
+methods defined by, table
+of, 578
+ObjectOutputStream class, 579
+methods defined by, table
+of, 579–580
+Observable class, 527–531
+methods, table of, 527
+Observer interface, 527, 528
+Octals, 50
+as character values, 51
+openConnection( ), 598–599
+Operator(s)
+arithmetic, 74–80
+assignment, 31, 94–95
+bitwise, 80–90
+Boolean logical, 92–94
+parentheses and, 96–98
+precedence, table of, 97
+relational, 48, 90–91
+ternary, 95–96
+OR operator (|)
+bitwise, 80, 82
+Boolean, 92
+OR operator, short-circuit (||), 92,
+93–94
+OurButton Bean, 890, 891
+out output stream, 29, 318, 407
+OutputStream class, 315, 316, 322,
+323, 545, 547–548
+methods, table of, 547
+Overloading  methods, 156–162,
+210–211
+Overriding, method, 208–211
+and dynamic method
+dispatch, 211–216
+using final to prevent,
+219–220
+P
+Package(s), 172, 224–235, 247
+access to classes contained
+in, 227–228
+core Java API, table of,
+844–846
+defining, 225
+importing, 232–235
+Package class, 380, 432–434
+methods, table of, 433–434
+package statement, 225, 232
+paint( ), 329, 632, 634–635, 637, 638,
+639, 705, 803
+Paint mode, setting, 715–717
+Panel class, 629, 691, 692, 772
+PARAM NAME, 644
+Parameters, 28, 138, 142–145
+applets and, 645–648
+objects as, 162–165
+and overloaded
+constructors, 160
+and overloaded
+methods, 156
+reference, C++ versus Java,
+991–994
+parseByte( ), 396
+parseInt( ), 396
+parseLong( ), 396
+parseShort( ), 396
+Parsing, 506
+Pascal, 5
+Pattern class, 859–860
+Payne, Jonathan, 7
+peek( ), 490, 491
+Persistence (Java Beans), 905–896
+PI (double constant), 420
+PixelGrabber class, 818–820
+play( ), 651
+Pointers, 71, 136, 982, 985–991
+Polling, 275, 297
+Polymorphism, 22–25
+and dynamic method
+dispatch, 211–216
+and interfaces, 235,
+238–239, 243
+and overloaded methods,
+156, 159
+pop( ), 490, 491
+1150 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+PopupMenu class, 782
+Port, 589
+Portability problem, 8, 10, 11, 14
+and data types, 43
+and native methods, 340
+POSITIVE_INFINITY, 382
+pow( ), 421
+preferredLayoutSize( ), 764
+previous( ), 772, 773
+print( ), 31, 322, 323, 354, 561, 572
+println( ), 29, 31, 322, 323, 354, 561,
+572
+PrintStream class, 316, 318, 322, 561
+PrintWriter class, 317, 323, 572
+private access specifier, 28, 172, 228
+and inheritance, 192–193
+Process class, 402
+methods, table of, 402
+Process-based versus thread-based
+multitasking, 274
+processActionEvent( ), 791,
+792, 796
+processAdjustmentEvent( ),
+791, 797
+processComponentEvent( ), 791
+processFocusEvent( ), 791
+processItemEvent( ), 791, 793,
+795, 796
+processKeyEvent( ), 791
+processMouseEvent( ), 791
+processMouseMotionEvent( ), 791
+processMouseWheelEvent( ), 791
+processTextEvent( ), 791
+Programming
+multithreaded. See
+Multithreaded
+programming
+object-oriented. See
+Object-oriented
+programming
+structured, 6
+Properties, environment, 412
+Properties class, 498–504
+legacy methods, table
+of, 499
+PropertyChangeEvent, 902,
+905, 908
+PropertyDescriptor class, 903, 909,
+910–911
+PropertyResourceBundle class, 441
+protected access specifier, 151,
+172, 228
+public access specifier, 28, 172, 228
+push( ), 490, 491
+Push buttons, 739–743
+Pushback, 558
+PushbackInputStream, 316, 558–559
+PushbackReader class, 317, 571–572
+put( ), 464, 468, 471, 493
+and buffers, 849–850, 856
+putAll( ), 464, 471
+PutField inner class, 579
+R
+Radio buttons, 745
+Swing, 932–934
+random( ), 422
+Random class, 245, 422, 524–526
+methods, table of, 525
+RandomAccess interface, 442, 462
+RandomAccessFile class, 316,
+561–562
+read( ), 315, 319, 325–326, 328, 556,
+558, 571. 850, 852
+and end-of-file condition,
+328
+Reader class, 315, 319, 545, 562
+methods defined by, table
+of, 563
+readLine( ), 320, 396, 581, 960
+readObject( ), 580, 581
+rebind( ), 875
+Recursion, 169–172
+Reference parameters, C++ versus
+Java, 991–994
+Reflection, 437, 869–872
+regionMatches( ), 358
+Regular expressions, 844, 859–869
+syntax, 861
+wildcards and quantifiers,
+861, 864–866
+Relational operators, 48, 90–91
+Remote interface, 874
+Remote method invocation (RMI),
+15, 577, 844, 874–878
+RemoteException, 874
+remove( ), 444, 445, 455, 493, 737
+removeAll( ), 444, 445, 737
+removeAttribute( ), 967, 978
+removeEldestEntry( ), 471
+removeElement( ), 487, 488
+removeElementAt( ), 487, 488
+removeFirst( ), 453
+removeLast( ), 453
+removeTypeListener( ), 656
+renameTo( ), 541
+repaint( ), 638–639
+demonstration program,
+639–641
+replace( ), 364–365, 375
+replaceAll( ), 368, 861, 867
+replaceFirst( ), 368
+replaceRange( ), 762
+ReplicateScaleFilter class, 821
+requestFocus( ), 677
+reset( ), 547, 548, 552, 554, 556,
+559, 569
+resetSyntax( ), 574
+ResourceBundle class, 441
+resume( ), 15, 305–308, 424, 426
+retainAll( ), 444, 445
+return statement, 126–127, 138
+reverse( ), 373–374
+reverseOrder( ), 477, 479
+rewind( ), 853, 856
+RGB color model, default, 815–816
+RGBImageFilter class, 821, 823–837
+RGBtoHSB( ), 713
+Richards, Martin, 5
+Ritchie, Dennis, 5, 588
+RMI compiler (rmic), 876–877
+rmiregistry (RMI registry), 877
+run( ), 277, 280, 423, 531, 532
+overriding, 282, 284, 531
+using flag variable with,
+308–310
+runFinalizersOnExit( ), 403, 408
+Runnable interface, 277, 380,
+423, 531
+implementing, 280–282, 284
+Run-time
+system, Java, 11
+type information, 15,
+333, 418
+Runtime class, 402, 403–407
+executing other programs
+and, 406–407
+memory management and,
+405–406
+methods, table of, 403–404
+RuntimeException class, 251, 261,
+265, 270
+RuntimePermission class, 380, 434
+S
+save( ), 498
+scanf( ) C function, 318
+schedule( ), 532, 533
+Scientific notation, 50
+Scope(s) in Java, 54–56
+Scrabblet applet, 1070–1132
+Scroll bars, 754–758
+Scroll panes, 939–941
+Scrollbar class, 755
+extending, 797
+search( ), 490, 491
+I n d e x 1151
+Security problem, 10–11, 1070–1071
+and native methods, 340
+and servlets, 950–951, 979
+SecurityException, 266, 403, 408
+SecurityManager class, 434
+seek( ), 561
+select( ), 748, 752, 759
+Selection statements, 100–108
+Selectors, 851
+Semaphore, 292
+SequenceInputStream class, 316,
+559–560
+Serializable interface, 577
+Serialization, 577–585
+example program, 583–585
+and static variables, 577
+and transient variables, 577
+Server, 589
+proxy, 590
+ServerSocket class, 595, 601–602
+service( ), 951, 953, 955, 956
+Servlet(s), 950–979
+advantages of, 950–951
+example of simple, 953–954
+life cycle of, 951
+parameters, reading,
+960–962
+and security, 950–951, 979
+and session tracking,
+977–979
+using Tomcat to develop,
+951–952
+Servlet interface, 955–956
+methods, table of, 956
+ServletConfig interface, 955, 956
+ServletContext interface, 955–957
+methods, table of, 957
+ServletException class, 955, 960
+ServletInputStream class, 955, 960
+ServletOutputStream class,
+955, 960
+ServletRequest interface, 953, 955,
+957, 960
+methods, table of, 958–959
+ServletResponse interface, 953,
+955, 957
+methods, table of, 959
+Session tracking, 977–979
+Set interface, 442, 447
+Set-view, obtaining, 497
+set( ), 445, 446, 454
+setAlignment( ), 738
+setAttribute( ), 967, 978
+setBackground( ), 636, 713
+setBlockIncrement( ), 755
+setBounds( ), 692, 764
+setChanged( ), 527
+setCharAt( ), 371
+setColor( ), 714
+setContentType( ), 953
+setDefault( ), 524
+setEchoCharacter( ), 759
+setEditable( ), 759
+setEnabled( ), 776
+setFont( ), 720
+setForeground( ), 636, 713
+SetIntField( ), 339
+setLabel( ), 739, 743, 776
+setLastModified( ), 542
+setLayout( ), 763–764
+setLength( ), 370–371, 562
+setLocation( ), 692
+setMaxAge( ), 969, 977
+setN( ), 894, 895, 896
+setName( ), 278, 279
+setPaintMode( ), 715
+setPriority( ), 289
+setReadOnly( ), 542
+setSelectedCheckbox( ), 746
+setSize( ), 692, 694, 695
+setState( ), 743, 777
+setText( ), 738, 758
+setTitle( ), 704
+setUnitIncrement( ), 755
+setValue( ), 755
+setValues( ), 755
+setVisible( ), 694, 695
+setXORMode( ), 715
+Sheridan, Mike, 7
+Shift operators, bitwise, 80, 84–89
+Short class, 387, 396, 397
+methods defined by, table
+of, 389–390
+short data type, 42, 43, 44, 50
+show( ), 772, 773
+showDocument( ), 649, 650–651,
+1048, 1056
+showStatus( ), 642, 681
+shuffle( ), 477, 479
+Sign extension, 87
+SimpleBeanInfo class, 903, 909
+SimpleDateFormat class, 524,
+880–882
+SimpleTimeZone class, 522–523
+sin( ), 420
+SingleThreadModel interface,
+955, 957
+size( ), 444, 445, 455, 493, 851
+Skeletons (RMI), 876–877
+skip( ), 548, 556, 558
+sleep( ), 277, 278, 279
+slice( ), 850
+Socket(s)
+example program of
+client/server, 602–623
+overview, 588–589
+reserved, 589–590
+TCP/IP client, 594–597
+TCP/IP server, 601
+Socket class, 595–596
+SocketChannel class, 850
+sort( ), 482
+SortedMap interface, 465
+methods, table of, 465
+SortedSet interface, 442, 447–448
+methods, table of, 447–448
+Source code, 25–26
+split( ), 368, 867–868
+sqrt( ), 53, 421
+Stack, definition of, 152
+Stack class, 490–492
+methods, table of, 491
+Stack trace, 252, 435
+StackTraceElement class, 435
+methods, table of,  435
+Standard Template Library (STL),
+442
+start( ), 277, 280, 282, 632, 634, 637,
+860, 864
+startsWith( ), 358–359
+Statements, 29
+null, 110
+Statements, control
+iteration, 100, 109–119
+jump, 100, 119–127
+selection, 100–108
+static, 28, 176–178
+stop( ), 15, 308, 632, 634, 635, 651
+store( ), 498, 499, 502–504
+Stream(s)
+benefits, 585
+buffered, 555–559
+classes, byte, 315, 316,
+545–562
+classes, character, 315, 317,
+545, 562–577
+definition of, 314, 538
+filtered, 555
+predefined, 318
+StreamTokenizer class, 574–577
+strictfp, 39, 335
+StrictMath class, 422
+String(s)
+arrays of, 187, 188
+changing case of characters
+in, 367
+comparison, 356–361
+1152 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+concatenating, 185–186,
+352–353. 364, 372–373
+creating, 348–351
+extracting characters from,
+355–356
+length, obtaining,
+186–187, 351
+literals, 52, 351
+modifying, 363–366
+as objects, 52, 70–71,
+181–182, 348
+parsing formatted input, 506
+reading, 320–322
+representations of numbers,
+converting, 392–393, 396
+searching, 361–363
+String class, 28, 185, 348
+constructors, 348–350
+StringBuffer class, 185, 348, 361,
+369–377
+StringBufferInputStream class, 539
+StringIndexOutOfBounds
+exception, 266
+StringTokenizer class, 506–508
+methods, table of, 507
+stringWidth( ), 725, 726
+Stroustrup, Bjarne, 7
+Stubs (RMI), 876–877
+Subclass, 190, 192
+subList( ), 446, 447
+subMap( ), 465
+subSequence( ), 368, 376
+subSet( ), 447, 448
+substring( ), 363–364, 375
+Sun Microsystems, 7, 588
+super, 176, 197–203
+and superclass constructors,
+197–202, 206
+and instance variables,
+202–203
+Superclass, 190, 192
+suspend( ), 15, 305–307, 308,
+424, 426
+Swing, 922–948
+and Bean Builder, 891
+component classes, list of
+some, 922
+switch statement, 104–108
+Synchronization, 276, 292–297
+and collections, 475
+and deadlock, 302–304
+race condition and, 294
+via synchronized block,
+295–297
+via synchronized method,
+292–295
+synchronized modifier, 292
+used with method, 292,
+295
+used with object, 295–297
+synchronizedList( ), 475, 478
+synchronizedSet( ), 475, 478
+System class, 29, 318, 407
+methods, table of, 408–410
+System.err standard error
+stream, 318
+System.in standard input stream,
+318, 319
+System.in.read( ), 114
+System.out standard output
+stream, 318, 322, 323, 324
+T
+Tabbed panes, 936–939
+Tables, Swing, 946–948
+tailMap( ), 465
+tailSet( ), 447, 448
+tan( ), 420
+TCP/IP, 15, 588, 1070
+client sockets, 594–597
+disadvantages of, 623
+reserved sockets, 589–590
+server sockets, 601–602
+See also Transmission
+Control Protocol (TCP)
+Temple, Robert, 1012
+Ternary operator (?:), 92, 95–96
+Text fields, 758–761
+Swing, 925–926
+Text formatting, 878–882
+Text output, managing, 723–733
+TextArea class, 761–763
+textChanged( ), 672
+TextComponent class, 758, 761
+TextEvent class, 658, 666–667
+TextField class, 758, 759
+TextListener interface, 669, 672
+this, 149–150, 176
+Thompson, Ken, 5, 588
+Thread(s)
+creating, 280–286
+daemon, 532
+and deadlock, 302–304, 308
+definition of, 274
+group, 279, 426–432
+main, 277, 282, 286
+messaging, 276–277, 297–302
+possible states of, 275
+priorities, 275–276,
+289–292, 423
+resuming, 305–310, 426
+stopping, 305–310
+suspending, 277, 278, 279,
+305–310, 426
+synchronization. See
+Synchronization
+Thread class, 15, 277,
+423–426, 531
+constructors, 280, 284, 423
+extending, 282–284
+methods, table of, 424–426
+ThreadGroup class, 426–432
+methods, table of, 427–428
+ThreadLocal class, 380, 432
+throw, 250, 260–261
+Throwable class, 251, 254, 267,
+269–270, 434
+methods defined by, table
+of, 267
+obtaining object of, 260–261
+throws, 250, 261–262, 265
+TickTock Bean, 902–903
+Time. See Date class
+Timer class, 531–534
+TimerTask class, 531–534
+Timestamps, 659
+TimeZone class, 521–522
+methods defined by, table
+of, 521–522
+toArray( ), 444, 445, 451–452
+toBinaryString( ), 397
+toCharArray( ), 356
+toDegrees( ), 422
+toHexString( ), 397
+Tokens, 506
+toLowerCase( ), 367
+Tomcat, 951–952
+toOctalString( ), 397
+Toolkit class, 720
+toRadians( ), 422
+toString( ), 221, 254, 268, 323,
+353–354, 366, 387, 456, 510,
+511, 656
+totalMemory( ), 404, 405–406
+toUpperCase( ), 367
+transient modifier, 331–332
+translatePoint( ), 665
+Transmission Control
+Protocol (TCP)
+definition of, 589
+and stream-based I/O, 592
+See also TCP/IP
+TreeExpansionEvent class, 942
+TreeExpansionListener
+interface, 942
+TreeMap class, 466, 468–470, 504
+TreeNode class, 942
+I n d e x 1153
+Trees, Swing, 941–946
+TreeSet class, 449, 455, 456–457, 504
+TreePath class, 942
+trim( ), 365–366
+trimToSize( ), 451
+true, 39, 48, 51, 91
+TRUE, 401
+True and false in Java, 51, 91
+try block(s),  250, 253–254
+nested, 257–259
+Two's complement, 81
+TYPE, 382, 387, 398, 401, 402
+Type
+casting, 57–59, 60
+checking, 42
+conversion, automatic, 42,
+57, 157–159
+promotion, 44, 59–61
+Types, data. See Data types
+U
+UDP protocol, 589, 591–592, 624
+UnavailableException class, 955,
+960
+unhand( ) macro, 342
+UnicastRemoteObject, 874
+Unicode, 47, 48, 51, 315, 350, 356,
+401, 562
+Uniform Resource Identifier
+(URI), 626
+UNIX, 5, 588
+UnknownHostException,
+593, 595
+unmodifiable, 475
+unread( ), 558, 571
+UnsupportedOperationException,
+266, 442–443, 445, 463, 475
+update( ), 527, 528, 638, 639, 705
+overriding, 635
+URI class, 592, 626
+URL (Uniform Resource
+Locator), 597
+specification format, 597
+URL class, 597–599, 601
+URLConnection class, 599–601
+User Datagram Protocol (UDP),
+589, 591–592, 624
+V
+valueBound( ), 967
+valueOf( ), 353, 366–367
+values( ), 464
+valueUnbound( ), 967
+van Hoff, Arthur, 7
+Variable(s), 52–56
+declaration, 30–31, 52–53
+definition of, 29, 52
+dynamic initialization of, 53
+final, 178–179
+instance. See Instance
+variables
+interface, 236
+object reference. See Object
+reference variables
+scope and lifetime of, 54–56
+Vector class, 462, 485–490
+methods, table of, 486–488
+Virtual functions (C++), 213
+Virtual machine, Java, 400
+void, 28, 138
+Void class, 401
+volatile modifier, 291–292, 331, 332
+VSPACE 644
+W
+wait( ), 221, 297–298, 300–302
+waitFor( ), 407
+Warth, Chris, 7
+wc( ), 572–577
+WeakHashMap class, 466, 467
+Web browser
+executing applet in, 330,
+331, 628
+handling older, 644
+using status window of, 642
+Web server and servlets, 950, 951
+while loop, 109–111
+Whitespace, 37
+from string, removing, 365
+whitespaceChars( ), 575
+Whois, 596–597
+WIDTH, 644
+Window
+displaying information in,
+704–705
+frame. See Frame window
+fundamentals, 691–693
+status, using, 642
+Window class, 693, 783
+windowActivated( ), 672
+windowClosed( ), 672
+windowClosing( ), 672, 694, 695
+windowDeactivated( ), 672
+windowDeiconified( ), 672
+WindowEvent class, 658, 667–668
+WindowFocusListener interface,
+669, 672
+windowGainedFocus( ), 672
+windowIconified( ), 672
+WindowListener interface, 669,
+672, 694
+windowLostFocus( ), 672
+windowOpened( ), 672
+Windows 3.1 and Java, 26
+Windows 95/98 and Windows NT
+and Java, 26
+wordChars( ), 575
+World Wide Web, 7, 8, 597
+wrap( ), 850
+Wrappers, simple type, 380–401
+write( ), 315, 322–323, 326–328, 850,
+855–856
+Writer class, 315, 545, 562
+methods defined by, table
+of, 564
+writeObject( ), 578
+writeTo( ), 554
+X
+XOR (exclusive OR) operator (^)
+bitwise, 80, 82, 83
+Boolean, 92
+Y
+Yellin, Frank, 7
+Z
+Zero crossing, 81
+ZIP file format, 536
+ZLIB file format, 536
+1154 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+INTERNATIONAL CONTACT INFORMATION
+AUSTRALIA
+McGraw-Hill Book Company Australia Pty. Ltd.
+TEL +61-2-9415-9899
+FAX +61-2-9415-5687
+http://www.mcgraw-hill.com.au
+books-it_sydney@mcgraw-hill.com
+CANADA
+McGraw-Hill Ryerson Ltd.
+TEL +905-430-5000
+FAX +905-430-5020
+http://www.mcgrawhill.ca
+GREECE, MIDDLE EAST,
+NORTHERN AFRICA
+McGraw-Hill Hellas
+TEL +30-1-656-0990-3-4
+FAX +30-1-654-5525
+MEXICO (Also serving Latin America)
+McGraw-Hill Interamericana Editores S.A. de C.V.
+TEL +525-117-1583
+FAX +525-117-1589
+http://www.mcgraw-hill.com.mx
+fernando_castellanos@mcgraw-hill.com
+SINGAPORE (Serving Asia)
+McGraw-Hill Book Company
+TEL +65-863-1580
+FAX +65-862-3354
+http://www.mcgraw-hill.com.sg
+mghasia@mcgraw-hill.com
+SOUTH AFRICA
+McGraw-Hill South Africa
+TEL +27-11-622-7512
+FAX +27-11-622-9045
+robyn_swanepoel@mcgraw-hill.com
+UNITED KINGDOM & EUROPE
+(Excluding Southern Europe)
+McGraw-Hill Education Europe
+TEL +44-1-628-502500
+FAX +44-1-628-770224
+http://www.mcgraw-hill.co.uk
+computing_neurope@mcgraw-hill.com
+ALL OTHER INQUIRIES Contact:
+Osborne/McGraw-Hill
+TEL +1-510-549-6600
+FAX +1-510-883-7600
+http://www.osborne.com
+omg_international@mcgraw-hill.com
+Herbert Schildt
+0-07-213485-2
+Chris H. Pappas & William 
+H. Murray, III
+0-07-212958-1
+Jeffery R. Shapiro
+0-07-213381-3
+Complete References
+For the answers to everything related to your technology, drill as deeply as you 
+please into our Complete Reference series. Written by topical authorities, these 
+comprehensive resources offer a full range of knowledge, including extensive product
+information, theory, step-by-step tutorials, sample projects, and helpful appendixes.
+Herbert Schildt
+0-07-213084-9
+Arthur Griffith
+0-07-222405-3
+Ron Ben-Natan & Ori Sasson
+0-07-222394-4
+For more information on these and other Osborne books, visit our Web site at www.osborne.com

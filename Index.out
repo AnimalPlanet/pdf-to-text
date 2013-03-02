@@ -1,0 +1,2266 @@
+Index
+& (bitwise AND), 80, 82
+& (Boolean logical AND), 92, 94
+&& (short-circuit AND), 92
+* (multiplication), 31, 74
+* (regular expression quantifier),
+861
+* (used in import statement), 233
+@ tags (javadoc), 1134–1138
+| (bitwise OR), 80, 82
+| (Boolean logical OR), 92
+|| (short-circuit OR), 92
+[ ], 38, 861, 866
+^ (bitwise exclusive OR), 80, 82, 83
+^ (Boolean logical exclusive OR), 92
+:,  123
+, (comma), 38, 116–117
+{ }, 27, 28, 35, 38, 63, 254
+=, 31, 94–95
+= = (relational operator), 90, 91
+versus equals( ), 359
+= = (Boolean operator), 92
+!, 92
+!=, 90, 91, 92
+/, 74
+/* */, 27
+/** */, 38, 1134
+//, 27–28
+<, 91
+<<, 80, 84–86
+<=, 91
+–, 74
+– –, 35, 74, 78–80
+%, 74, 76
+( ), 38, 96–98
+. (dot operator), 132, 140, 177–178
+. (regular expression wildcard
+character), 861, 865
+. (separator), 38, 232, 233
++ (addition), 74
++ (concatenation operator), 31, 185,
+352–353, 372, 373
++ (regular expression quantifier),
+861, 864–865
+++, 34–35, 74, 78–80
+? (regular expression quantifier),
+861, 865–866
+?:, 92, 95–96
+>, 90
+>>, 80, 86–87
+>>>, 80, 87–89
+>=, 91
+; (semicolon), 29, 38, 110
+~, 80, 82
+A
+abs( ), 159
+abstract type modifier, 216, 220
+Abstract Window Toolkit (AWT),
+314, 329, 331, 628, 632, 688, 736
+and applet architecture,
+631–632
+classes, table of, 688–691
+components, extending,
+790–797
+creating stand-alone
+windows with, 702–704
+AbstractButton class, 927
+AbstractCollection class, 448
+AbstractList class, 448
+AbstractMap class, 466, 467
+AbstractSequentialList class, 448
+AbstractSet class, 449
+accept( ), 543, 545, 602
+Access control, 172–176
+example program, 229–232
+and packages, 224, 227–228
+Access specifiers, 28, 172, 227–228
+Accessibility API, 948
+acos( ), 420
+ActionEvent class, 657, 658–659,
+739, 752, 777
+ActionListener interface, 669, 670,
+739, 752, 777
+actionPerformed( ), 670, 739
+Adapter classes, 680–682
+add( ), 443, 445, 446, 447, 454, 455,
+692, 736–737, 748, 751, 767, 772,
+777
+addAll( ), 443, 445, 446
+1141
+addCookie( ), 965, 967, 975
+addElement( ), 486, 488
+addFirst( ), 453
+addImage( ), 811
+addLast( ), 453, 454
+addMouseListener( ), 676
+addMouseMotionListener( ), 676
+addTypeListener( ), 655–656
+AdjustmentEvent class, 657,
+659–660, 756
+AdjustmentListener interface, 669,
+670, 756
+adjustmentValueChanged( ), 670
+after( ), 512, 514
+Algorithms, collection, 441,
+475–480
+ALIGN, 644
+allocate( ), 850, 851–852
+ALT, 643
+AND operator
+bitwise (&), 80, 82
+Boolean logical (&), 92, 94
+short-circuit (&&), 92, 93–94
+Animation, cell, 837–841
+Apache Software Foundation, 951
+append( ), 372–373, 762
+Applet, 10, 328–331
+architecture, 632
+basics, 628–629
+colors, setting and
+obtaining, 636–638
+executing, 330–331
+and the Internet, 10
+and main( ), 29, 131, 329, 331
+outputting to console, 652
+passing parameters to,
+644–649
+request for repaint, 638–641
+skeleton, 632–635
+and socket connections, 595
+string output to, 636
+versus application, 10
+viewer, 330–331
+Applet class, 329, 628–652, 692
+methods, table of, 629–631
+applet package, 314, 328
+applet tag, 16
+APPLET tag, HTML, 330–331,
+628–629
+full syntax for, 643–644
+AppletContext interface, 628,
+649–651, 1048
+methods, table of, 650
+AppletStub interface, 628, 652
+appletviewer, 330, 628
+status window, using, 642
+Application builder tools, 887–888
+Application versus applet, 10
+AreaAveragingScaleFilter class, 821
+areFieldsSet, 514
+Arguments, 138, 143
+command-line, 188
+passing, 165–167
+Arithmetic operators, 74–80
+ArithmeticException, 252, 253, 265
+Array(s), 28, 61–70
+boundary checks, 64
+copying, 408, 411
+declaration syntax,
+alternative, 70
+dynamic, 449–451, 485
+initializing, 63–64, 68–69
+length instance variable of,
+179–181
+multidimensional, 64–70
+one-dimensional, 61–64
+of strings, 187
+and strings, 52, 70
+arraycopy( ), 408, 411
+ArrayIndexOutOfBoundsExceptio
+n, 256, 265, 482, 483
+ArrayList class, 448, 449–452, 462
+Arrays class, 480–484
+ArrayStoreException, 265
+ASCII character set, 47, 48, 51
+and the Internet, 350, 356
+asin( ), 420
+asList( ), 480
+Assembly language, 4, 5
+assert( ), 16, 39, 340–343
+Assertion, 340–344
+AssertionError, 340
+Assignment operator(s)
+=, 31, 94–95
+arithmetic (op=), 74, 76–78
+bitwise, 80, 89–90
+Boolean, 92
+atan( ), 420
+atan2( ), 420
+AudioClip interface, 628, 651
+available( ), 548
+AWT. See Abstract Window Toolkit
+AWTEvent class, 656–657
+bit mask constants, 791
+B
+B, 4, 5
+BASIC, 5
+BCPL, 5
+Bean Builder, 888, 911–920
+Bean Developer Kit (BDK), 888–891
+BeanBox, 888
+BeanDescriptor class, 907, 909–911
+BeanInfo interface, 903–904, 907,
+910–911
+Beans, Java. See Java Beans
+before( ), 512, 514
+Bell curve, 525
+Berkeley Software Distribution
+(BSD), 588
+Berners-Lee, Tim, 597
+Beyond Photography, The Digital
+Darkroom (Holzmann), 816
+binarySearch( ), 481
+BitSet class, 508–511
+methods, table of, 508–510
+Bitwise operators, 80–90
+Blocks, code. See Code blocks
+Boolean
+literals, 51
+logical operators, 92–94
+Boolean class, 401
+methods, table of, 401
+boolean data type, 42, 48–49
+and relational operators, 91
+BorderLayout class, 766–768
+Borenstein, Nat, 602
+break statement, 100, 104, 105–107,
+120–124
+as form of goto, 122–124
+Buffer class, 847–850
+methods, table of, 848
+Buffer(s), NIO, 847–850
+BufferedInputStream class, 316,
+555–557
+BufferedOutputStream class, 316,
+557
+BufferedReader class, 318–319, 320,
+321, 569–570
+BufferedWriter class, 570–571
+Buffering, double, 807–811
+Button class, 739
+extending, 792
+Buttons, Swing, 927–934
+Byte class, 387, 396, 397
+methods defined by, table
+of, 387–389
+byte data type, 42, 43, 44, 50
+ByteArrayInputStream class,
+552–553
+ByteArrayOutputStream class,
+553–554
+ByteBuffer class, 848–850, 851, 852
+get( ) and put( ) methods,
+table of, 849
+Bytecode, 11–12, 14, 26, 422
+byteValue( ), 381
+1142 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C
+C, history of, 4–6
+and Java, 4, 6, 8, 13
+C Programming Language, The
+(Kernighan and Ritchie), 5
+C++
+code, converting to Java,
+985–1003
+features not in Java, 982–983
+history of, 6–7
+and Java, 4, 7, 8, 9, 13
+Java features not in, 984–985
+C# and Java, 9
+Calendar class, 514–518, 524
+methods defined by, table
+of, 515–517
+Call-by-reference, 165, 166–167
+Call-by-value, 165–166, 167
+cancel( ), 532, 533
+Canvas class, 693
+capacity( ), 369–370
+capacityIncrement Vector data
+member, 485–486
+CardLayout class, 772–775
+Case-sensitivity and Java, 26, 28, 37
+case statement, 104, 105, 107, 108
+Casts, 57–59, 60
+using instanceof with,
+332–335
+catch block(s), 250, 253–254
+displaying exception
+description within,
+254–255
+using multiple, 255–257
+CGI (Common Gateway
+Interface), 950
+Channel(s), 550, 551, 562, 596, 602,
+847, 850–851
+char data type, 42, 47–48, 74
+Character(s), 42, 47–48
+changing case of, 367–368
+classes (regular
+expressions), 861, 866
+escape sequences, table of, 51
+extracting, 355–356
+literals, 51
+Character class, 397–401
+methods, table of, 399–400
+Character.Subset class, 380, 401
+Character.Unicode class, 380, 401
+CharArrayReader class, 566–567
+CharArrayWriter class, 567–568
+charAt( ), 186–187, 355, 371
+CharBuffer class, 436
+Charsets, 851
+CharSequence interface, 345, 380,
+436, 860
+charValue( ), 397
+Check boxes, 743–747
+Swing, 930–932
+checkAll( ), 812
+Checkbox class, 743
+extending, 793
+CheckboxGroup class, 745–747
+extending, 794
+CheckboxMenuItem class, 775, 777
+checkID( ), 812
+Choice class, 748
+extending, 795
+Choice controls, 748–750
+Class(es), 130–154
+abstract, 216–219, 220, 239
+access levels of, 228
+adapter, 680–682
+and code, 26, 228
+in collections, storing
+user-defined, 460–462
+constructor. See
+Constructor
+definition of, 20
+final, 220
+general form of, 130–131
+inner, 181–184, 682–685
+and interfaces, 235, 236–237
+libraries, 25, 39
+member. See Member, class
+name and source file
+name, 26
+nested, 181
+packages as containers for,
+224, 227
+public, 228
+scope, 54
+Class class, 416–419, 869, 872
+methods, table of, 416–417
+.class file, 26, 133
+class keyword, 27, 130
+ClassCastException, 265, 400, 443,
+445, 447, 463, 465, 471, 475, 481,
+482, 483
+ClassLoader class, 419
+methods, table of, 419
+ClassNotFoundException, 266
+CLASSPATH, 226, 227
+clear( ), 443, 445
+Client/server model, 589
+clone( ), 221, 412–415
+Cloneable interface, 380,
+412–415, 508
+CloneNotSupportedException,
+266, 412
+close( ), 314, 325
+COBOL, 5
+CODE, 643
+Code blocks, 35–37
+CODEBASE, 643
+Collection(s), 440–504
+algorithms, 475–480
+classes, 448–457
+framework overview,
+441–442
+interfaces, 440, 441–448
+and legacy classes and
+interfaces, 484
+modifiable vs unmodifiable,
+442–443
+storing user-defined classes
+in, 460–462
+and synchronization, 475, 484
+when to use, 504
+Collection interface, 442, 443–445
+methods defined by, table
+of, 443–444
+Collections class, 441, 475–480
+algorithms defined by, table
+of, 476–479
+Collection-view, 442, 464
+Color class, 712–715
+constants 636
+ColorsBeanInfo class, 903
+Combo boxes, Swing, 934–936
+Comment, 27–28
+documentation, 38,
+1134–1140
+Common Gateway interface
+(CGI), 950
+Comparable interface, 380, 436,
+512, 514, 542
+Comparator(s), 471–475
+Comparator interface, 442, 471–472
+compare( ), 471, 472–475
+compareTo( ), 359–361, 400–401,
+436, 514, 542
+compareToIgnoreCase( ), 361
+Compilation unit, 25
+compile( ), 859–860
+Compiler, Java, 26
+Compiler class, 423
+Component class, 629, 654, 691,
+736, 801
+componentAdded( ), 670
+ComponentEvent class, 657, 660
+componentHidden( ), 670
+ComponentListener interface, 669,
+670
+componentMoved( ), 670
+componentRemoved( ), 670
+I n d e x 1143
+componentResized( ), 670
+componentShown( ), 670
+concat( ), 364
+Constants, 37
+Constructor(s), 145–149
+in class hierarchy, order of
+calling, 207–208
+default, 136, 147
+object parameters for,
+163–165
+overloading, 159–162
+parameterized, 147–149
+and super, 197–202, 206
+Constructor class, 869–870
+Container class, 629, 692, 763
+ContainerEvent class, 657, 660
+ContainerListener interface,
+669, 670
+contains( ), 443, 445, 455
+containsAll( ), 443, 445
+Content pane, 923
+contentEquals( ), 368
+Context switching, 311
+rules for, 275–276
+continue statement, 100, 124–126
+Control statements, 100–127
+Controls, 736–775
+fundamentals, 736–737
+Convolution filters, 824, 831–837
+Cookie class, 963, 967–968
+methods, table of, 968–969
+Cookies, example servlet using,
+975–977
+cos( ), 420
+countStackFrames( ), 424
+createImage( ), 801
+CropImageFilter class, 821–823
+Currency class, 534–535
+methods, table of, 535
+currentThread( ), 278
+currentTimeMillis( ), 408, 410–411
+D
+Data type(s)
+casting, 57–59, 60
+class as, 130, 131
+conversion, automatic, 42,
+57, 157–159
+conversion into string
+representation, 353–354,
+366–367, 397
+promotion of, 44, 59–61
+simple, 42–43
+wrappers for simple,
+380–398
+DatagramPacket class, 624
+Datagrams, 623–626
+server/client example,
+624–626
+DatagramSocket class, 624, 626
+DataInput interface, 561
+DataInputStream class, 316
+DataOutput interface, 561
+DataOutputStream class, 316
+Date class, 512–514
+methods, table of, 512–513
+object comparisons, 514
+DateFormat class, 524, 878–879
+Decrement operator (– –), 35, 74,
+78–80
+default statement, 104
+DefaultMutableTreeNode class, 942
+Delegation event model, 654–656
+and Beans, 896–897
+event listeners, 654, 656,
+669–672
+event sources, 654, 655–656,
+668–669
+using, 673–680
+delete operator, 150
+delete( ), 374–375, 541
+deleteCharAt( ), 374–375
+deleteOnExit( ), 541
+destroy( ), 407, 632, 634, 635, 951,
+955, 956
+Destructors versus finalize( ), 151,
+1003–1007
+Dialog boxes, 782–790
+file, 788–790
+Dialog class, 783
+Dictionary class, 492–494
+abstract methods, table
+of, 493
+digit( ), 400
+Dimension class, 689, 694, 711
+Directories as File objects, 539,
+542–543
+creating, 545
+dispose( ), 783
+DLL, 339, 340
+do-while loop, 111–114
+Document/view, 531
+Domain Naming Service (DNS), 591
+DOS and Java, 25
+Dot operator (.), 132, 140, 177–178
+Double buffering, 807–811
+Double class, 381–382, 386
+methods, table of, 384–385
+double data type, 42, 46–47, 50
+doubleValue( ), 381
+Drag-and-Drop API, 948
+drawArc( ), 709–710
+drawImage( ), 802, 809
+drawLine( ), 705–706
+drawOval( ), 708
+drawPolygon( ), 710–711
+drawRect( ), 706
+drawRoundRect( ), 706–707
+drawString( ), 329, 628, 636, 724
+Dynamic link library (DLL), 339, 340
+Dynamic method dispatch,
+211–216
+DynamicBillboard applet,
+1012–1046
+E
+E (double constant), 420
+Early binding, 220
+echoCharIsSet( ), 759
+Edit control, 758
+elementAt( ), 486, 488
+elementCount Vector data
+member, 485–486
+elementData[ ] Vector data
+member, 485–486
+elements( ), 493
+else, 100–104
+empty( ), 490, 491
+EMPTY_LIST static variable, 479
+EMPTY_MAP static variable, 479
+EMPTY_SET static variable, 479
+EmptyStackException, 490, 492
+enableEvents( ), 790–791
+Encapsulation, 19–20, 24–25,
+151–152
+and access control, 172
+end( ), 860
+Endian format, 44
+endsWith( ), 358
+ensureCapacity( ), 370, 451
+entrySet( ), 463, 464, 466, 468
+enumerate( ), 427, 432
+Enumeration interface, 484–485
+program demonstrating,
+488–490
+Environment properties, list of, 412
+eolIsSignificant( ), 575
+equals( ),  186–187, 221, 357, 401,
+443, 445, 471, 472, 482, 494, 513,
+514, 594
+versus = =, 349
+equalsIgnoreCase( ), 357
+err, 318, 407
+Error class, 251, 261, 270
+Errors, run-time, 13, 14, 250
+Event, definition of, 655
+1144 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Event handling, 654–685
+and adapter classes, 680–682
+event classes, 656–668
+by extending AWT
+components, 655, 790–797
+See also Delegation event
+model
+EventListener interface, 440
+EventListenerProxy class, 441
+EventObject class, 656, 657
+EventSetDescriptor class, 908,
+910–911
+Exception class, 251, 267–269, 270
+Exception handling, 13, 14, 114,
+120, 250–271, 328
+block, general form of,
+250–251
+and chained exceptions, 16,
+250, 269–271
+and creating custom
+exceptions, 267–269
+and default exception
+handler, 251–252
+Exceptions, built-in run-time, 250,
+251, 265
+checked, table of, 266
+constructors for, 261
+unchecked
+RuntimeException, table
+of, 265–266
+exec( ), 402, 403, 406–407
+exists( ), 540
+exitValue( ), 407
+exp( ), 420
+Expressions, regular. See Regular
+expressions
+extends, 190, 246
+Externalizable interface, 578
+F
+false, 39, 48, 51, 91
+FALSE, 401
+Field class, 869–870
+fields, 514
+File(s)
+I/O, 324–328, 539–545
+pointer, 561
+source, 25–26, 131, 224
+File class, 539–545
+methods, demonstration of
+some, 540–541
+FileChannel class, 850–851
+FileDialog class, 788–789
+FileFilter interface, 539, 545
+FileInputStream class, 316, 324,
+325, 548–550
+FilenameFilter interface, 539,
+543–544
+FileNotFoundException, 325, 548,
+550, 563
+FileOutputStream, 316, 324, 325,
+326, 550–551
+FileReader class, 562–565
+FileWriter class, 565–566
+fill( ), 482–483
+fillArc( ), 709–710
+fillOval( ), 708
+fillPolygon( ), 710–711
+fillRect( ), 706
+fillRoundRect( ), 706–707
+FilteredImageSource class, 815, 821
+FilterInputStream class, 555
+FilterOutputStream class, 555
+final
+to prevent class
+inheritance, 220
+to prevent method
+overriding, 219–220
+variables, 178–179
+finalize( ), 150–151, 221
+versus C++ destructors,
+1003–1007
+finally block, 250, 263–264
+find( ), 860, 863–864, 865
+Firewall, 10, 1070
+first( ), 447, 772–773
+firstElement( ), 486, 488
+firstKey( ), 465
+Float class, 381–382, 386
+methods, table of, 382–383
+float data type, 42, 46, 50
+Floating-point(s), 42, 45–47
+literals, 50
+floatValue( ), 381
+FlowLayout class, 764–766
+flush( ), 557, 570
+FocusEvent class, 657, 661
+focusGained( ), 670
+FocusListener interface, 669, 670
+focusLost( ), 670
+Font class, 717–718, 720
+methods, table of, 718
+FontMetrics class, 724–733
+methods, table of, 724–725
+Fonts, 717–733
+creating and selecting,
+720–722
+determining available,
+719–720
+information, obtaining,
+722–723
+terminology to describe, 724
+for loop, 33–35, 36, 114–119
+variations, 117–119
+forDigit( ), 400
+format( ), 878–879
+forName( ), 869
+FORTRAN, 5, 6
+Frame class, 691, 693
+Frame window (s), 693–704
+creating stand-alone,
+702–704
+handling events in, 697–702
+within applet, creating,
+695–697
+Frank, Ed, 7
+freeMemory( ), 404, 405–406
+G
+Garbage collection, 150, 151, 405, 437
+gc( ), 404, 405–406
+GenericServlet class, 953, 955, 960
+get( ), 445, 446, 454, 464, 493
+and buffers, 849–850
+getActionCommand( ), 658, 740, 752
+getAddress( ), 594, 624
+getAdjustable( ), 659
+getAdjustmentType( ), 659, 756
+getAlignment( ), 738
+getAllByName( ), 593
+getAllFonts( ), 719
+getAppletContext( ), 650
+getAscent( ), 724, 725
+getAttribute, 966, 978
+getAttributeNames( ), 966, 978
+getAudioClip( ), 651
+getAvailableFontFamilyNames( ),
+719
+getBackground( ), 637
+getBlue( ), 713–714
+getByName( ), 593
+getBytes( ), 356, 550
+getCause( ), 267, 270
+getChannel( ), 550, 551, 562, 596,
+602, 850, 851, 853
+getChars( ), 355–356, 371–372, 565
+getChild( ), 661
+getClass( ), 221, 416, 418–419, 872
+getClickCount( ), 665
+getCodeBase( ), 648–649
+getColor( ), 714
+getComponent( ), 660
+getConstructors( ), 869
+getContainer( ), 661
+getCookies( ), 963, 976
+getData( ), 624
+getDateInstance( ), 878
+getDateTimeInstance( ), 880
+I n d e x 1145
+getDeclaredMethods( ), 872
+getDefault( ), 524
+getDescent( ), 725
+getDirectionality( ), 401
+getDirectory( ), 789
+getDisplayCountry( ), 524
+getDisplayLanguage( ), 524
+getDisplayName( ), 524
+getDocumentBase( ), 648–649, 803
+getEchoChar( ), 759
+getEventSetDescriptors( ), 903
+GetField inner class, 581
+GetFieldID( ), 339
+getFields( ), 869
+getFile( ), 789
+getFirst( ), 453
+getFont( ), 722
+getFontList( ), 720
+getForeground( ), 637
+getGraphics( ), 639, 705
+getGreen( ), 713–714
+getHeight( ), 725–726
+getHostAddress( ), 594
+getHostName( ), 594
+getID( ), 657
+getImage( ), 801–802, 803, 805
+getInetAddress( ), 595
+getInputStream( ), 407, 595
+getInsets( ), 768–769
+getInstance( ), 516, 519
+GetIntField( ), 339
+getItem( ), 663, 748, 752, 777
+getItemCount( ), 748, 752
+getItemSelectable( ), 663, 752
+getKey( ), 468
+getKeyChar( ), 664
+getKeyCode( ), 664
+getLabel( ), 739, 743, 776
+getLast( ), 453
+getLeading( ), 725
+getLength( ), 624
+getLocalGraphicsEnvironment( ),
+719
+getLocalHost( ), 593
+getLocalPort( ), 595
+getMaximum( ), 755
+getMessage( ), 261, 267
+getMethodDescriptors( ), 903
+getMethods( ), 869
+getMinimum( ), 755
+getMinimumSize( ), 764
+getModifiers( ), 658–659, 662, 872
+getModifiersEx( ), 662
+getN( ), 894, 895, 896
+getName( ), 277, 279, 540, 873, 968,
+971, 976
+getNewState( ), 668
+GetObjectClass( ), 339
+getOldState( ), 668
+getOppositeComponent( ), 661
+getOppositeWindow( ), 668
+getOutputStream( ), 407, 595
+getParameter( ), 645, 646, 803
+getParent( ), 540
+getPoint( ), 665
+getPort( ), 595, 624
+getPreferredSize( ), 764
+getPriority( ), 277, 290
+getProperties( ), 408, 498
+getProperty( ), 409, 412, 499, 500, 501
+getPropertyDescriptors( ), 903
+getRed( ), 713–714
+getRGB( ), 714
+getRuntime( ), 403, 404
+getScrollAmount( ), 666
+getScrollType( ), 666
+getSelectedCheckbox( ), 746
+getSelectedIndex( ), 748, 751
+getSelectedIndexes( ), 751
+getSelectedItem( ), 748, 751
+getSelectedItems( ), 751
+getSelectedText( ), 759
+getServletConfig( ), 956
+getServletInfo( ), 956
+getSession( ), 971, 978
+getSize( ), 694, 711
+getSource( ), 656, 741
+getStackTrace( ), 267, 435
+getState( ), 743, 777
+getStateChange( ), 663, 752
+getSuperclass( ), 417, 418–419
+getText( ), 738, 758
+getTime( ), 513, 514
+getTimeInstance( ), 879–880
+getValue( ), 468, 660, 755, 968,
+971, 976
+getWheelRotation( ), 666
+getWhen( ), 659
+getWindow( ), 668
+getWriter( ), 954
+getX( ), 665
+getY( ), 665
+GIF image format, 800
+Gosling, James, 7, 8
+Goto statement, using labeled
+break as form of, 122–124
+grabPixels( ), 818, 819
+Graphics class, 329, 636, 705
+drawing methods, 705–711
+Graphics
+context, 705
+sizing, 711–712
+GraphicsEnvironment class, 719
+GregorianCalendar class, 514,
+519–520, 524
+GridLayout class, 770–772
+group( ), 860
+GZIP file format, 536
+H
+hashCode( ), 221, 401, 494
+Hashing, 455
+HashMap class, 466, 467–468
+HashSet( ), 449, 454–456
+Hashtable class, 494–498
+and iterators, 497
+legacy methods, table of,
+495–496
+hasMoreElements( ), 485, 506, 507
+hasMoreTokens( ), 506, 507
+hasNext( ), 459
+Header file, creating, 337–338
+headMap( ), 465
+headSet( ), 447
+HEIGHT, 644
+Hexadecimals, 50
+as character values, 51
+Hierarchical abstraction and
+classification, 18–19
+and inheritance, 20, 190
+Histogram, 819
+Hoare, C.A.R., 276
+Holzmann, Gerard J., 816
+HSB color model, 713
+HSBtoRGB( ), 713
+HSPACE, 644
+HTML (Hypertext Markup
+Language), 597, 950
+file, 330
+HTTP, 597, 950
+GET requests, handling,
+971–973
+POST requests, handling,
+971, 973–974
+server example, caching
+proxy, 602–623
+server example transaction,
+589–590
+socket, 589
+and URLConnection class,
+599–601
+HttpServlet class, 963, 969, 971
+methods, table of, 969–970
+HttpServletRequest interface, 962,
+963, 978
+methods, table of, 963–964
+1146 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+HttpServletResponse interface,
+962, 965, 978
+methods, table of, 965–966
+HttpSession interface, 962, 966
+methods, table of, 966–967
+HttpSessionBindingEvent class,
+963, 971
+HttpSessionBindingListener
+interface, 962, 967
+HttpSessionEvent class, 963, 970–971
+I
+Icon interface, 924
+Icon, rollover, 927
+Identifiers, 27, 37
+IdentityHashMap class, 466, 471
+IEEEremainder( ), 422
+if statement, 31–33, 35, 100–104, 170
+and boolean variables, 101
+nested, 102
+switch statement versus, 108
+if-else-if ladder, 102–104
+IllegalAccessException, 262, 266
+IllegalArgumentException, 265,
+482, 483
+IllegalMonitorStateException, 265
+IllegalStateException, 265, 860, 966
+IllegalThreadStateException, 265
+Image class, 800, 801
+ImageConsumer interface, 800,
+817–820
+ImageFilter class, 821–837
+ImageIcon class, 923–924
+ImageMenu applet, 1048–1056
+ImageObserver interface, 800, 802,
+803–807
+ImageProducer interface, 800, 801,
+815–817
+imageUpdate( ), 803, 804–805, 807
+flags, table of, 804
+Images, 800–841
+animation of, 837–841
+creating, loading,
+displaying, 801–803
+double buffering and,
+807–811
+implements clause, 236
+import statement, 232–233
+in, 318, 407
+Increment operator (++), 34–35, 74,
+78–80
+indexOf( ), 361–363, 376–377, 445,
+446, 486, 488
+IndexOutOfBoundsException, 265
+Inet4Address class, 592, 626
+Inet6Address class, 592, 626
+InetAddress class, 592–594, 626
+Infinity (IEEE floating-point
+specification value), 385
+InheritableThreadLocal class,
+380, 432
+Inheritance, 20–22, 24–25, 176,
+190–221
+final and, 220
+and interfaces, 235,
+246–247
+multilevel, 203–207
+multiple superclass, 192,
+1001–1003
+init( ), 632, 634, 637, 951, 955, 956
+initCause( ), 267, 270
+Inline method calls, 220
+Inner classes, 181–184, 682–685
+InputEvent class, 657, 661–662
+InputStream class, 315, 316, 318,
+545, 546, 548
+methods, table of, 546–547
+objects, concatenating,
+559–560
+InputStreamReader class, 319
+insert( ), 373, 762
+Insets class, 768–770
+Instance of a class, 20, 130
+See also Object(s)
+Instance variables
+accessing, 132, 138, 140, 143
+definition of, 20, 131
+hiding, 149–150
+static, 176–178
+as unique to their object,
+131, 133
+using super to access
+hidden, 202–203
+instanceof operator, 332–335, 462
+InstantiationException, 266
+int, 30, 42, 43, 44
+and integer literals, 50
+Integer(s), 42, 43–45, 81
+literals, 50
+Integer class, 387, 396, 397
+methods, table of, 391–393
+Interface(s), 224, 235–247
+converting C++ abstract
+classes to Java, 995–999
+general form of, 235–236
+implementing, 236–239
+inheritance of, 246–247
+reference variables,
+237–239, 243
+variables, 236, 243–245
+interface keyword, 224, 235
+Internet, 4, 7, 8, 9, 11
+addresses, obtaining, 594
+addressing, 590–591
+and portability, 10, 11
+and security, 10–11,
+1070–1071
+Internet Protocol (IP)
+addresses, 590–591
+definition of, 588–589
+InterNIC (Internet root server),
+594, 596
+Interpreter, Java, 26
+and main( ), 28, 29
+InterruptedException, 266, 278
+Introspection, 894–897
+Introspector class, 908, 909–911
+I/O, 314–328, 538–585
+channel-based, 16, 847
+classes, list of, 538
+console, 29, 114, 314, 318–324
+error handling, 328
+file, 324–328, 539–545
+interfaces, list of, 539
+new. See New I/O (NIO)
+streams. See Streams
+io package. See java.io package
+IOException, 319, 325, 326, 546,
+547, 548, 558, 562, 565, 571, 578,
+580, 581, 595, 599, 601, 851
+isAbsolute( ), 541
+isAlive( ), 277, 286–289
+isAltDown( ), 662
+isAltGraphDown( ), 662
+isControlDown( ), 662
+isDirectory( ), 542
+isEditable( ), 759
+isEmpty( ), 444, 445, 493
+isEnabled( ), 776
+isFile( ), 541
+isHidden( ), 541
+isInfinite( ),  386
+isLeapYear( ), 519
+isMetaDown( ), 662
+isMulticastAddress( ), 594
+isN( ), 895
+isNaN( ), 386
+isPopupTrigger( ), 665
+isSet, 514
+isShiftDown( ), 662
+isTemporary( ), 661
+isTimeSet, 514
+ItemEvent class, 657, 662–663, 744,
+748, 777
+ItemListener interface, 669, 671,
+743, 748, 777
+ItemSelectable interface, 663
+I n d e x 1147
+itemStateChanged( ), 671, 744, 748
+Iteration statements, 109–119
+Iterator interface, 441, 442, 457–460
+methods, table of, 458
+iterator( ), 444, 445, 457, 459
+J
+Jakarta Project, 951
+JAR files, 536, 891–894
+JApplet class, 923
+Java
+API packages, table of core,
+844–846
+and C, 4, 6, 13
+and C++, 4, 7, 8, 9, 13
+and C#, 9
+design features, 12–15
+and DOS and
+Windows 3.1, 26
+history of, 4, 7–9, 15–16
+and the Internet, 4, 7, 11, 15
+as interpreted language,
+11, 14
+keywords, 38–39
+as strongly typed
+language, 42
+versions of, 15
+and Windows 95/98 and
+Windows NT, 26
+and the World Wide Web, 7,
+8, 13
+Java 2 SDK (Software
+Development Kit), 25
+Java 2D API, 733, 948
+Java Archive (JAR) files, 536,
+891–894
+Java Beans, 418, 437, 869, 886–920
+advantages of, 887
+API, 906–911
+and constrained properties,
+905
+customizers, 906
+introspection, 894–897
+using the BDK to develop,
+897–901
+using Bean Builder to
+develop, 911–920
+using bound property of,
+902–903
+.java file, 25
+Java Foundation Classes (JFC), 948
+java (Java interpreter), 26
+Java Native Interface (JNI), 336
+java package, 234
+Java Virtual Machine (JVM), 11, 12,
+14, 403
+java.applet package, 628
+java.awt package, 628, 656, 688
+classes, tables of, 688–691
+java.awt.Dimension class, 869
+java.awt.event package, 654, 656,
+669, 680
+classes, table of, 657–658
+java.awt.image package, 800,
+840–841
+java.beans package, 906–911
+classes, table of, 907–909
+interfaces, tables of, 907
+java.io package, 314, 538–539
+java.io.IOException, 114
+java.lang package, 234, 318, 380–437
+java.lang.image, 818
+java.lang.ref package, 437
+java.lang.reflect package, 437, 844,
+845, 869
+classes, table of, 870
+java.net package, 588
+classes and interfaces, list
+of, 592
+java.nio package, 436, 538, 550, 551,
+562, 596, 602, 844, 845, 847
+java.nio.channels package, 845,
+847, 850, 851
+java.nio.channles.spi package, 845,
+847
+java.nio.charset package, 846, 847,
+851
+java.nio.charset.spi package, 846,
+847
+java.rmi package, 844, 846, 874
+java.text package, 844, 846, 878
+java.util package, 440–441, 506, 656
+java.util.jar package, 506, 536
+java.util.regex package, 846, 859
+java.util.zip package, 506, 536, 892
+javac (Java compiler), 26
+javadoc utility program, 1134,
+1138–1139
+javah.exe, 337, 339
+JavaSoft, 888
+javax.imageio package, 841
+javax.servlet package, 953, 954–960
+interfaces and classes, list
+of, 955
+javax.servlet.http package, 954,
+962–971
+interfaces and classes, list
+of, 962–963
+javax.swing package, 923
+javax.swing.tree package, 923
+JButton class, 927–929
+JCheckBox class, 930–932
+JComboBox class, 934–936
+JComponent class, 924
+JFrame class, 913
+JLabel class, 914, 924–925
+jni.h, 339
+jni_md.h, 339
+join( ), 277, 286–289
+Joy, Bill, 7, 588
+JPanel class, 940
+JPEG image format, 800
+JRadioButton class, 932–934
+JscrollBar class, 915
+JScrollPane class, 939–940
+JSlider class, 914, 915
+JTabbedPane class, 936–939
+JTable class, 946–948
+JTextCompenent class, 925–926
+JTextField class, 926
+JToggleButton class, 930, 932
+JTree class, 941–942
+Jump statements, 119–127
+Just In Time (JIT) compiler, 12
+K
+Kernighan, Brian, 5
+KeyAdapter class, 681
+Keyboard events, handling, 676–680
+KeyEvent class, 658, 663–664
+KeyListener interface, 669, 671, 676
+keyPressed( ), 671, 676, 678
+keyReleased( ), 671, 676
+keys( ), 493
+keySet( ), 464
+keyTyped( ), 671, 676, 678
+Keywords, table of Java, 39
+L
+Label, 123, 125
+Swing, 924
+Label class, 737–739
+last( ), 447, 772, 773
+lastElement( ), 487, 488
+lastIndexOf( ), 361–363, 376–377,
+445, 446, 487, 488
+lastKey( ), 465
+Late binding, 220
+LaVallée, David, 1048, 1058
+Lavatron applet, 1058–1067
+Layout managers, 763–775
+LayoutManager interface, 763–764
+length( ), 186–187, 351, 369–370
+1148 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+length instance variable of arrays,
+179–181
+Lexer, 506
+Libraries, class, 25, 39
+Lindholm, Tim, 7
+LinkedHashMap class, 466, 470–471
+LinkedHashSet class, 449, 456
+LinkedList class, 448, 452–454
+list( ) and directories, 539, 542–544
+List class, 751
+extending, 795–796
+List controls, 751–754
+List interface, 442, 445–447
+methods, table of, 446
+listFiles( ), 544–545
+ListIterator interface, 442, 457–460
+methods, table of, 458
+ListResourceBundle class, 441
+Literals, 37, 50–52
+regular expression, 861
+load( ), 404, 499, 502–504
+loadLibrary( ), 337, 404
+Locale class, 523–524, 878, 880
+log( ), 420, 960
+Logical operators, Boolean, 92–94
+long, 42, 43, 45
+literal, 50
+Long class, 387, 396, 397
+methods, table of, 393–395
+lookup( ), 875
+loop( ), 651
+Loops
+do-while, 111–114
+for. See for loop
+infinite, 118–119
+nested, 119
+and polling, event, 275, 297
+while, 109–111
+M
+main( ), 28, 29, 131, 176
+and applets, 329, 331
+and command-line
+arguments, 188
+main (default name of main
+thread), 279
+MalformedURLException, 597
+Manifest files, 892
+Map interface, 463–464
+methods, table of, 463–464
+map( ), 851, 853–854, 856
+Map.Entry interface, 466
+methods, table of, 466
+MappedByteBuffer class, 848, 854
+Maps, 441, 462–471
+mark( ), 546, 548, 552, 556, 557, 559,
+569
+markSupported( ), 556, 559, 569
+Matcher class, 859, 860–861
+matcher( ), 860
+matches( ), 368, 860, 862–863,
+868–869
+Math class, 53, 159, 420–422
+rounding methods, table of,
+421
+max( ), 476, 480
+MAX_PRIORITY, 289, 423–424
+MAX_RADIX, 398
+MAX_VALUE, 382, 387, 398
+MediaTracker class, 811–815
+Member, class, 20, 158
+access, table of, 228
+Member interface, 869
+Memory
+allocation using new, 62, 63,
+134–136
+management, 13–14
+and Runtime class, 405–406
+MemoryImageSource class, 815–817
+Menu applet, Image-based,
+1048–1056
+Menu bars and menus, 775–782
+Menu class, 775, 776
+MenuBar class, 775, 776, 777
+MenuItem class, 775, 776, 777
+Messaging system, 276–277
+Method(s), 20, 131, 138–145
+abstract, 216–219
+calling, 140, 142
+dispatch, dynamic, 211–216
+factory, 593
+final, 219–220
+general form, 138
+interface, 236, 237
+native, 335–340
+overloading, 156–162
+overriding, 208–216
+and parameters, 138, 142–145
+passing object to, 166–167
+recursive, 169–172
+returning object from,
+168–169
+returning a value from,
+140–142
+scope defined by, 54–56
+static, 176–178
+synchronized, 276, 292–295
+and throws clause, 261–262
+Method class, 869–870, 872
+MIME types, 602, 950
+min( ), 477, 480
+minimumLayoutSize( ), 764
+MIN_PRIORITY, 289, 423–424
+MIN_RADIX, 398
+MIN_VALUE, 382, 387, 398
+mkdir( ), 545
+mkdirs( ), 545
+Modifier class, 872
+methods, table of, 872
+Modulus operator (%), 74–76
+Molecule Bean, 889–890
+Monitor, 276, 292
+Mouse events, handling, 673–676
+MouseAdapter class, 680, 681
+mouseClicked( ), 671, 680
+mouseDragged( ), 671, 680
+mouseEntered( ), 671
+MouseEvent class, 658, 664–665
+mouseExited( ), 671
+MouseListener interface, 669,
+671, 673
+MouseMotionAdapter class,
+680, 681
+MouseMotionListener interface,
+656, 669, 671, 673
+mouseMoved( ), 671, 680
+mousePressed( ), 671
+mouseReleased( ), 671
+MouseWheelEvent class, 658,
+665–666
+MouseWheelListener interface,
+669, 672, 673
+mouseWheelMoved( ), 672
+Multitasking, 274, 276
+Multithreaded programming, 14,
+274–311
+context switching rules for,
+275–276
+effectively using, 311
+Observable class, Observer
+interface and, 531
+and synchronization. See
+Synchronization
+and threads. See Thread(s)
+versus single-threaded
+system, 275
+MutableTreeNode interface, 942
+Mutex, 292
+N
+NAME, 644
+Name-space collisions
+instance variables and local
+variables, 149–150
+packages and, 224
+Naming class, 875
+I n d e x 1149
+NaN, 382, 385
+native modifier, 336, 339
+Naughton, Patrick, 7
+Negative numbers in Java,
+representation of, 81
+NEGATIVE_INFINITY, 382
+NegativeArraySizeException, 265
+.Net Framework, 9
+Networking, 588–626
+new, 62, 63, 134–136, 145, 147,
+260, 261
+New I/O (NIO), 844, 847–859
+copying a file using, 857–859
+reading a file using, 851–855
+writing to a file using,
+855–857
+next( ), 459, 772, 773
+nextBoolean( ), 525
+nextBytes( ), 525
+nextDouble( ), 245, 525
+nextElement( ), 485, 506, 507
+nextFloat( ), 525
+nextGaussian( ), 525
+nextInt( ), 525
+nextLong( ), 525
+nextToken( ), 506, 507, 575
+NIO. See New I/O (NIO)
+NORM_PRIORITY, 289, 423–424
+NoSuchElementException, 447,
+463, 465
+NoSuchFieldException, 266
+NoSuchMethodException, 266
+NOT operator
+bitwise unary (~), 80, 82
+Boolean logical unary (!), 92
+notepad, 406–407
+notify( ), 221, 297–298, 300–302
+notifyAll( ), 221, 297–298
+notifyObservers( ), 527, 528
+null, 39
+Null statement, 110
+NullPointerException, 261, 266,
+447, 463, 465
+Number class, 381
+NumberFormatException, 266
+O
+Oak, 7, 15
+Object(s), 20, 130, 136
+bitwise copy (clone) of,
+412–415
+creating, 132, 134–136
+initialization with
+constructor, 145, 147
+to method, passing, 166–167
+as parameters, 162–165
+returning, 168–169
+serialization of. See
+Serialization
+type at run time,
+determining, 332–335
+Object class, 220–221, 323, 412
+methods, table of, 413
+Object reference variables
+assigning, 137
+declaring, 134–136
+and dynamic method
+dispatch, 211–212
+interface, 237–239
+to superclass reference
+variable, assigning
+subclass, 196–197
+OBJECT tag, 643
+Object-oriented programming
+(OOP), 6, 18–25
+model in Java, 13
+ObjectInput interface, 580
+methods defined by, table
+of, 580–581
+ObjectInputStream class, 581
+methods defined by, table
+of, 581–583
+ObjectOutput interface, 578
+methods defined by, table
+of, 578
+ObjectOutputStream class, 579
+methods defined by, table
+of, 579–580
+Observable class, 527–531
+methods, table of, 527
+Observer interface, 527, 528
+Octals, 50
+as character values, 51
+openConnection( ), 598–599
+Operator(s)
+arithmetic, 74–80
+assignment, 31, 94–95
+bitwise, 80–90
+Boolean logical, 92–94
+parentheses and, 96–98
+precedence, table of, 97
+relational, 48, 90–91
+ternary, 95–96
+OR operator (|)
+bitwise, 80, 82
+Boolean, 92
+OR operator, short-circuit (||), 92,
+93–94
+OurButton Bean, 890, 891
+out output stream, 29, 318, 407
+OutputStream class, 315, 316, 322,
+323, 545, 547–548
+methods, table of, 547
+Overloading  methods, 156–162,
+210–211
+Overriding, method, 208–211
+and dynamic method
+dispatch, 211–216
+using final to prevent,
+219–220
+P
+Package(s), 172, 224–235, 247
+access to classes contained
+in, 227–228
+core Java API, table of,
+844–846
+defining, 225
+importing, 232–235
+Package class, 380, 432–434
+methods, table of, 433–434
+package statement, 225, 232
+paint( ), 329, 632, 634–635, 637, 638,
+639, 705, 803
+Paint mode, setting, 715–717
+Panel class, 629, 691, 692, 772
+PARAM NAME, 644
+Parameters, 28, 138, 142–145
+applets and, 645–648
+objects as, 162–165
+and overloaded
+constructors, 160
+and overloaded
+methods, 156
+reference, C++ versus Java,
+991–994
+parseByte( ), 396
+parseInt( ), 396
+parseLong( ), 396
+parseShort( ), 396
+Parsing, 506
+Pascal, 5
+Pattern class, 859–860
+Payne, Jonathan, 7
+peek( ), 490, 491
+Persistence (Java Beans), 905–896
+PI (double constant), 420
+PixelGrabber class, 818–820
+play( ), 651
+Pointers, 71, 136, 982, 985–991
+Polling, 275, 297
+Polymorphism, 22–25
+and dynamic method
+dispatch, 211–216
+and interfaces, 235,
+238–239, 243
+and overloaded methods,
+156, 159
+pop( ), 490, 491
+1150 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+PopupMenu class, 782
+Port, 589
+Portability problem, 8, 10, 11, 14
+and data types, 43
+and native methods, 340
+POSITIVE_INFINITY, 382
+pow( ), 421
+preferredLayoutSize( ), 764
+previous( ), 772, 773
+print( ), 31, 322, 323, 354, 561, 572
+println( ), 29, 31, 322, 323, 354, 561,
+572
+PrintStream class, 316, 318, 322, 561
+PrintWriter class, 317, 323, 572
+private access specifier, 28, 172, 228
+and inheritance, 192–193
+Process class, 402
+methods, table of, 402
+Process-based versus thread-based
+multitasking, 274
+processActionEvent( ), 791,
+792, 796
+processAdjustmentEvent( ),
+791, 797
+processComponentEvent( ), 791
+processFocusEvent( ), 791
+processItemEvent( ), 791, 793,
+795, 796
+processKeyEvent( ), 791
+processMouseEvent( ), 791
+processMouseMotionEvent( ), 791
+processMouseWheelEvent( ), 791
+processTextEvent( ), 791
+Programming
+multithreaded. See
+Multithreaded
+programming
+object-oriented. See
+Object-oriented
+programming
+structured, 6
+Properties, environment, 412
+Properties class, 498–504
+legacy methods, table
+of, 499
+PropertyChangeEvent, 902,
+905, 908
+PropertyDescriptor class, 903, 909,
+910–911
+PropertyResourceBundle class, 441
+protected access specifier, 151,
+172, 228
+public access specifier, 28, 172, 228
+push( ), 490, 491
+Push buttons, 739–743
+Pushback, 558
+PushbackInputStream, 316, 558–559
+PushbackReader class, 317, 571–572
+put( ), 464, 468, 471, 493
+and buffers, 849–850, 856
+putAll( ), 464, 471
+PutField inner class, 579
+R
+Radio buttons, 745
+Swing, 932–934
+random( ), 422
+Random class, 245, 422, 524–526
+methods, table of, 525
+RandomAccess interface, 442, 462
+RandomAccessFile class, 316,
+561–562
+read( ), 315, 319, 325–326, 328, 556,
+558, 571. 850, 852
+and end-of-file condition,
+328
+Reader class, 315, 319, 545, 562
+methods defined by, table
+of, 563
+readLine( ), 320, 396, 581, 960
+readObject( ), 580, 581
+rebind( ), 875
+Recursion, 169–172
+Reference parameters, C++ versus
+Java, 991–994
+Reflection, 437, 869–872
+regionMatches( ), 358
+Regular expressions, 844, 859–869
+syntax, 861
+wildcards and quantifiers,
+861, 864–866
+Relational operators, 48, 90–91
+Remote interface, 874
+Remote method invocation (RMI),
+15, 577, 844, 874–878
+RemoteException, 874
+remove( ), 444, 445, 455, 493, 737
+removeAll( ), 444, 445, 737
+removeAttribute( ), 967, 978
+removeEldestEntry( ), 471
+removeElement( ), 487, 488
+removeElementAt( ), 487, 488
+removeFirst( ), 453
+removeLast( ), 453
+removeTypeListener( ), 656
+renameTo( ), 541
+repaint( ), 638–639
+demonstration program,
+639–641
+replace( ), 364–365, 375
+replaceAll( ), 368, 861, 867
+replaceFirst( ), 368
+replaceRange( ), 762
+ReplicateScaleFilter class, 821
+requestFocus( ), 677
+reset( ), 547, 548, 552, 554, 556,
+559, 569
+resetSyntax( ), 574
+ResourceBundle class, 441
+resume( ), 15, 305–308, 424, 426
+retainAll( ), 444, 445
+return statement, 126–127, 138
+reverse( ), 373–374
+reverseOrder( ), 477, 479
+rewind( ), 853, 856
+RGB color model, default, 815–816
+RGBImageFilter class, 821, 823–837
+RGBtoHSB( ), 713
+Richards, Martin, 5
+Ritchie, Dennis, 5, 588
+RMI compiler (rmic), 876–877
+rmiregistry (RMI registry), 877
+run( ), 277, 280, 423, 531, 532
+overriding, 282, 284, 531
+using flag variable with,
+308–310
+runFinalizersOnExit( ), 403, 408
+Runnable interface, 277, 380,
+423, 531
+implementing, 280–282, 284
+Run-time
+system, Java, 11
+type information, 15,
+333, 418
+Runtime class, 402, 403–407
+executing other programs
+and, 406–407
+memory management and,
+405–406
+methods, table of, 403–404
+RuntimeException class, 251, 261,
+265, 270
+RuntimePermission class, 380, 434
+S
+save( ), 498
+scanf( ) C function, 318
+schedule( ), 532, 533
+Scientific notation, 50
+Scope(s) in Java, 54–56
+Scrabblet applet, 1070–1132
+Scroll bars, 754–758
+Scroll panes, 939–941
+Scrollbar class, 755
+extending, 797
+search( ), 490, 491
+I n d e x 1151
+Security problem, 10–11, 1070–1071
+and native methods, 340
+and servlets, 950–951, 979
+SecurityException, 266, 403, 408
+SecurityManager class, 434
+seek( ), 561
+select( ), 748, 752, 759
+Selection statements, 100–108
+Selectors, 851
+Semaphore, 292
+SequenceInputStream class, 316,
+559–560
+Serializable interface, 577
+Serialization, 577–585
+example program, 583–585
+and static variables, 577
+and transient variables, 577
+Server, 589
+proxy, 590
+ServerSocket class, 595, 601–602
+service( ), 951, 953, 955, 956
+Servlet(s), 950–979
+advantages of, 950–951
+example of simple, 953–954
+life cycle of, 951
+parameters, reading,
+960–962
+and security, 950–951, 979
+and session tracking,
+977–979
+using Tomcat to develop,
+951–952
+Servlet interface, 955–956
+methods, table of, 956
+ServletConfig interface, 955, 956
+ServletContext interface, 955–957
+methods, table of, 957
+ServletException class, 955, 960
+ServletInputStream class, 955, 960
+ServletOutputStream class,
+955, 960
+ServletRequest interface, 953, 955,
+957, 960
+methods, table of, 958–959
+ServletResponse interface, 953,
+955, 957
+methods, table of, 959
+Session tracking, 977–979
+Set interface, 442, 447
+Set-view, obtaining, 497
+set( ), 445, 446, 454
+setAlignment( ), 738
+setAttribute( ), 967, 978
+setBackground( ), 636, 713
+setBlockIncrement( ), 755
+setBounds( ), 692, 764
+setChanged( ), 527
+setCharAt( ), 371
+setColor( ), 714
+setContentType( ), 953
+setDefault( ), 524
+setEchoCharacter( ), 759
+setEditable( ), 759
+setEnabled( ), 776
+setFont( ), 720
+setForeground( ), 636, 713
+SetIntField( ), 339
+setLabel( ), 739, 743, 776
+setLastModified( ), 542
+setLayout( ), 763–764
+setLength( ), 370–371, 562
+setLocation( ), 692
+setMaxAge( ), 969, 977
+setN( ), 894, 895, 896
+setName( ), 278, 279
+setPaintMode( ), 715
+setPriority( ), 289
+setReadOnly( ), 542
+setSelectedCheckbox( ), 746
+setSize( ), 692, 694, 695
+setState( ), 743, 777
+setText( ), 738, 758
+setTitle( ), 704
+setUnitIncrement( ), 755
+setValue( ), 755
+setValues( ), 755
+setVisible( ), 694, 695
+setXORMode( ), 715
+Sheridan, Mike, 7
+Shift operators, bitwise, 80, 84–89
+Short class, 387, 396, 397
+methods defined by, table
+of, 389–390
+short data type, 42, 43, 44, 50
+show( ), 772, 773
+showDocument( ), 649, 650–651,
+1048, 1056
+showStatus( ), 642, 681
+shuffle( ), 477, 479
+Sign extension, 87
+SimpleBeanInfo class, 903, 909
+SimpleDateFormat class, 524,
+880–882
+SimpleTimeZone class, 522–523
+sin( ), 420
+SingleThreadModel interface,
+955, 957
+size( ), 444, 445, 455, 493, 851
+Skeletons (RMI), 876–877
+skip( ), 548, 556, 558
+sleep( ), 277, 278, 279
+slice( ), 850
+Socket(s)
+example program of
+client/server, 602–623
+overview, 588–589
+reserved, 589–590
+TCP/IP client, 594–597
+TCP/IP server, 601
+Socket class, 595–596
+SocketChannel class, 850
+sort( ), 482
+SortedMap interface, 465
+methods, table of, 465
+SortedSet interface, 442, 447–448
+methods, table of, 447–448
+Source code, 25–26
+split( ), 368, 867–868
+sqrt( ), 53, 421
+Stack, definition of, 152
+Stack class, 490–492
+methods, table of, 491
+Stack trace, 252, 435
+StackTraceElement class, 435
+methods, table of,  435
+Standard Template Library (STL),
+442
+start( ), 277, 280, 282, 632, 634, 637,
+860, 864
+startsWith( ), 358–359
+Statements, 29
+null, 110
+Statements, control
+iteration, 100, 109–119
+jump, 100, 119–127
+selection, 100–108
+static, 28, 176–178
+stop( ), 15, 308, 632, 634, 635, 651
+store( ), 498, 499, 502–504
+Stream(s)
+benefits, 585
+buffered, 555–559
+classes, byte, 315, 316,
+545–562
+classes, character, 315, 317,
+545, 562–577
+definition of, 314, 538
+filtered, 555
+predefined, 318
+StreamTokenizer class, 574–577
+strictfp, 39, 335
+StrictMath class, 422
+String(s)
+arrays of, 187, 188
+changing case of characters
+in, 367
+comparison, 356–361
+1152 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+concatenating, 185–186,
+352–353. 364, 372–373
+creating, 348–351
+extracting characters from,
+355–356
+length, obtaining,
+186–187, 351
+literals, 52, 351
+modifying, 363–366
+as objects, 52, 70–71,
+181–182, 348
+parsing formatted input, 506
+reading, 320–322
+representations of numbers,
+converting, 392–393, 396
+searching, 361–363
+String class, 28, 185, 348
+constructors, 348–350
+StringBuffer class, 185, 348, 361,
+369–377
+StringBufferInputStream class, 539
+StringIndexOutOfBounds
+exception, 266
+StringTokenizer class, 506–508
+methods, table of, 507
+stringWidth( ), 725, 726
+Stroustrup, Bjarne, 7
+Stubs (RMI), 876–877
+Subclass, 190, 192
+subList( ), 446, 447
+subMap( ), 465
+subSequence( ), 368, 376
+subSet( ), 447, 448
+substring( ), 363–364, 375
+Sun Microsystems, 7, 588
+super, 176, 197–203
+and superclass constructors,
+197–202, 206
+and instance variables,
+202–203
+Superclass, 190, 192
+suspend( ), 15, 305–307, 308,
+424, 426
+Swing, 922–948
+and Bean Builder, 891
+component classes, list of
+some, 922
+switch statement, 104–108
+Synchronization, 276, 292–297
+and collections, 475
+and deadlock, 302–304
+race condition and, 294
+via synchronized block,
+295–297
+via synchronized method,
+292–295
+synchronized modifier, 292
+used with method, 292,
+295
+used with object, 295–297
+synchronizedList( ), 475, 478
+synchronizedSet( ), 475, 478
+System class, 29, 318, 407
+methods, table of, 408–410
+System.err standard error
+stream, 318
+System.in standard input stream,
+318, 319
+System.in.read( ), 114
+System.out standard output
+stream, 318, 322, 323, 324
+T
+Tabbed panes, 936–939
+Tables, Swing, 946–948
+tailMap( ), 465
+tailSet( ), 447, 448
+tan( ), 420
+TCP/IP, 15, 588, 1070
+client sockets, 594–597
+disadvantages of, 623
+reserved sockets, 589–590
+server sockets, 601–602
+See also Transmission
+Control Protocol (TCP)
+Temple, Robert, 1012
+Ternary operator (?:), 92, 95–96
+Text fields, 758–761
+Swing, 925–926
+Text formatting, 878–882
+Text output, managing, 723–733
+TextArea class, 761–763
+textChanged( ), 672
+TextComponent class, 758, 761
+TextEvent class, 658, 666–667
+TextField class, 758, 759
+TextListener interface, 669, 672
+this, 149–150, 176
+Thompson, Ken, 5, 588
+Thread(s)
+creating, 280–286
+daemon, 532
+and deadlock, 302–304, 308
+definition of, 274
+group, 279, 426–432
+main, 277, 282, 286
+messaging, 276–277, 297–302
+possible states of, 275
+priorities, 275–276,
+289–292, 423
+resuming, 305–310, 426
+stopping, 305–310
+suspending, 277, 278, 279,
+305–310, 426
+synchronization. See
+Synchronization
+Thread class, 15, 277,
+423–426, 531
+constructors, 280, 284, 423
+extending, 282–284
+methods, table of, 424–426
+ThreadGroup class, 426–432
+methods, table of, 427–428
+ThreadLocal class, 380, 432
+throw, 250, 260–261
+Throwable class, 251, 254, 267,
+269–270, 434
+methods defined by, table
+of, 267
+obtaining object of, 260–261
+throws, 250, 261–262, 265
+TickTock Bean, 902–903
+Time. See Date class
+Timer class, 531–534
+TimerTask class, 531–534
+Timestamps, 659
+TimeZone class, 521–522
+methods defined by, table
+of, 521–522
+toArray( ), 444, 445, 451–452
+toBinaryString( ), 397
+toCharArray( ), 356
+toDegrees( ), 422
+toHexString( ), 397
+Tokens, 506
+toLowerCase( ), 367
+Tomcat, 951–952
+toOctalString( ), 397
+Toolkit class, 720
+toRadians( ), 422
+toString( ), 221, 254, 268, 323,
+353–354, 366, 387, 456, 510,
+511, 656
+totalMemory( ), 404, 405–406
+toUpperCase( ), 367
+transient modifier, 331–332
+translatePoint( ), 665
+Transmission Control
+Protocol (TCP)
+definition of, 589
+and stream-based I/O, 592
+See also TCP/IP
+TreeExpansionEvent class, 942
+TreeExpansionListener
+interface, 942
+TreeMap class, 466, 468–470, 504
+TreeNode class, 942
+I n d e x 1153
+Trees, Swing, 941–946
+TreeSet class, 449, 455, 456–457, 504
+TreePath class, 942
+trim( ), 365–366
+trimToSize( ), 451
+true, 39, 48, 51, 91
+TRUE, 401
+True and false in Java, 51, 91
+try block(s),  250, 253–254
+nested, 257–259
+Two's complement, 81
+TYPE, 382, 387, 398, 401, 402
+Type
+casting, 57–59, 60
+checking, 42
+conversion, automatic, 42,
+57, 157–159
+promotion, 44, 59–61
+Types, data. See Data types
+U
+UDP protocol, 589, 591–592, 624
+UnavailableException class, 955,
+960
+unhand( ) macro, 342
+UnicastRemoteObject, 874
+Unicode, 47, 48, 51, 315, 350, 356,
+401, 562
+Uniform Resource Identifier
+(URI), 626
+UNIX, 5, 588
+UnknownHostException,
+593, 595
+unmodifiable, 475
+unread( ), 558, 571
+UnsupportedOperationException,
+266, 442–443, 445, 463, 475
+update( ), 527, 528, 638, 639, 705
+overriding, 635
+URI class, 592, 626
+URL (Uniform Resource
+Locator), 597
+specification format, 597
+URL class, 597–599, 601
+URLConnection class, 599–601
+User Datagram Protocol (UDP),
+589, 591–592, 624
+V
+valueBound( ), 967
+valueOf( ), 353, 366–367
+values( ), 464
+valueUnbound( ), 967
+van Hoff, Arthur, 7
+Variable(s), 52–56
+declaration, 30–31, 52–53
+definition of, 29, 52
+dynamic initialization of, 53
+final, 178–179
+instance. See Instance
+variables
+interface, 236
+object reference. See Object
+reference variables
+scope and lifetime of, 54–56
+Vector class, 462, 485–490
+methods, table of, 486–488
+Virtual functions (C++), 213
+Virtual machine, Java, 400
+void, 28, 138
+Void class, 401
+volatile modifier, 291–292, 331, 332
+VSPACE 644
+W
+wait( ), 221, 297–298, 300–302
+waitFor( ), 407
+Warth, Chris, 7
+wc( ), 572–577
+WeakHashMap class, 466, 467
+Web browser
+executing applet in, 330,
+331, 628
+handling older, 644
+using status window of, 642
+Web server and servlets, 950, 951
+while loop, 109–111
+Whitespace, 37
+from string, removing, 365
+whitespaceChars( ), 575
+Whois, 596–597
+WIDTH, 644
+Window
+displaying information in,
+704–705
+frame. See Frame window
+fundamentals, 691–693
+status, using, 642
+Window class, 693, 783
+windowActivated( ), 672
+windowClosed( ), 672
+windowClosing( ), 672, 694, 695
+windowDeactivated( ), 672
+windowDeiconified( ), 672
+WindowEvent class, 658, 667–668
+WindowFocusListener interface,
+669, 672
+windowGainedFocus( ), 672
+windowIconified( ), 672
+WindowListener interface, 669,
+672, 694
+windowLostFocus( ), 672
+windowOpened( ), 672
+Windows 3.1 and Java, 26
+Windows 95/98 and Windows NT
+and Java, 26
+wordChars( ), 575
+World Wide Web, 7, 8, 597
+wrap( ), 850
+Wrappers, simple type, 380–401
+write( ), 315, 322–323, 326–328, 850,
+855–856
+Writer class, 315, 545, 562
+methods defined by, table
+of, 564
+writeObject( ), 578
+writeTo( ), 554
+X
+XOR (exclusive OR) operator (^)
+bitwise, 80, 82, 83
+Boolean, 92
+Y
+Yellin, Frank, 7
+Z
+Zero crossing, 81
+ZIP file format, 536
+ZLIB file format, 536
+1154 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+INTERNATIONAL CONTACT INFORMATION
+AUSTRALIA
+McGraw-Hill Book Company Australia Pty. Ltd.
+TEL +61-2-9415-9899
+FAX +61-2-9415-5687
+http://www.mcgraw-hill.com.au
+books-it_sydney@mcgraw-hill.com
+CANADA
+McGraw-Hill Ryerson Ltd.
+TEL +905-430-5000
+FAX +905-430-5020
+http://www.mcgrawhill.ca
+GREECE, MIDDLE EAST,
+NORTHERN AFRICA
+McGraw-Hill Hellas
+TEL +30-1-656-0990-3-4
+FAX +30-1-654-5525
+MEXICO (Also serving Latin America)
+McGraw-Hill Interamericana Editores S.A. de C.V.
+TEL +525-117-1583
+FAX +525-117-1589
+http://www.mcgraw-hill.com.mx
+fernando_castellanos@mcgraw-hill.com
+SINGAPORE (Serving Asia)
+McGraw-Hill Book Company
+TEL +65-863-1580
+FAX +65-862-3354
+http://www.mcgraw-hill.com.sg
+mghasia@mcgraw-hill.com
+SOUTH AFRICA
+McGraw-Hill South Africa
+TEL +27-11-622-7512
+FAX +27-11-622-9045
+robyn_swanepoel@mcgraw-hill.com
+UNITED KINGDOM & EUROPE
+(Excluding Southern Europe)
+McGraw-Hill Education Europe
+TEL +44-1-628-502500
+FAX +44-1-628-770224
+http://www.mcgraw-hill.co.uk
+computing_neurope@mcgraw-hill.com
+ALL OTHER INQUIRIES Contact:
+Osborne/McGraw-Hill
+TEL +1-510-549-6600
+FAX +1-510-883-7600
+http://www.osborne.com
+omg_international@mcgraw-hill.com

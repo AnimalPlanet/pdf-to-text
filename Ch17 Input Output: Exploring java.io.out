@@ -1,0 +1,1913 @@
+Chapter 17
+Input/Output:
+Exploring java.io
+537
+This chapter explores java.io, which provides support for I/O operations. InChapter 12, we presented an overview of Java’s I/O system. Here, we willexamine the Java I/O system in greater detail.
+As all programmers learn early on, most programs cannot accomplish their goals
+without accessing external data. Data is retrieved from an input source. The results of
+a program are sent to an output destination. In Java, these sources or destinations are
+defined very broadly. For example, a network connection, memory buffer, or disk file
+can be manipulated by the Java I/O classes. Although physically different, these
+devices are all handled by the same abstraction: the stream. A stream, as explained in
+Chapter 12, is a logical entity that either produces or consumes information. A stream
+is linked to a physical device by the Java I/O system. All streams behave in the same
+manner, even if the actual physical devices they are linked to differ.
+Java 2, version 1.4 includes some additional I/O capabilities which are contained in the
+java.nio package. These are described in Chapter 24.
+The Java I/O Classes and Interfaces
+The I/O classes defined by java.io are listed here:
+BufferedInputStream FileWriter PipedInputStream
+BufferedOutputStream FilterInputStream PipedOutputStream
+BufferedReader FilterOutputStream PipedReader
+BufferedWriter FilterReader PipedWriter
+ByteArrayInputStream FilterWriter PrintStream
+ByteArrayOutputStream InputStream PrintWriter
+CharArrayReader InputStreamReader PushbackInputStream
+CharArrayWriter LineNumberReader PushbackReader
+DataInputStream ObjectInputStream RandomAccessFile
+DataOutputStream ObjectInputStream.GetField Reader
+File ObjectOutputStream SequenceInputStream
+FileDescriptor ObjectOutputStream.PutField SerializablePermission
+FileInputStream ObjectStreamClass StreamTokenizer
+FileOutputStream ObjectStreamField StringReader
+FilePermission OutputStream StringWriter
+FileReader OutputStreamWriter Writer
+538 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 539
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The ObjectInputStream.GetField and ObjectOutputStream.PutField inner classes
+were added by Java 2. The java.io package also contains two classes that were deprecated
+by Java 2 and are not shown in the preceding table: LineNumberInputStream and
+StringBufferInputStream. These classes should not be used for new code.
+The following interfaces are defined by java.io:
+DataInput FilenameFilter ObjectOutput
+DataOutput ObjectInput ObjectStreamConstants
+Externalizable ObjectInputValidation Serializable
+FileFilter
+The FileFilter interface was added by Java 2.
+As you can see, there are many classes and interfaces in the java.io package. These
+include byte and character streams, and object serialization (the storage and retrieval of
+objects). This chapter examines several of the most commonly used I/O components,
+beginning with one of the most unique: File.
+File
+Although most of the classes defined by java.io operate on streams, the File class does
+not. It deals directly with files and the file system. That is, the File class does not
+specify how information is retrieved from or stored in files; it describes the properties
+of a file itself. A File object is used to obtain or manipulate the information associated
+with a disk file, such as the permissions, time, date, and directory path, and to navigate
+subdirectory hierarchies.
+Files are a primary source and destination for data within many programs.
+Although there are severe restrictions on their use within applets for security reasons,
+files are still a central resource for storing persistent and shared information. A
+directory in Java is treated simply as a File with one additional property—a list of
+filenames that can be examined by the list( ) method.
+The following constructors can be used to create File objects:
+File(String directoryPath)
+File(String directoryPath, String filename)
+File(File dirObj, String filename)
+File(URI uriObj)
+Here, directoryPath is the path name of the file, filename is the name of the file, dirObj is a
+File object that specifies a directory, and uriObj is a URI object that describes a file. The
+fourth constructor was added by Java 2, version 1.4.
+The following example creates three files: f1, f2, and f3. The first File object is
+constructed with a directory path as the only argument. The second includes two
+arguments—the path and the filename. The third includes the file path assigned to f1
+and a filename; f3 refers to the same file as f2.
+File f1 = new File("/");
+File f2 = new File("/","autoexec.bat");
+File f3 = new File(f1,"autoexec.bat");
+Java does the right thing with path separators between UNIX and Windows
+conventions. If you use a forward slash (/) on a Windows version of Java, the path
+will still resolve correctly. Remember, if you are using the Windows convention
+of a backslash character (\), you will need to use its escape sequence (\\) within a
+string. The Java convention is to use the UNIX- and URL-style forward slash for
+path separators.
+File defines many methods that obtain the standard properties of a File object. For
+example, getName( ) returns the name of the file, getParent( ) returns the name of the
+parent directory, and exists( ) returns true if the file exists, false if it does not. The File class,
+however, is not symmetrical. By this, we mean that there are many methods that allow you
+to examine the properties of a simple file object, but no corresponding function exists to
+change those attributes. The following example demonstrates several of the File methods:
+// Demonstrate File.
+import java.io.File;
+class FileDemo {
+static void p(String s) {
+System.out.println(s);
+}
+public static void main(String args[]) {
+File f1 = new File("/java/COPYRIGHT");
+p("File Name: " + f1.getName());
+p("Path: " + f1.getPath());
+p("Abs Path: " + f1.getAbsolutePath());
+p("Parent: " + f1.getParent());
+p(f1.exists() ? "exists" : "does not exist");
+p(f1.canWrite() ? "is writeable" : "is not writeable");
+p(f1.canRead() ? "is readable" : "is not readable");
+p("is " + (f1.isDirectory() ? "" : "not" + " a directory"));
+p(f1.isFile() ? "is normal file" : "might be a named pipe");
+p(f1.isAbsolute() ? "is absolute" : "is not absolute");
+p("File last modified: " + f1.lastModified());
+p("File size: " + f1.length() + " Bytes");
+}
+}
+540 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 541
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+When you run this program, you will see something similar to the following:
+File Name: COPYRIGHT
+Path: /java/COPYRIGHT
+Abs Path: /java/COPYRIGHT
+Parent: /java
+exists
+is writeable
+is readable
+is not a directory
+is normal file
+is absolute
+File last modified: 812465204000
+File size: 695 Bytes
+Most of the File methods are self-explanatory. isFile( ) and isAbsolute( ) are not.
+isFile( ) returns true if called on a file and false if called on a directory. Also, isFile( )
+returns false for some special files, such as device drivers and named pipes, so this
+method can be used to make sure the file will behave as a file. The isAbsolute( )
+method returns true if the file has an absolute path and false if its path is relative.
+File also includes two useful utility methods. The first is renameTo( ), shown here:
+boolean renameTo(File newName)
+Here, the filename specified by newName becomes the new name of the invoking File
+object. It will return true upon success and false if the file cannot be renamed (if you
+either attempt to rename a file so that it moves from one directory to another or use an
+existing filename, for example).
+The second utility method is delete( ), which deletes the disk file represented by the
+path of the invoking File object. It is shown here:
+boolean delete( )
+You can also use delete( ) to delete a directory if the directory is empty. delete( )
+returns true if it deletes the file and false if the file cannot be removed.
+Here are some other File methods that you will find helpful. (They were added
+by Java 2.)
+Method Description
+void deleteOnExit( ) Removes the file associated with the
+invoking object when the Java Virtual
+Machine terminates.
+boolean isHidden( ) Returns true if the invoking file is
+hidden. Returns false otherwise.
+Method Description
+boolean setLastModified(long millisec) Sets the time stamp on the invoking
+file to that specified by millisec, which
+is the number of milliseconds from
+January 1, 1970, Coordinated
+Universal Time (UTC).
+boolean setReadOnly( ) Sets the invoking file to read-only.
+Also, because File supports the Comparable interface, the method compareTo( ) is
+also supported.
+Directories
+A directory is a File that contains a list of other files and directories. When you create a
+File object and it is a directory, the isDirectory( ) method will return true. In this case,
+you can call list( ) on that object to extract the list of other files and directories inside.
+It has two forms. The first is shown here:
+String[ ] list( )
+The list of files is returned in an array of String objects.
+The program shown here illustrates how to use list( ) to examine the contents of
+a directory:
+// Using directories.
+import java.io.File;
+class DirList {
+public static void main(String args[]) {
+String dirname = "/java";
+File f1 = new File(dirname);
+if (f1.isDirectory()) {
+System.out.println("Directory of " + dirname);
+String s[] = f1.list();
+for (int i=0; i < s.length; i++) {
+File f = new File(dirname + "/" + s[i]);
+if (f.isDirectory()) {
+System.out.println(s[i] + " is a directory");
+} else {
+542 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 543
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+System.out.println(s[i] + " is a file");
+}
+}
+} else {
+System.out.println(dirname + " is not a directory");
+}
+}
+}
+Here is sample output from the program. (Of course, the output you see will be
+different, based on what is in the directory.)
+Directory of /java
+bin is a directory
+lib is a directory
+demo is a directory
+COPYRIGHT is a file
+README is a file
+index.html is a file
+include is a directory
+src.zip is a file
+.hotjava is a directory
+src is a directory
+Using FilenameFilter
+You will often want to limit the number of files returned by the list( ) method to
+include only those files that match a certain filename pattern, or filter. To do this, you
+must use a second form of list( ), shown here:
+String[ ] list(FilenameFilter FFObj)
+In this form, FFObj is an object of a class that implements the FilenameFilter interface.
+FilenameFilter defines only a single method, accept( ), which is called once for each
+file in a list. Its general form is given here:
+boolean accept(File directory, String filename)
+The accept( ) method returns true for files in the directory specified by directory that
+should be included in the list (that is, those that match the filename argument), and
+returns false for those files that should be excluded.
+544 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The OnlyExt class, shown next, implements FilenameFilter. It will be used to modify
+the preceding program so that it restricts the visibility of the filenames returned by list( )
+to files with names that end in the file extension specified when the object is constructed.
+import java.io.*;
+public class OnlyExt implements FilenameFilter {
+String ext;
+public OnlyExt(String ext) {
+this.ext = "." + ext;
+}
+public boolean accept(File dir, String name) {
+return name.endsWith(ext);
+}
+}
+The modified directory listing program is shown here. Now it will only display files
+that use the .html extension.
+// Directory of .HTML files.
+import java.io.*;
+class DirListOnly {
+public static void main(String args[]) {
+String dirname = "/java";
+File f1 = new File(dirname);
+FilenameFilter only = new OnlyExt("html");
+String s[] = f1.list(only);
+for (int i=0; i < s.length; i++) {
+System.out.println(s[i]);
+}
+}
+}
+The listFiles( ) Alternative
+Java 2 added a variation to the list( ) method, called listFiles( ), which you might find
+useful. The signatures for listFiles( ) are shown here:
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 545
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+File[ ] listFiles( )
+File[ ] listFiles(FilenameFilter FFObj)
+File[ ] listFiles(FileFilter FObj)
+These methods return the file list as an array of File objects instead of strings. The first
+method returns all files, and the second returns those files that satisfy the specified
+FilenameFilter. Aside from returning an array of File objects, these two versions of
+listFiles( ) work like their equivalent list( ) methods.
+The third version of listFiles( ) returns those files with path names that satisfy the
+specified FileFilter. FileFilter defines only a single method, accept( ), which is called
+once for each file in a list. Its general form is given here:
+boolean accept(File path)
+The accept( ) method returns true for files that should be included in the list (that is,
+those that match the path argument), and false for those that should be excluded.
+Creating Directories
+Another two useful File utility methods are mkdir( ) and mkdirs( ). The mkdir( )
+method creates a directory, returning true on success and false on failure. Failure
+indicates that the path specified in the File object already exists, or that the directory
+cannot be created because the entire path does not exist yet. To create a directory for
+which no path exists, use the mkdirs( ) method. It creates both a directory and all the
+parents of the directory.
+The Stream Classes
+Java’s stream-based I/O is built upon four abstract classes: InputStream, OutputStream,
+Reader, and Writer. These classes were briefly discussed in Chapter 12. They are used to
+create several concrete stream subclasses. Although your programs perform their I/O
+operations through concrete subclasses, the top-level classes define the basic functionality
+common to all stream classes.
+InputStream and OutputStream are designed for byte streams. Reader and Writer
+are designed for character streams. The byte stream classes and the character stream
+classes form separate hierarchies. In general, you should use the character stream
+classes when working with characters or strings, and use the byte stream classes when
+working with bytes or other binary objects.
+In the remainder of this chapter, both the byte- and character-oriented streams
+are examined.
+The Byte Streams
+The byte stream classes provide a rich environment for handling byte-oriented I/O. A
+byte stream can be used with any type of object, including binary data. This versatility
+makes byte streams important to many types of programs. Since the byte stream classes
+are topped by InputStream and OutputStream, our discussion will begin with them.
+InputStream
+InputStream is an abstract class that defines Java’s model of streaming byte input. All
+of the methods in this class will throw an IOException on error conditions. Table 17-1
+shows the methods in InputStream.
+546 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+int available( ) Returns the number of bytes of input currently
+available for reading.
+void close( ) Closes the input source. Further read attempts
+will generate an IOException.
+void mark(int numBytes) Places a mark at the current point in the input
+stream that will remain valid until numBytes
+bytes are read.
+boolean markSupported( ) Returns true if mark( )/reset( ) are supported
+by the invoking stream.
+int read( ) Returns an integer representation of the next
+available byte of input. –1 is returned when the
+end of the file is encountered.
+int read(byte buffer[ ]) Attempts to read up to buffer.length bytes into
+buffer and returns the actual number of bytes
+that were successfully read. –1 is returned
+when the end of the file is encountered.
+int read(byte buffer[ ], int offset,
+int numBytes)
+Attempts to read up to numBytes bytes into
+buffer starting at buffer[offset], returning the
+number of bytes successfully read. –1 is
+returned when the end of the file is
+encountered.
+Table 17-1. The Methods Defined by InputStream
+OutputStream
+OutputStream is an abstract class that defines streaming byte output. All of the
+methods in this class return a void value and throw an IOException in the case of
+errors. Table 17-2 shows the methods in OutputStream.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 547
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void reset( ) Resets the input pointer to the previously
+set mark.
+long skip(long numBytes) Ignores (that is, skips) numBytes bytes of input,
+returning the number of bytes actually ignored.
+Table 17-1. The Methods Defined by InputStream (continued)
+Method Description
+void close( ) Closes the output stream. Further write
+attempts will generate an IOException.
+void flush( ) Finalizes the output state so that any
+buffers are cleared. That is, it flushes the
+output buffers.
+void write(int b) Writes a single byte to an output stream.
+Note that the parameter is an int, which
+allows you to call write( ) with expressions
+without having to cast them back to byte.
+void write(byte buffer[ ]) Writes a complete array of bytes to an
+output stream.
+void write(byte buffer[ ], int offset,
+int numBytes)
+Writes a subrange of numBytes bytes from
+the array buffer, beginning at buffer[offset].
+Table 17-2. The Methods Defined by OutputStream
+Most of the methods described in Tables 17-1 and 17-2 are implemented by the
+subclasses of InputStream and OutputStream. The mark( ) and reset( ) methods are
+exceptions; notice their use or lack thereof by each subclass in the discussions that follow.
+FileInputStream
+The FileInputStream class creates an InputStream that you can use to read bytes from
+a file. Its two most common constructors are shown here:
+FileInputStream(String filepath)
+FileInputStream(File fileObj)
+Either can throw a FileNotFoundException. Here, filepath is the full path name of a file,
+and fileObj is a File object that describes the file.
+The following example creates two FileInputStreams that use the same disk file
+and each of the two constructors:
+FileInputStream f0 = new FileInputStream("/autoexec.bat")
+File f = new File("/autoexec.bat");
+FileInputStream f1 = new FileInputStream(f);
+Although the first constructor is probably more commonly used, the second allows
+us to closely examine the file using the File methods, before we attach it to an input
+stream. When a FileInputStream is created, it is also opened for reading.
+FileInputStream overrides six of the methods in the abstract class InputStream. The
+mark( ) and reset( ) methods are not overridden, and any attempt to use reset( ) on a
+FileInputStream will generate an IOException.
+The next example shows how to read a single byte, an array of bytes, and a
+subrange array of bytes. It also illustrates how to use available( ) to determine the
+number of bytes remaining, and how to use the skip( ) method to skip over unwanted
+bytes. The program reads its own source file, which must be in the current directory.
+// Demonstrate FileInputStream.
+import java.io.*;
+class FileInputStreamDemo {
+public static void main(String args[]) throws Exception {
+int size;
+InputStream f =
+new FileInputStream("FileInputStreamDemo.java");
+548 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 549
+System.out.println("Total Available Bytes: " +
+(size = f.available()));
+int n = size/40;
+System.out.println("First " + n +
+" bytes of the file one read() at a time");
+for (int i=0; i < n; i++) {
+System.out.print((char) f.read());
+}
+System.out.println("\nStill Available: " + f.available());
+System.out.println("Reading the next " + n +
+" with one read(b[])");
+byte b[] = new byte[n];
+if (f.read(b) != n) {
+System.err.println("couldn't read " + n + " bytes.");
+}
+System.out.println(new String(b, 0, n));
+System.out.println("\nStill Available: " + (size = f.available()));
+System.out.println("Skipping half of remaining bytes with skip()");
+f.skip(size/2);
+System.out.println("Still Available: " + f.available());
+System.out.println("Reading " + n/2 + " into the end of array");
+if (f.read(b, n/2, n/2) != n/2) {
+System.err.println("couldn't read " + n/2 + " bytes.");
+}
+System.out.println(new String(b, 0, b.length));
+System.out.println("\nStill Available: " + f.available());
+f.close();
+}
+}
+Here is the output produced by this program:
+Total Available Bytes: 1433
+First 35 bytes of the file one read() at a time
+// Demonstrate FileInputStream.
+im
+Still Available: 1398
+Reading the next 35 with one read(b[])
+port java.io.*;
+class FileInputS
+Still Available: 1363
+Skipping half of remaining bytes with skip()
+Still Available: 682
+Reading 17 into the end of array
+port java.io.*;
+read(b) != n) {
+S
+Still Available: 665
+This somewhat contrived example demonstrates how to read three ways, to skip input,
+and to inspect the amount of data available on a stream.
+Java 2, version 1.4 added the getChannel( ) method to FileInputStream. This
+method returns a channel connected to the FileInputStream object. Channels are used
+by the new I/O classes contained in java.nio. (See Chapter 24.)
+FileOutputStream
+FileOutputStream creates an OutputStream that you can use to write bytes to a file. Its
+most commonly used constructors are shown here:
+FileOutputStream(String filePath)
+FileOutputStream(File fileObj)
+FileOutputStream(String filePath, boolean append)
+FileOutputStream(File fileObj, boolean append)
+They can throw a FileNotFoundException or a SecurityException. Here, filePath is the full
+path name of a file, and fileObj is a File object that describes the file. If append is true, the file
+is opened in append mode. The fourth constructor was added by Java 2, version 1.4.
+Creation of a FileOutputStream is not dependent on the file already existing.
+FileOutputStream will create the file before opening it for output when you create
+the object. In the case where you attempt to open a read-only file, an IOException
+will be thrown.
+The following example creates a sample buffer of bytes by first making a String
+and then using the getBytes( ) method to extract the byte array equivalent. It then
+creates three files. The first, file1.txt, will contain every other byte from the sample.
+The second, file2.txt, will contain the entire set of bytes. The third and last, file3.txt,
+will contain only the last quarter. Unlike the FileInputStream methods, all of the
+FileOutputStream methods have a return type of void. In the case of an error, these
+methods will throw an IOException.
+550 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 551
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+// Demonstrate FileOutputStream.
+import java.io.*;
+class FileOutputStreamDemo {
+public static void main(String args[]) throws Exception {
+String source = "Now is the time for all good men\n"
++ " to come to the aid of their country\n"
++ " and pay their due taxes.";
+byte buf[] = source.getBytes();
+OutputStream f0 = new FileOutputStream("file1.txt");
+for (int i=0; i < buf.length; i += 2) {
+f0.write(buf[i]);
+}
+f0.close();
+OutputStream f1 = new FileOutputStream("file2.txt");
+f1.write(buf);
+f1.close();
+OutputStream f2 = new FileOutputStream("file3.txt");
+f2.write(buf,buf.length-buf.length/4,buf.length/4);
+f2.close();
+}
+}
+Here are the contents of each file after running this program. First, file1.txt:
+Nwi h iefralgo e
+t oet h i ftercuty n a hi u ae.
+Next, file2.txt:
+Now is the time for all good men
+to come to the aid of their country
+and pay their due taxes.
+Finally, file3.txt:
+nd pay their due taxes.
+Java 2, version 1.4 added the getChannel( ) method to FileOutputStream. This
+method returns a channel connected to the FileOutputStream object. Channels are
+used by the new I/O classes contained in java.nio. (See Chapter 24.)
+552 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+ByteArrayInputStream
+ByteArrayInputStream is an implementation of an input stream that uses a byte array
+as the source. This class has two constructors, each of which requires a byte array to
+provide the data source:
+ByteArrayInputStream(byte array[ ])
+ByteArrayInputStream(byte array[ ], int start, int numBytes)
+Here, array is the input source. The second constructor creates an InputStream from a
+subset of your byte array that begins with the character at the index specified by start
+and is numBytes long.
+The following example creates a pair of ByteArrayInputStreams, initializing them
+with the byte representation of the alphabet:
+// Demonstrate ByteArrayInputStream.
+import java.io.*;
+class ByteArrayInputStreamDemo {
+public static void main(String args[]) throws IOException {
+String tmp = "abcdefghijklmnopqrstuvwxyz";
+byte b[] = tmp.getBytes();
+ByteArrayInputStream input1 = new ByteArrayInputStream(b);
+ByteArrayInputStream input2 = new ByteArrayInputStream(b, 0,3);
+}
+}
+The input1 object contains the entire lowercase alphabet, while input2 contains only
+the first three letters.
+A ByteArrayInputStream implements both mark( ) and reset( ). However, if mark( )
+has not been called, then reset( ) sets the stream pointer to the start of the stream—which
+in this case is the start of the byte array passed to the constructor. The next example
+shows how to use the reset( ) method to read the same input twice. In this case, we read
+and print the letters “abc” once in lowercase and then again in uppercase.
+import java.io.*;
+class ByteArrayInputStreamReset {
+public static void main(String args[]) throws IOException {
+String tmp = "abc";
+byte b[] = tmp.getBytes();
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 553
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+ByteArrayInputStream in = new ByteArrayInputStream(b);
+for (int i=0; i<2; i++) {
+int c;
+while ((c = in.read()) != -1) {
+if (i == 0) {
+System.out.print((char) c);
+} else {
+System.out.print(Character.toUpperCase((char) c));
+}
+}
+System.out.println();
+in.reset();
+}
+}
+}
+This example first reads each character from the stream and prints it as is, in lowercase.
+It then resets the stream and begins reading again, this time converting each character
+to uppercase before printing. Here’s the output:
+abc
+ABC
+ByteArrayOutputStream
+ByteArrayOutputStream is an implementation of an output stream that uses a byte
+array as the destination. ByteArrayOutputStream has two constructors, shown here:
+ByteArrayOutputStream( )
+ByteArrayOutputStream(int numBytes)
+In the first form, a buffer of 32 bytes is created. In the second, a buffer is created with a
+size equal to that specified by numBytes. The buffer is held in the protected buf field of
+ByteArrayOutputStream. The buffer size will be increased automatically, if needed.
+The number of bytes held by the buffer is contained in the protected count field of
+ByteArrayOutputStream.
+The following example demonstrates ByteArrayOutputStream:
+// Demonstrate ByteArrayOutputStream.
+import java.io.*;
+554 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+class ByteArrayOutputStreamDemo {
+public static void main(String args[]) throws IOException {
+ByteArrayOutputStream f = new ByteArrayOutputStream();
+String s = "This should end up in the array";
+byte buf[] = s.getBytes();
+f.write(buf);
+System.out.println("Buffer as a string");
+System.out.println(f.toString());
+System.out.println("Into array");
+byte b[] = f.toByteArray();
+for (int i=0; i<b.length; i++) {
+System.out.print((char) b[i]);
+}
+System.out.println("\nTo an OutputStream()");
+OutputStream f2 = new FileOutputStream("test.txt");
+f.writeTo(f2);
+f2.close();
+System.out.println("Doing a reset");
+f.reset();
+for (int i=0; i<3; i++)
+f.write('X');
+System.out.println(f.toString());
+}
+}
+When you run the program, you will create the following output. Notice how after the
+call to reset( ), the three X’s end up at the beginning.
+Buffer as a string
+This should end up in the array
+Into array
+This should end up in the array
+To an OutputStream()
+Doing a reset
+XXX
+This example uses the writeTo( ) convenience method to write the contents of f to
+test.txt. Examining the contents of the test.txt file created in the preceding example
+shows the result we expected:
+This should end up in the array
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 555
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Filtered Byte Streams
+Filtered streams are simply wrappers around underlying input or output streams that
+transparently provide some extended level of functionality. These streams are typically
+accessed by methods that are expecting a generic stream, which is a superclass of the
+filtered streams. Typical extensions are buffering, character translation, and raw data
+translation. The filtered byte streams are FilterInputStream and FilterOutputStream.
+Their constructors are shown here:
+FilterOutputStream(OutputStream os)
+FilterInputStream(InputStream is)
+The methods provided in these classes are identical to those in InputStream and
+OutputStream.
+Buffered Byte Streams
+For the byte-oriented streams, a buffered stream extends a filtered stream class by attaching a
+memory buffer to the I/O streams. This buffer allows Java to do I/O operations on more
+than a byte at a time, hence increasing performance. Because the buffer is available,
+skipping, marking, and resetting of the stream becomes possible. The buffered byte stream
+classes are BufferedInputStream and BufferedOutputStream. PushbackInputStream also
+implements a buffered stream.
+BufferedInputStream
+Buffering I/O is a very common performance optimization. Java’s BufferedInputStream
+class allows you to “wrap” any InputStream into a buffered stream and achieve this
+performance improvement.
+BufferedInputStream has two constructors:
+BufferedInputStream(InputStream inputStream)
+BufferedInputStream(InputStream inputStream, int bufSize)
+The first form creates a buffered stream using a default buffer size. In the second, the
+size of the buffer is passed in bufSize. Use of sizes that are multiples of memory page,
+disk block, and so on can have a significant positive impact on performance. This is,
+however, implementation-dependent. An optimal buffer size is generally dependent on
+the host operating system, the amount of memory available, and how the machine is
+configured. To make good use of buffering doesn’t necessarily require quite this degree
+of sophistication. A good guess for a size is around 8,192 bytes, and attaching even a
+rather small buffer to an I/O stream is always a good idea. That way, the low-level
+system can read blocks of data from the disk or network and store the results in your
+buffer. Thus, even if you are reading the data a byte at a time out of the InputStream,
+you will be manipulating fast memory over 99.9 percent of the time.
+Buffering an input stream also provides the foundation required to support moving
+backward in the stream of the available buffer. Beyond the read( ) and skip( ) methods
+implemented in any InputStream, BufferedInputStream also supports the mark( ) and
+reset( ) methods. This support is reflected by BufferedInputStream.markSupported( )
+returning true.
+The following example contrives a situation where we can use mark( ) to remember
+where we are in an input stream and later use reset( ) to get back there. This example is
+parsing a stream for the HTML entity reference for the copyright symbol. Such a
+reference begins with an ampersand (&) and ends with a semicolon (;) without any
+intervening whitespace. The sample input has two ampersands to show the case where
+the reset( ) happens and where it does not.
+// Use buffered input.
+import java.io.*;
+class BufferedInputStreamDemo {
+public static void main(String args[]) throws IOException {
+String s = "This is a &copy; copyright symbol " +
+"but this is &copy not.\n";
+byte buf[] = s.getBytes();
+ByteArrayInputStream in = new ByteArrayInputStream(buf);
+BufferedInputStream f = new BufferedInputStream(in);
+int c;
+boolean marked = false;
+while ((c = f.read()) != -1) {
+switch(c) {
+case '&':
+if (!marked) {
+f.mark(32);
+marked = true;
+} else {
+marked = false;
+}
+break;
+case ';':
+if (marked) {
+marked = false;
+System.out.print("(c)");
+} else
+System.out.print((char) c);
+break;
+556 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+case ' ':
+if (marked) {
+marked = false;
+f.reset();
+System.out.print("&");
+} else
+System.out.print((char) c);
+break;
+default:
+if (!marked)
+System.out.print((char) c);
+break;
+}
+}
+}
+}
+Notice that this example uses mark(32), which preserves the mark for the next 32 bytes
+read (which is enough for all entity references). Here is the output produced by this
+program:
+This is a (c) copyright symbol but this is &copy not.
+Use of mark( ) is restricted to access within the buffer. This means that you can only
+specify a parameter to mark( ) that is smaller than the buffer size of the stream.
+BufferedOutputStream
+A BufferedOutputStream is similar to any OutputStream with the exception of an
+added flush( ) method that is used to ensure that data buffers are physically written to
+the actual output device. Since the point of a BufferedOutputStream is to improve
+performance by reducing the number of times the system actually writes data, you may
+need to call flush( ) to cause any data that is in the buffer to get written.
+Unlike buffered input, buffering output does not provide additional functionality.
+Buffers for output in Java are there to increase performance. Here are the two available
+constructors:
+BufferedOutputStream(OutputStream outputStream)
+BufferedOutputStream(OutputStream outputStream, int bufSize)
+The first form creates a buffered stream using a buffer of 512 bytes. In the second form,
+the size of the buffer is passed in bufSize.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 557
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+558 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+PushbackInputStream
+One of the novel uses of buffering is the implementation of pushback. Pushback is used
+on an input stream to allow a byte to be read and then returned (that is, “pushed
+back”) to the stream. The PushbackInputStream class implements this idea. It provides
+a mechanism to “peek” at what is coming from an input stream without disrupting it.
+PushbackInputStream has the following constructors:
+PushbackInputStream(InputStream inputStream)
+PushbackInputStream(InputStream inputStream, int numBytes)
+The first form creates a stream object that allows one byte to be returned to the input
+stream. The second form creates a stream that has a pushback buffer that is numBytes
+long. This allows multiple bytes to be returned to the input stream.
+Beyond the familiar methods of InputStream, PushbackInputStream provides
+unread( ), shown here:
+void unread(int ch)
+void unread(byte buffer[ ])
+void unread(byte buffer, int offset, int numChars)
+The first form pushes back the low-order byte of ch. This will be the next byte returned
+by a subsequent call to read( ). The second form returns the bytes in buffer. The third
+form pushes back numChars bytes beginning at offset from buffer. An IOException will
+be thrown if there is an attempt to return a byte when the pushback buffer is full.
+Java 2 made a small change to PushbackInputStream: it added the skip( ) method.
+Here is an example that shows how a programming language parser might use a
+PushbackInputStream and unread( ) to deal with the difference between the = =
+operator for comparison and the = operator for assignment:
+// Demonstrate unread().
+import java.io.*;
+class PushbackInputStreamDemo {
+public static void main(String args[]) throws IOException {
+String s = "if (a == 4) a = 0;\n";
+byte buf[] = s.getBytes();
+ByteArrayInputStream in = new ByteArrayInputStream(buf);
+PushbackInputStream f = new PushbackInputStream(in);
+int c;
+while ((c = f.read()) != -1) {
+switch(c) {
+case '=':
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 559
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+if ((c = f.read()) == '=')
+System.out.print(".eq.");
+else {
+System.out.print("<-");
+f.unread(c);
+}
+break;
+default:
+System.out.print((char) c);
+break;
+}
+}
+}
+}
+Here is the output for this example. Notice that = = was replaced by “.eq.” and = was
+replaced by “<–”.
+if (a .eq. 4) a <- 0;
+PushbackInputStream has the side effect of invalidating the mark( ) or reset( )
+methods of the InputStream used to create it. Use markSupported( ) to check any
+stream on which you are going to use mark( )/reset( ).
+SequenceInputStream
+The SequenceInputStream class allows you to concatenate multiple InputStreams.
+The construction of a SequenceInputStream is different from any other InputStream.
+A SequenceInputStream constructor uses either a pair of InputStreams or an
+Enumeration of InputStreams as its argument:
+SequenceInputStream(InputStream first, InputStream second)
+SequenceInputStream(Enumeration streamEnum)
+Operationally, the class fulfills read requests from the first InputStream until it runs
+out and then switches over to the second one. In the case of an Enumeration, it will
+continue through all of the InputStreams until the end of the last one is reached.
+Here is a simple example that uses a SequenceInputStream to output the contents
+of two files:
+// Demonstrate sequenced input.
+import java.io.*;
+import java.util.*;
+560 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+class InputStreamEnumerator implements Enumeration {
+private Enumeration files;
+public InputStreamEnumerator(Vector files) {
+this.files = files.elements();
+}
+public boolean hasMoreElements() {
+return files.hasMoreElements();
+}
+public Object nextElement() {
+try {
+return new FileInputStream(files.nextElement().toString());
+} catch (Exception e) {
+return null;
+}
+}
+}
+class SequenceInputStreamDemo {
+public static void main(String args[]) throws Exception {
+int c;
+Vector files = new Vector();
+files.addElement("/autoexec.bat");
+files.addElement("/config.sys");
+InputStreamEnumerator e = new InputStreamEnumerator(files);
+InputStream input = new SequenceInputStream(e);
+while ((c = input.read()) != -1) {
+System.out.print((char) c);
+}
+input.close();
+}
+}
+This example creates a Vector and then adds two filenames to it. It passes that vector of
+names to the InputStreamEnumerator class, which is designed to provide a wrapper
+on the vector where the elements returned are not the filenames but rather open
+FileInputStreams on those names. The SequenceInputStream opens each file in turn,
+and this example prints the contents of the two files.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 561
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+PrintStream
+The PrintStream class provides all of the formatting capabilities we have been using
+from the System file handle, System.out, since the beginning of the book. Here are two
+of its constructors:
+PrintStream(OutputStream outputStream)
+PrintStream(OutputStream outputStream, boolean flushOnNewline)
+where flushOnNewline controls whether Java flushes the output stream every time a
+newline (\n) character is output. If flushOnNewline is true, flushing automatically takes
+place. If it is false, flushing is not automatic. The first constructor does not
+automatically flush.
+Java’s PrintStream objects support the print( ) and println( ) methods for all types,
+including Object. If an argument is not a simple type, the PrintStream methods will
+call the object’s toString( ) method and then print the result.
+RandomAccessFile
+RandomAccessFile encapsulates a random-access file. It is not derived from InputStream
+or OutputStream. Instead, it implements the interfaces DataInput and DataOutput,
+which define the basic I/O methods. It also supports positioning requests—that is, you
+can position the file pointer within the file. It has these two constructors:
+RandomAccessFile(File fileObj, String access)
+throws FileNotFoundException
+RandomAccessFile(String filename, String access)
+throws FileNotFoundException
+In the first form, fileObj specifies the name of the file to open as a File object. In the
+second form, the name of the file is passed in filename. In both cases, access determines
+what type of file access is permitted. If it is “r”, then the file can be read, but not
+written. If it is “rw”, then the file is opened in read-write mode. If it is “rws”, the file
+is opened for read-write operations and every change to the file’s data or metadata
+will be immediately written to the physical device. If it is “rwd”, the file is opened for
+read-write operations and every change to the file’s data will be immediately written
+to the physical device.
+The method seek( ), shown here, is used to set the current position of the file
+pointer within the file:
+void seek(long newPos) throws IOException
+Here, newPos specifies the new position, in bytes, of the file pointer from the beginning
+of the file. After a call to seek( ), the next read or write operation will occur at the new
+file position.
+562 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+RandomAccessFile implements the standard input and output methods, which
+you can use to read and write to random access files. It also includes some additional
+methods. One is setLength( ). It has this signature:
+void setLength(long len) throws IOException
+This method sets the length of the invoking file to that specified by len. This method can be
+used to lengthen or shorten a file. If the file is lengthened, the added portion is undefined.
+Java 2, version 1.4 added the getChannel( ) method to RandomAccessFile. This
+method returns a channel connected to the RandomAccessFile object. Channels are
+used by the new I/O classes contained in java.nio. (See Chapter 24.)
+The Character Streams
+While the byte stream classes provide sufficient functionality to handle any type of I/O
+operation, they cannot work directly with Unicode characters. Since one of the main
+purposes of Java is to support the “write once, run anywhere” philosophy, it was
+necessary to include direct I/O support for characters. In this section, several of the
+character I/O classes are discussed. As explained earlier, at the top of the character
+stream hierarchies are the Reader and Writer abstract classes. We will begin with them.
+As discussed in Chapter 12, the character I/O classes were added by the 1.1 release of
+Java. Because of this, you may still find legacy code that uses byte streams where
+character streams should be. When working on such code, it is a good idea to update it.
+Reader
+Reader is an abstract class that defines Java’s model of streaming character input. All of
+the methods in this class will throw an IOException on error conditions. Table 17-3
+provides a synopsis of the methods in Reader.
+Writer
+Writer is an abstract class that defines streaming character output. All of the methods
+in this class return a void value and throw an IOException in the case of errors.
+Table 17-4 shows a synopsis of the methods in Writer.
+FileReader
+The FileReader class creates a Reader that you can use to read the contents of a file. Its
+two most commonly used constructors are shown here:
+FileReader(String filePath)
+FileReader(File fileObj)
+Either can throw a FileNotFoundException. Here, filePath is the full path name of a file,
+and fileObj is a File object that describes the file.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 563
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+abstract void close( ) Closes the input source. Further read
+attempts will generate an IOException.
+void mark(int numChars) Places a mark at the current point in the
+input stream that will remain valid until
+numChars characters are read.
+boolean markSupported( ) Returns true if mark( )/reset( ) are
+supported on this stream.
+int read( ) Returns an integer representation of the
+next available character from the invoking
+input stream. –1 is returned when the end
+of the file is encountered.
+int read(char buffer[ ]) Attempts to read up to buffer.length
+characters into buffer and returns the actual
+number of characters that were successfully
+read. –1 is returned when the end of the file
+is encountered.
+abstract int read(char buffer[ ],
+int offset,
+int numChars)
+Attempts to read up to numChars characters
+into buffer starting at buffer[offset], returning
+the number of characters successfully read.
+–1 is returned when the end of the file is
+encountered.
+boolean ready( ) Returns true if the next input request will
+not wait. Otherwise, it returns false.
+void reset( ) Resets the input pointer to the previously
+set mark.
+long skip(long numChars) Skips over numChars characters of input,
+returning the number of characters actually
+skipped.
+Table 17-3. The Methods Defined by Reader
+The following example shows how to read lines from a file and print these
+to the standard output stream. It reads its own source file, which must be in the
+current directory.
+// Demonstrate FileReader.
+import java.io.*;
+class FileReaderDemo {
+public static void main(String args[]) throws Exception {
+FileReader fr = new FileReader("FileReaderDemo.java");
+BufferedReader br = new BufferedReader(fr);
+String s;
+564 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+abstract void close( ) Closes the output stream. Further write
+attempts will generate an IOException.
+abstract void flush( ) Finalizes the output state so that any
+buffers are cleared. That is, it flushes the
+output buffers.
+void write(int ch) Writes a single character to the invoking
+output stream. Note that the parameter is
+an int, which allows you to call write with
+expressions without having to cast them
+back to char.
+void write(char buffer[ ]) Writes a complete array of characters to
+the invoking output stream.
+abstract void write(char buffer[ ],
+int offset,
+int numChars)
+Writes a subrange of numChars characters
+from the array buffer, beginning at
+buffer[offset] to the invoking output stream.
+void write(String str) Writes str to the invoking output stream.
+void write(String str, int offset,
+int numChars)
+Writes a subrange of numChars characters
+from the array str, beginning at the
+specified offset.
+Table 17-4. The Methods Defined by Writer
+while((s = br.readLine()) != null) {
+System.out.println(s);
+}
+fr.close();
+}
+}
+FileWriter
+FileWriter creates a Writer that you can use to write to a file. Its most commonly used
+constructors are shown here:
+FileWriter(String filePath)
+FileWriter(String filePath, boolean append)
+FileWriter(File fileObj)
+FileWriter(File fileObj, boolean append)
+They can throw an IOException. Here, filePath is the full path name of a file, and fileObj
+is a File object that describes the file. If append is true, then output is appended to the
+end of the file. The fourth constructor was added by Java 2, version 1.4.
+Creation of a FileWriter is not dependent on the file already existing. FileWriter
+will create the file before opening it for output when you create the object. In the case
+where you attempt to open a read-only file, an IOException will be thrown.
+The following example is a character stream version of an example shown earlier
+when FileOutputStream was discussed. This version creates a sample buffer of
+characters by first making a String and then using the getChars( ) method to extract
+the character array equivalent. It then creates three files. The first, file1.txt, will contain
+every other character from the sample. The second, file2.txt, will contain the entire set
+of characters. Finally, the third, file3.txt, will contain only the last quarter.
+// Demonstrate FileWriter.
+import java.io.*;
+class FileWriterDemo {
+public static void main(String args[]) throws Exception {
+String source = "Now is the time for all good men\n"
++ " to come to the aid of their country\n"
++ " and pay their due taxes.";
+char buffer[] = new char[source.length()];
+source.getChars(0, source.length(), buffer, 0);
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 565
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+FileWriter f0 = new FileWriter("file1.txt");
+for (int i=0; i < buffer.length; i += 2) {
+f0.write(buffer[i]);
+}
+f0.close();
+FileWriter f1 = new FileWriter("file2.txt");
+f1.write(buffer);
+f1.close();
+FileWriter f2 = new FileWriter("file3.txt");
+f2.write(buffer,buffer.length-buffer.length/4,buffer.length/4);
+f2.close();
+}
+}
+CharArrayReader
+CharArrayReader is an implementation of an input stream that uses a character array as
+the source. This class has two constructors, each of which requires a character array
+to provide the data source:
+CharArrayReader(char array[ ])
+CharArrayReader(char array[ ], int start, int numChars)
+Here, array is the input source. The second constructor creates a Reader from a subset
+of your character array that begins with the character at the index specified by start and
+is numChars long.
+The following example uses a pair of CharArrayReaders:
+// Demonstrate CharArrayReader.
+import java.io.*;
+public class CharArrayReaderDemo {
+public static void main(String args[]) throws IOException {
+String tmp = "abcdefghijklmnopqrstuvwxyz";
+int length = tmp.length();
+char c[] = new char[length];
+566 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 567
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+tmp.getChars(0, length, c, 0);
+CharArrayReader input1 = new CharArrayReader(c);
+CharArrayReader input2 = new CharArrayReader(c, 0, 5);
+int i;
+System.out.println("input1 is:");
+while((i = input1.read()) != -1) {
+System.out.print((char)i);
+}
+System.out.println();
+System.out.println("input2 is:");
+while((i = input2.read()) != -1) {
+System.out.print((char)i);
+}
+System.out.println();
+}
+}
+The input1 object is constructed using the entire lowercase alphabet, while input2
+contains only the first five letters. Here is the output:
+input1 is:
+abcdefghijklmnopqrstuvwxyz
+input2 is:
+abcde
+CharArrayWriter
+CharArrayWriter is an implementation of an output stream that uses an array as the
+destination. CharArrayWriter has two constructors, shown here:
+CharArrayWriter( )
+CharArrayWriter(int numChars)
+In the first form, a buffer with a default size is created. In the second, a buffer is created
+with a size equal to that specified by numChars. The buffer is held in the buf field of
+CharArrayWriter. The buffer size will be increased automatically, if needed. The
+number of characters held by the buffer is contained in the count field of
+CharArrayWriter. Both buf and count are protected fields.
+The following example demonstrates CharArrayWriter by reworking the sample
+program shown earlier for ByteArrayOutputStream. It produces the same output as
+the previous version.
+// Demonstrate CharArrayWriter.
+import java.io.*;
+class CharArrayWriterDemo {
+public static void main(String args[]) throws IOException {
+CharArrayWriter f = new CharArrayWriter();
+String s = "This should end up in the array";
+char buf[] = new char[s.length()];
+s.getChars(0, s.length(), buf, 0);
+f.write(buf);
+System.out.println("Buffer as a string");
+System.out.println(f.toString());
+System.out.println("Into array");
+char c[] = f.toCharArray();
+for (int i=0; i<c.length; i++) {
+System.out.print(c[i]);
+}
+System.out.println("\nTo a FileWriter()");
+FileWriter f2 = new FileWriter("test.txt");
+f.writeTo(f2);
+f2.close();
+System.out.println("Doing a reset");
+f.reset();
+for (int i=0; i<3; i++)
+f.write('X');
+System.out.println(f.toString());
+}
+}
+568 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+BufferedReader
+BufferedReader improves performance by buffering input. It has two constructors:
+BufferedReader(Reader inputStream)
+BufferedReader(Reader inputStream, int bufSize)
+The first form creates a buffered character stream using a default buffer size. In the
+second, the size of the buffer is passed in bufSize.
+As is the case with the byte-oriented stream, buffering an input character stream
+also provides the foundation required to support moving backward in the stream
+within the available buffer. To support this, BufferedReader implements the mark( )
+and reset( ) methods, and BufferedReader.markSupported( ) returns true.
+The following example reworks the BufferedInputStream example, shown earlier,
+so that it uses a BufferedReader character stream rather than a buffered byte stream.
+As before, it uses mark( ) and reset( ) methods to parse a stream for the HTML entity
+reference for the copyright symbol. Such a reference begins with an ampersand (&) and
+ends with a semicolon (;) without any intervening whitespace. The sample input has
+two ampersands, to show the case where the reset( ) happens and where it does not.
+Output is the same as that shown earlier.
+// Use buffered input.
+import java.io.*;
+class BufferedReaderDemo {
+public static void main(String args[]) throws IOException {
+String s = "This is a &copy; copyright symbol " +
+"but this is &copy not.\n";
+char buf[] = new char[s.length()];
+s.getChars(0, s.length(), buf, 0);
+CharArrayReader in = new CharArrayReader(buf);
+BufferedReader f = new BufferedReader(in);
+int c;
+boolean marked = false;
+while ((c = f.read()) != -1) {
+switch(c) {
+case '&':
+if (!marked) {
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 569
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+f.mark(32);
+marked = true;
+} else {
+marked = false;
+}
+break;
+case ';':
+if (marked) {
+marked = false;
+System.out.print("(c)");
+} else
+System.out.print((char) c);
+break;
+case ' ':
+if (marked) {
+marked = false;
+f.reset();
+System.out.print("&");
+} else
+System.out.print((char) c);
+break;
+default:
+if (!marked)
+System.out.print((char) c);
+break;
+}
+}
+}
+}
+BufferedWriter
+A BufferedWriter is a Writer that adds a flush( ) method that can be used to ensure
+that data buffers are physically written to the actual output stream. Using a
+BufferedWriter can increase performance by reducing the number of times data is
+actually physically written to the output stream.
+A BufferedWriter has these two constructors:
+BufferedWriter(Writer outputStream)
+BufferedWriter(Writer outputStream, int bufSize)
+570 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The first form creates a buffered stream using a buffer with a default size. In the
+second, the size of the buffer is passed in bufSize.
+PushbackReader
+The PushbackReader class allows one or more characters to be returned to the input
+stream. This allows you to look ahead in the input stream. Here are its two constructors:
+PushbackReader(Reader inputStream)
+PushbackReader(Reader inputStream, int bufSize)
+The first form creates a buffered stream that allows one character to be pushed back.
+In the second, the size of the pushback buffer is passed in bufSize.
+PushbackReader provides unread( ), which returns one or more characters to the
+invoking input stream. It has the three forms shown here:
+void unread(int ch)
+void unread(char buffer[ ])
+void unread(char buffer[ ], int offset, int numChars)
+The first form pushes back the character passed in ch. This will be the next character
+returned by a subsequent call to read( ). The second form returns the characters in
+buffer. The third form pushes back numChars characters beginning at offset from buffer.
+An IOException will be thrown if there is an attempt to return a character when the
+pushback buffer is full.
+The following program reworks the earlier PushBackInputStream example by
+replacing PushBackInputStream with a PushbackReader. As before, it shows how a
+programming language parser can use a pushback stream to deal with the difference
+between the == operator for comparison and the = operator for assignment.
+// Demonstrate unread().
+import java.io.*;
+class PushbackReaderDemo {
+public static void main(String args[]) throws IOException {
+String s = "if (a == 4) a = 0;\n";
+char buf[] = new char[s.length()];
+s.getChars(0, s.length(), buf, 0);
+CharArrayReader in = new CharArrayReader(buf);
+PushbackReader f = new PushbackReader(in);
+int c;
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 571
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+while ((c = f.read()) != -1) {
+switch(c) {
+case '=':
+if ((c = f.read()) == '=')
+System.out.print(".eq.");
+else {
+System.out.print("<-");
+f.unread(c);
+}
+break;
+default:
+System.out.print((char) c);
+break;
+}
+}
+}
+}
+PrintWriter
+PrintWriter is essentially a character-oriented version of PrintStream. It provides the
+formatted output methods print( ) and println( ). PrintWriter has four constructors:
+PrintWriter(OutputStream outputStream)
+PrintWriter(OutputStream outputStream, boolean flushOnNewline)
+PrintWriter(Writer outputStream)
+PrintWriter(Writer outputStream, boolean flushOnNewline)
+where flushOnNewline controls whether Java flushes the output stream every time
+println( ) is called. If flushOnNewline is true, flushing automatically takes place. If false,
+flushing is not automatic. The first and third constructors do not automatically flush.
+Java’s PrintWriter objects support the print( ) and println( ) methods for all types,
+including Object. If an argument is not a simple type, the PrintWriter methods will call
+the object’s toString( ) method and then print out the result.
+Using Stream I/O
+The following example demonstrates several of Java’s I/O character stream classes and
+methods. This program implements the standard wc (word count) command. The
+program has two modes: if no filenames are provided as arguments, the program
+572 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+operates on the standard input stream. If one or more filenames are specified, the
+program operates on each of them.
+// A word counting utility.
+import java.io.*;
+class WordCount {
+public static int words = 0;
+public static int lines = 0;
+public static int chars = 0;
+public static void wc(InputStreamReader isr)
+throws IOException {
+int c = 0;
+boolean lastWhite = true;
+String whiteSpace = " \t\n\r";
+while ((c = isr.read()) != -1) {
+// Count characters
+chars++;
+// Count lines
+if (c == '\n') {
+lines++;
+}
+// Count words by detecting the start of a word
+int index = whiteSpace.indexOf(c);
+if(index == -1) {
+if(lastWhite == true) {
+++words;
+}
+lastWhite = false;
+}
+else {
+lastWhite = true;
+}
+}
+if(chars != 0) {
+++lines;
+}
+}
+public static void main(String args[]) {
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 573
+FileReader fr;
+try {
+if (args.length == 0) { // We're working with stdin
+wc(new InputStreamReader(System.in));
+}
+else { // We're working with a list of files
+for (int i = 0; i < args.length; i++) {
+fr = new FileReader(args[i]);
+wc(fr);
+}
+}
+}
+catch (IOException e) {
+return;
+}
+System.out.println(lines + " " + words + " " + chars);
+}
+}
+The wc( ) method operates on any input stream and counts the number of
+characters, lines, and words. It tracks the parity of words and whitespace in the
+lastNotWhite variable.
+When executed with no arguments, WordCount creates an InputStreamReader
+object using System.in as the source for the stream. This stream is then passed to wc( ),
+which does the actual counting. When executed with one or more arguments,
+WordCount assumes that these are filenames and creates FileReaders for each of them,
+passing the resultant FileReader objects to the wc( ) method. In either case, it prints the
+results before exiting.
+Improving wc( ) Using a StreamTokenizer
+An even better way to look for patterns in an input stream is to use another of Java’s
+I/O classes: StreamTokenizer. Similar to StringTokenizer from Chapter 16,
+StreamTokenizer breaks up the InputStream into tokens that are delimited by sets of
+characters. It has this constructor:
+StreamTokenizer(Reader inStream)
+Here inStream must be some form of Reader.
+StreamTokenizer defines several methods. In this example, we will use only a few.
+To reset the default set of delimiters, we will employ the resetSyntax( ) method. The
+default set of delimiters is finely tuned for tokenizing Java programs and is thus too
+574 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 575
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+specialized for this example. We declare that our tokens, or “words,” are any
+consecutive string of visible characters delimited on both sides by whitespace.
+We use the eolIsSignificant( ) method to ensure that newline characters will be
+delivered as tokens, so we can count the number of lines as well as words. It has this
+general form:
+void eolIsSignificant(boolean eolFlag)
+If eolFlag is true, the end-of-line characters are returned as tokens. If eolFlag is false, the
+end-of-line characters are ignored.
+The wordChars( ) method is used to specify the range of characters that can be used
+in words. Its general form is shown here:
+void wordChars(int start, int end)
+Here, start and end specify the range of valid characters. In the program, characters in
+the range 33 to 255 are valid word characters.
+The whitespace characters are specified using whitespaceChars( ). It has this
+general form:
+void whitespaceChars(int start, int end)
+Here, start and end specify the range of valid whitespace characters.
+The next token is obtained from the input stream by calling nextToken( ). It returns
+the type of the token.
+StreamTokenizer defines four int constants: TT_EOF, TT_EOL, TT_NUMBER,
+and TT_WORD. There are three instance variables. nval is a public double used to
+hold the values of numbers as they are recognized. sval is a public String used to hold
+the value of any words as they are recognized. ttype is a public int indicating the type
+of token that has just been read by the nextToken( ) method. If the token is a word,
+ttype equals TT_WORD. If the token is a number, ttype equals TT_NUMBER. If the
+token is a single character, ttype contains its value. If an end-of-line condition has been
+encountered, ttype equals TT_EOL. (This assumes that eolIsSignificant( ) was invoked
+with a true argument.) If the end of the stream has been encountered, ttype equals
+TT_EOF.
+The word count program revised to use a StreamTokenizer is shown here:
+// Enhanced word count program that uses a StreamTokenizer
+import java.io.*;
+class WordCount {
+public static int words=0;
+public static int lines=0;
+public static int chars=0;
+public static void wc(Reader r) throws IOException {
+StreamTokenizer tok = new StreamTokenizer(r);
+tok.resetSyntax();
+tok.wordChars(33, 255);
+tok.whitespaceChars(0, ' ');
+tok.eolIsSignificant(true);
+while (tok.nextToken() != tok.TT_EOF) {
+switch (tok.ttype) {
+case StreamTokenizer.TT_EOL:
+lines++;
+chars++;
+break;
+case StreamTokenizer.TT_WORD:
+words++;
+default: // FALLSTHROUGH
+chars += tok.sval.length();
+break;
+}
+}
+}
+public static void main(String args[]) {
+if (args.length == 0) { // We're working with stdin
+try {
+wc(new InputStreamReader(System.in));
+System.out.println(lines + " " + words + " " + chars);
+} catch (IOException e) {};
+} else { // We're working with a list of files
+int twords = 0, tchars = 0, tlines = 0;
+for (int i=0; i<args.length; i++) {
+try {
+words = chars = lines = 0;
+wc(new FileReader(args[i]));
+twords += words;
+tchars += chars;
+tlines += lines;
+System.out.println(args[i] + ": " +
+lines + " " + words + " " + chars);
+576 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+} catch (IOException e) {
+System.out.println(args[i] + ": error.");
+}
+}
+System.out.println("total: " +
+tlines + " " + twords + " " + tchars);
+}
+}
+}
+Serialization
+Serialization is the process of writing the state of an object to a byte stream. This is
+useful when you want to save the state of your program to a persistent storage area,
+such as a file. At a later time, you may restore these objects by using the process of
+deserialization.
+Serialization is also needed to implement Remote Method Invocation (RMI). RMI
+allows a Java object on one machine to invoke a method of a Java object on a different
+machine. An object may be supplied as an argument to that remote method. The
+sending machine serializes the object and transmits it. The receiving machine
+deserializes it. (More information about RMI is in Chapter 24.)
+Assume that an object to be serialized has references to other objects, which, in
+turn, have references to still more objects. This set of objects and the relationships
+among them form a directed graph. There may also be circular references within this
+object graph. That is, object X may contain a reference to object Y, and object Y may
+contain a reference back to object X. Objects may also contain references to themselves.
+The object serialization and deserialization facilities have been designed to work
+correctly in these scenarios. If you attempt to serialize an object at the top of an object
+graph, all of the other referenced objects are recursively located and serialized.
+Similarly, during the process of deserialization, all of these objects and their references
+are correctly restored.
+An overview of the interfaces and classes that support serialization follows.
+Serializable
+Only an object that implements the Serializable interface can be saved and restored by
+the serialization facilities. The Serializable interface defines no members. It is simply
+used to indicate that a class may be serialized. If a class is serializable, all of its
+subclasses are also serializable.
+Variables that are declared as transient are not saved by the serialization facilities.
+Also, static variables are not saved.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 577
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Externalizable
+The Java facilities for serialization and deserialization have been designed so that much
+of the work to save and restore the state of an object occurs automatically. However,
+there are cases in which the programmer may need to have control over these
+processes. For example, it may be desirable to use compression or encryption
+techniques. The Externalizable interface is designed for these situations.
+The Externalizable interface defines these two methods:
+void readExternal(ObjectInput inStream)
+throws IOException, ClassNotFoundException
+void writeExternal(ObjectOutput outStream)
+throws IOException
+In these methods, inStream is the byte stream from which the object is to be read, and
+outStream is the byte stream to which the object is to be written.
+ObjectOutput
+The ObjectOutput interface extends the DataOutput interface and supports object
+serialization. It defines the methods shown in Table 17-5. Note especially the
+writeObject( ) method. This is called to serialize an object. All of these methods will
+throw an IOException on error conditions.
+578 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void close( ) Closes the invoking stream. Further write
+attempts will generate an IOException.
+void flush( ) Finalizes the output state so that any
+buffers are cleared. That is, it flushes the
+output buffers.
+void write(byte buffer[ ]) Writes an array of bytes to the invoking
+stream.
+void write(byte buffer[ ], int offset,
+int numBytes)
+Writes a subrange of numBytes bytes from
+the array buffer, beginning at buffer[offset].
+void write(int b) Writes a single byte to the invoking stream.
+The byte written is the low-order byte of b.
+void writeObject(Object obj) Writes object obj to the invoking stream.
+Table 17-5. The Methods Defined by ObjectOutput
+ObjectOutputStream
+The ObjectOutputStream class extends the OutputStream class and implements the
+ObjectOutput interface. It is responsible for writing objects to a stream. A constructor
+of this class is
+ObjectOutputStream(OutputStream outStream) throws IOException
+The argument outStream is the output stream to which serialized objects will be written.
+The most commonly used methods in this class are shown in Table 17-6. They
+will throw an IOException on error conditions. Java 2 added an inner class to
+ObjectOuputStream called PutField. It facilitates the writing of persistent fields and its
+use is beyond the scope of this book.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 579
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void close( ) Closes the invoking stream. Further write
+attempts will generate an IOException.
+void flush( ) Finalizes the output state so that any
+buffers are cleared. That is, it flushes the
+output buffers.
+void write(byte buffer[ ]) Writes an array of bytes to the invoking
+stream.
+void write(byte buffer[ ], int offset,
+int numBytes)
+Writes a subrange of numBytes bytes from
+the array buffer, beginning at buffer[offset].
+void write(int b) Writes a single byte to the invoking stream.
+The byte written is the low-order byte of b.
+void writeBoolean(boolean b) Writes a boolean to the invoking stream.
+void writeByte(int b) Writes a byte to the invoking stream. The
+byte written is the low-order byte of b.
+void writeBytes(String str) Writes the bytes representing str to the
+invoking stream.
+void writeChar(int c) Writes a char to the invoking stream.
+void writeChars(String str) Writes the characters in str to the invoking
+stream.
+Table 17-6. Commonly Used Methods Defined by ObjectOutputStream
+ObjectInput
+The ObjectInput interface extends the DataInput interface and defines the methods
+shown in Table 17-7. It supports object serialization. Note especially the readObject( )
+method. This is called to deserialize an object. All of these methods will throw an
+IOException on error conditions.
+580 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void writeDouble(double d) Writes a double to the invoking stream.
+void writeFloat(float f ) Writes a float to the invoking stream.
+void writeInt(int i) Writes an int to the invoking stream.
+void writeLong(long l) Writes a long to the invoking stream.
+final void writeObject(Object obj) Writes obj to the invoking stream.
+void writeShort(int i) Writes a short to the invoking stream.
+Table 17-6. Commonly Used Methods Defined by ObjectOutputStream (continued)
+Method Description
+int available( ) Returns the number of bytes that are now
+available in the input buffer.
+void close( ) Closes the invoking stream. Further read
+attempts will generate an IOException.
+int read( ) Returns an integer representation of the next
+available byte of input. –1 is returned when
+the end of the file is encountered.
+int read(byte buffer[ ]) Attempts to read up to buffer.length bytes into
+buffer, returning the number of bytes that
+were successfully read. –1 is returned when
+the end of the file is encountered.
+Table 17-7. The Methods Defined by ObjectInput
+ObjectInputStream
+The ObjectInputStream class extends the InputStream class and implements the
+ObjectInput interface. ObjectInputStream is responsible for reading objects from a
+stream. A constructor of this class is
+ObjectInputStream(InputStream inStream)
+throws IOException, StreamCorruptedException
+The argument inStream is the input stream from which serialized objects should be read.
+The most commonly used methods in this class are shown in Table 17-8. They will throw
+an IOException on error conditions. Java 2 added an inner class to ObjectInputStream called
+GetField. It facilitates the reading of persistent fields and its use is beyond the scope of this
+book. Also, the method readLine( ) was deprecated by Java 2 and should no longer be used.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 581
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+int read(byte buffer[ ], int offset,
+int numBytes)
+Attempts to read up to numBytes bytes into
+buffer starting at buffer[offset], returning the
+number of bytes that were successfully read.
+–1 is returned when the end of the file is
+encountered.
+Object readObject( ) Reads an object from the invoking stream.
+long skip(long numBytes) Ignores (that is, skips) numBytes bytes in the
+invoking stream, returning the number of
+bytes actually ignored.
+Table 17-7. The Methods Defined by ObjectInput (continued)
+Method Description
+int available( ) Returns the number of bytes that are now
+available in the input buffer.
+void close( ) Closes the invoking stream. Further read
+attempts will generate an IOException.
+Table 17-8. Commonly Used Methods Defined by ObjectInputStream
+582 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+int read( ) Returns an integer representation of the next
+available byte of input. –1 is returned when
+the end of the file is encountered.
+int read(byte buffer[ ], int offset,
+int numBytes)
+Attempts to read up to numBytes bytes into
+buffer starting at buffer[offset], returning the
+number of bytes successfully read. –1 is
+returned when the end of the file is
+encountered.
+boolean readBoolean( ) Reads and returns a boolean from the
+invoking stream.
+byte readByte( ) Reads and returns a byte from the
+invoking stream.
+char readChar( ) Reads and returns a char from the
+invoking stream.
+double readDouble( ) Reads and returns a double from the
+invoking stream.
+float readFloat( ) Reads and returns a float from the
+invoking stream.
+void readFully(byte buffer[ ]) Reads buffer.length bytes into buffer. Returns
+only when all bytes have been read.
+void readFully(byte buffer[ ],
+int offset,
+int numBytes)
+Reads numBytes bytes into buffer starting at
+buffer[offset]. Returns only when numBytes
+have been read.
+int readInt( ) Reads and returns an int from the
+invoking stream.
+long readLong( ) Reads and returns a long from the
+invoking stream.
+final Object readObject( ) Reads and returns an object from the
+invoking stream.
+Table 17-8. Commonly Used Methods Defined by ObjectInputStream (continued)
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 583
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+YA Serialization Example
+The following program illustrates how to use object serialization and deserialization.
+It begins by instantiating an object of class MyClass. This object has three instance
+variables that are of types String, int, and double. This is the information we want to
+save and restore.
+A FileOutputStream is created that refers to a file named “serial,” and an
+ObjectOutputStream is created for that file stream. The writeObject( ) method
+of ObjectOutputStream is then used to serialize our object. The object output
+stream is flushed and closed.
+A FileInputStream is then created that refers to the file named “serial,” and
+an ObjectInputStream is created for that file stream. The readObject( ) method of
+ObjectInputStream is then used to deserialize our object. The object input stream is
+then closed.
+Note that MyClass is defined to implement the Serializable interface. If this is not
+done, a NotSerializableException is thrown. Try experimenting with this program by
+declaring some of the MyClass instance variables to be transient. That data is then not
+saved during serialization.
+import java.io.*;
+public class SerializationDemo {
+public static void main(String args[]) {
+// Object serialization
+try {
+Method Description
+short readShort( ) Reads and returns a short from the invoking
+stream.
+int readUnsignedByte( ) Reads and returns an unsigned byte from the
+invoking stream.
+int readUnsignedShort( ) Reads an unsigned short from the invoking
+stream.
+Table 17-8. Commonly Used Methods Defined by ObjectInputStream (continued)
+584 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+MyClass object1 = new MyClass("Hello", -7, 2.7e10);
+System.out.println("object1: " + object1);
+FileOutputStream fos = new FileOutputStream("serial");
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+oos.writeObject(object1);
+oos.flush();
+oos.close();
+}
+catch(Exception e) {
+System.out.println("Exception during serialization: " + e);
+System.exit(0);
+}
+// Object deserialization
+try {
+MyClass object2;
+FileInputStream fis = new FileInputStream("serial");
+ObjectInputStream ois = new ObjectInputStream(fis);
+object2 = (MyClass)ois.readObject();
+ois.close();
+System.out.println("object2: " + object2);
+}
+catch(Exception e) {
+System.out.println("Exception during deserialization: " + e);
+System.exit(0);
+}
+}
+}
+class MyClass implements Serializable {
+String s;
+int i;
+double d;
+public MyClass(String s, int i, double d) {
+this.s = s;
+this.i = i;
+this.d = d;
+}
+public String toString() {
+return "s=" + s + "; i=" + i + "; d=" + d;
+}
+}
+This program demonstrates that the instance variables of object1 and object2 are
+identical. The output is shown here:
+object1: s=Hello; i=-7; d=2.7E10
+object2: s=Hello; i=-7; d=2.7E10
+Stream Benefits
+The streaming interface to I/O in Java provides a clean abstraction for a complex and
+often cumbersome task. The composition of the filtered stream classes allows you to
+dynamically build the custom streaming interface to suit your data transfer
+requirements. Java programs written to adhere to the abstract, high-level InputStream,
+OutputStream, Reader, and Writer classes will function properly in the future even
+when new and improved concrete stream classes are invented. As you will see in the
+next chapter, this model works very well when we switch from a file system-based set of
+streams to the network and socket streams. Finally, serialization of objects is expected to
+play an increasingly important role in Java programming in the future. Java’s
+serialization I/O classes provide a portable solution to this sometimes tricky task.
+C h a p t e r 1 7 : I n p u t / O u t p u t : E x p l o r i n g j a v a . i o 585
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+This page intentionally left blank.
+Chapter 18
+Networking
+587

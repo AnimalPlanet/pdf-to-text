@@ -1,0 +1,1715 @@
+Chapter 21
+Introducing the AWT:
+Working with Windows,
+Graphics, and Text
+687
+The Abstract Window Toolkit (AWT) was introduced in Chapter 19 because itprovides support for applets. This chapter begins its in-depth examination.The AWT contains numerous classes and methods that allow you to create
+and manage windows. A full description of the AWT would easily fill an entire book.
+Therefore, it is not possible to describe in detail every method, instance variable, or
+class contained in the AWT. However, this and the following two chapters explain
+the techniques needed to effectively use the AWT when creating your own applets or
+stand-alone programs. From there, you will be able to explore other parts of the AWT
+on your own.
+In this chapter, you will learn how to create and manage windows, manage fonts,
+output text, and utilize graphics. Chapter 22 describes the various controls, such as
+scroll bars and push buttons, supported by the AWT. It also explains further aspects of
+Java’s event-handling mechanism. Chapter 23 examines the AWT’s imaging subsystem
+and animation.
+Although the main purpose of the AWT is to support applet windows, it can
+also be used to create stand-alone windows that run in a GUI environment, such as
+Windows. Most of the examples are contained in applets, so to run them, you need
+to use an applet viewer or a Java-compatible Web browser. A few examples will
+demonstrate the creation of stand-alone, windowed programs.
+If you have not yet read Chapter 20, please do so now. It provides an overview of event
+handling, which is used by many of the examples in this chapter.
+AWT Classes
+The AWT classes are contained in the java.awt package. It is one of Java’s largest
+packages. Fortunately, because it is logically organized in a top-down, hierarchical
+fashion, it is easier to understand and use than you might at first believe. Table 21-1
+lists some of the many AWT classes.
+688 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Class Description
+AWTEvent Encapsulates AWT events.
+AWTEventMulticaster Dispatches events to multiple listeners.
+BorderLayout The border layout manager. Border layouts use five
+components: North, South, East, West, and Center.
+Button Creates a push button control.
+Table 21-1. Some AWT Classes
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 689
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Class Description
+Canvas A blank, semantics-free window.
+CardLayout The card layout manager. Card layouts emulate
+index cards. Only the one on top is showing.
+Checkbox Creates a check box control.
+CheckboxGroup Creates a group of check box controls.
+CheckboxMenuItem Creates an on/off menu item.
+Choice Creates a pop-up list.
+Color Manages colors in a portable, platform-independent
+fashion.
+Component An abstract superclass for various AWT components.
+Container A subclass of Component that can hold other
+components.
+Cursor Encapsulates a bitmapped cursor.
+Dialog Creates a dialog window.
+Dimension Specifies the dimensions of an object. The width is
+stored in width, and the height is stored in height.
+Event Encapsulates events.
+EventQueue Queues events.
+FileDialog Creates a window from which a file can be selected.
+FlowLayout The flow layout manager. Flow layout positions
+components left to right, top to bottom.
+Font Encapsulates a type font.
+FontMetrics Encapsulates various information related to a font.
+This information helps you display text in a window.
+Frame Creates a standard window that has a title bar, resize
+corners, and a menu bar.
+Graphics Encapsulates the graphics context. This context is
+used by the various output methods to display
+output in a window.
+GraphicsDevice Describes a graphics device such as a screen or printer.
+Table 21-1. Some AWT Classes (continued)
+690 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Class Description
+GraphicsEnvironment Describes the collection of available Font and
+GraphicsDevice objects.
+GridBagConstraints Defines various constraints relating to the
+GridBagLayout class.
+GridBagLayout The grid bag layout manager. Grid bag layout
+displays components subject to the constraints
+specified by GridBagConstraints.
+GridLayout The grid layout manager. Grid layout displays
+components in a two-dimensional grid.
+Image Encapsulates graphical images.
+Insets Encapsulates the borders of a container.
+Label Creates a label that displays a string.
+List Creates a list from which the user can choose. Similar
+to the standard Windows list box.
+MediaTracker Manages media objects.
+Menu Creates a pull-down menu.
+MenuBar Creates a menu bar.
+MenuComponent An abstract class implemented by various menu
+classes.
+MenuItem Creates a menu item.
+MenuShortcut Encapsulates a keyboard shortcut for a menu item.
+Panel The simplest concrete subclass of Container.
+Point Encapsulates a Cartesian coordinate pair, stored in x
+and y.
+Polygon Encapsulates a polygon.
+PopupMenu Encapsulates a pop-up menu.
+PrintJob An abstract class that represents a print job.
+Rectangle Encapsulates a rectangle.
+Robot Supports automated testing of AWT- based applications.
+(Added by Java 2, vl.3)
+Scrollbar Creates a scroll bar control.
+Table 21-1. Some AWT Classes (continued)
+Although the basic structure of the AWT has been the same since Java 1.0, some of the
+original methods were deprecated and replaced by new ones when Java 1.1 was released.
+For backward-compatibility, Java 2 still supports all the original 1.0 methods. However,
+because these methods are not for use with new code, this book does not describe them.
+Window Fundamentals
+The AWT defines windows according to a class hierarchy that adds functionality and
+specificity with each level. The two most common windows are those derived from
+Panel, which is used by applets, and those derived from Frame, which creates a
+standard window. Much of the functionality of these windows is derived from their
+parent classes. Thus, a description of the class hierarchies relating to these two classes
+is fundamental to their understanding. Figure 21-1 shows the class hierarchy for Panel
+and Frame. Let’s look at each of these classes now.
+Component
+At the top of the AWT hierarchy is the Component class. Component is an abstract
+class that encapsulates all of the attributes of a visual component. All user interface
+elements that are displayed on the screen and that interact with the user are subclasses
+of Component. It defines over a hundred public methods that are responsible for
+managing events, such as mouse and keyboard input, positioning and sizing the
+window, and repainting. (You already used many of these methods when you created
+applets in Chapters 19 and 20.) A Component object is responsible for remembering
+the current foreground and background colors and the currently selected text font.
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 691
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Class Description
+ScrollPane A container that provides horizontal and/or vertical
+scroll bars for another component.
+SystemColor Contains the colors of GUI widgets such as windows,
+scroll bars, text, and others.
+TextArea Creates a multiline edit control.
+TextComponent A superclass for TextArea and TextField.
+TextField Creates a single-line edit control.
+Toolkit Abstract class implemented by the AWT.
+Window Creates a window with no frame, no menu bar,
+and no title.
+Table 21-1. Some AWT Classes (continued)
+Container
+The Container class is a subclass of Component. It has additional methods that allow
+other Component objects to be nested within it. Other Container objects can be stored
+inside of a Container (since they are themselves instances of Component). This makes
+for a multileveled containment system. A container is responsible for laying out (that
+is, positioning) any components that it contains. It does this through the use of various
+layout managers, which you will learn about in Chapter 22.
+Panel
+The Panel class is a concrete subclass of Container. It doesn’t add any new methods; it
+simply implements Container. A Panel may be thought of as a recursively nestable,
+concrete screen component. Panel is the superclass for Applet. When screen output is
+directed to an applet, it is drawn on the surface of a Panel object. In essence, a Panel is
+a window that does not contain a title bar, menu bar, or border. This is why you don’t
+see these items when an applet is run inside a browser. When you run an applet using
+an applet viewer, the applet viewer provides the title and border.
+Other components can be added to a Panel object by its add( ) method (inherited
+from Container). Once these components have been added, you can position and resize
+them manually using the setLocation( ), setSize( ), or setBounds( ) methods defined by
+Component.
+692 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 21-1. The class hierarchy for Panel and Frame
+Window
+The Window class creates a top-level window. A top-level window is not contained
+within any other object; it sits directly on the desktop. Generally, you won’t create
+Window objects directly. Instead, you will use a subclass of Window called Frame,
+described next.
+Frame
+Frame encapsulates what is commonly thought of as a “window.” It is a subclass of
+Window and has a title bar, menu bar, borders, and resizing corners. If you create a
+Frame object from within an applet, it will contain a warning message, such as “Java
+Applet Window,” to the user that an applet window has been created. This message
+warns users that the window they see was started by an applet and not by software
+running on their computer. (An applet that could masquerade as a host-based
+application could be used to obtain passwords and other sensitive information without
+the user’s knowledge.) When a Frame window is created by a program rather than an
+applet, a normal window is created.
+Canvas
+Although it is not part of the hierarchy for applet or frame windows, there is one other
+type of window that you will find valuable: Canvas. Canvas encapsulates a blank
+window upon which you can draw. You will see an example of Canvas later in this book.
+Working with Frame Windows
+After the applet, the type of window you will most often create is derived from Frame.
+You will use it to create child windows within applets, and top-level or child windows
+for applications. As mentioned, it creates a standard-style window.
+Here are two of Frame’s constructors:
+Frame( )
+Frame(String title)
+The first form creates a standard window that does not contain a title. The second form
+creates a window with the title specified by title. Notice that you cannot specify the
+dimensions of the window. Instead, you must set the size of the window after it
+has been created.
+There are several methods you will use when working with Frame windows. They
+are examined here.
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 693
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Setting the Window’s Dimensions
+The setSize( ) method is used to set the dimensions of the window. Its signature is
+shown here:
+void setSize(int newWidth, int newHeight)
+void setSize(Dimension newSize)
+The new size of the window is specified by newWidth and newHeight, or by the width
+and height fields of the Dimension object passed in newSize. The dimensions are
+specified in terms of pixels.
+The getSize( ) method is used to obtain the current size of a window. Its signature
+is shown here:
+Dimension getSize( )
+This method returns the current size of the window contained within the width and
+height fields of a Dimension object.
+Hiding and Showing a Window
+After a frame window has been created, it will not be visible until you call
+setVisible( ). Its signature is shown here:
+void setVisible(boolean visibleFlag)
+The component is visible if the argument to this method is true. Otherwise, it is hidden.
+Setting a Window’s Title
+You can change the title in a frame window using setTitle( ), which has this
+general form:
+void setTitle(String newTitle)
+Here, newTitle is the new title for the window.
+Closing a Frame Window
+When using a frame window, your program must remove that window from the
+screen when it is closed, by calling setVisible(false). To intercept a window-close
+event, you must implement the windowClosing( ) method of the WindowListener
+interface. Inside windowClosing( ), you must remove the window from the screen.
+The example in the next section illustrates this technique.
+694 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 695
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Creating a Frame Window in an Applet
+While it is possible to simply create a window by creating an instance of Frame, you
+will seldom do so, because you will not be able to do much with it. For example, you
+will not be able to receive or process events that occur within it or easily output
+information to it. Most of the time, you will create a subclass of Frame. Doing so lets
+you override Frame’s methods and event handling.
+Creating a new frame window from within an applet is actually quite easy. First, create
+a subclass of Frame. Next, override any of the standard window methods, such as init( ),
+start( ), stop( ), and paint( ). Finally, implement the windowClosing( ) method of the
+WindowListener interface, calling setVisible(false) when the window is closed.
+Once you have defined a Frame subclass, you can create an object of that class.
+This causes a frame window to come into existence, but it will not be initially visible.
+You make it visible by calling setVisible( ). When created, the window is given a
+default height and width. You can set the size of the window explicitly by calling the
+setSize( ) method.
+The following applet creates a subclass of Frame called SampleFrame. A window
+of this subclass is instantiated within the init( ) method of AppletFrame. Notice that
+SampleFrame calls Frame’s constructor. This causes a standard frame window to be
+created with the title passed in title. This example overrides the applet window’s
+start( ) and stop( ) methods so that they show and hide the child window, respectively.
+This causes the window to be removed automatically when you terminate the applet,
+when you close the window, or, if using a browser, when you move to another page.
+It also causes the child window to be shown when the browser returns to the applet.
+//  Create a child frame window from within an applet.
+import java.awt.*;
+import java.awt.event.*;
+import java.applet.*;
+/*
+<applet code="AppletFrame" width=300 height=50>
+</applet>
+*/
+// Create a subclass of Frame.
+class SampleFrame extends Frame {
+SampleFrame(String title) {
+super(title);
+// create an object to handle window events
+MyWindowAdapter adapter = new MyWindowAdapter(this);
+// register it to receive those events
+addWindowListener(adapter);
+}
+public void paint(Graphics g) {
+g.drawString("This is in frame window", 10, 40);
+}
+}
+class MyWindowAdapter extends WindowAdapter {
+SampleFrame sampleFrame;
+public MyWindowAdapter(SampleFrame sampleFrame) {
+this.sampleFrame = sampleFrame;
+}
+public void windowClosing(WindowEvent we) {
+sampleFrame.setVisible(false);
+}
+}
+// Create frame window.
+public class AppletFrame extends Applet {
+Frame f;
+public void init() {
+f = new SampleFrame("A Frame Window");
+f.setSize(250, 250);
+f.setVisible(true);
+}
+public void start() {
+f.setVisible(true);
+}
+public void stop() {
+f.setVisible(false);
+}
+public void paint(Graphics g) {
+g.drawString("This is in applet window", 10, 20);
+}
+}
+Sample output from this program is shown here:
+696 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 697
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Handling Events in a Frame Window
+Since Frame is a subclass of Component, it inherits all the capabilities defined by
+Component. This means that you can use and manage a frame window that you create
+just like you manage your applet’s main window. For example, you can override
+paint( ) to display output, call repaint( ) when you need to restore the window, and
+override all event handlers. Whenever an event occurs in a window, the event handlers
+defined by that window will be called. Each window handles its own events. For
+example, the following program creates a window that responds to mouse events.
+The main applet window also responds to mouse events. When you experiment
+with this program, you will see that mouse events are sent to the window in which
+the event occurs.
+// Handle mouse events in both child and applet windows.
+import java.awt.*;
+import java.awt.event.*;
+import java.applet.*;
+/*
+<applet code="WindowEvents" width=300 height=50>
+</applet>
+*/
+// Create a subclass of Frame.
+class SampleFrame extends Frame
+implements MouseListener, MouseMotionListener {
+String msg = "";
+int mouseX=10, mouseY=40;
+int movX=0, movY=0;
+SampleFrame(String title) {
+super(title);
+// register this object to receive its own mouse events
+addMouseListener(this);
+addMouseMotionListener(this);
+// create an object to handle window events
+MyWindowAdapter adapter = new MyWindowAdapter(this);
+// register it to receive those events
+addWindowListener(adapter);
+}
+// Handle mouse clicked.
+public void mouseClicked(MouseEvent me) {
+}
+// Handle mouse entered.
+public void mouseEntered(MouseEvent evtObj) {
+// save coordinates
+mouseX = 10;
+mouseY = 54;
+msg = "Mouse just entered child.";
+repaint();
+}
+// Handle mouse exited.
+public void mouseExited(MouseEvent evtObj) {
+// save coordinates
+mouseX = 10;
+mouseY = 54;
+msg = "Mouse just left child window.";
+repaint();
+}
+// Handle mouse pressed.
+public void mousePressed(MouseEvent me) {
+// save coordinates
+mouseX = me.getX();
+mouseY = me.getY();
+msg = "Down";
+repaint();
+}
+// Handle mouse released.
+698 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+public void mouseReleased(MouseEvent me) {
+// save coordinates
+mouseX = me.getX();
+mouseY = me.getY();
+msg = "Up";
+repaint();
+}
+// Handle mouse dragged.
+public void mouseDragged(MouseEvent me) {
+// save coordinates
+mouseX = me.getX();
+mouseY = me.getY();
+movX = me.getX();
+movY = me.getY();
+msg = "*";
+repaint();
+}
+// Handle mouse moved.
+public void mouseMoved(MouseEvent me) {
+// save coordinates
+movX = me.getX();
+movY = me.getY();
+repaint(0, 0, 100, 60);
+}
+public void paint(Graphics g) {
+g.drawString(msg, mouseX, mouseY);
+g.drawString("Mouse at " + movX + ", " + movY, 10, 40);
+}
+}
+class MyWindowAdapter extends WindowAdapter {
+SampleFrame sampleFrame;
+public MyWindowAdapter(SampleFrame sampleFrame) {
+this.sampleFrame = sampleFrame;
+}
+public void windowClosing(WindowEvent we) {
+sampleFrame.setVisible(false);
+}
+}
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 699
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+// Applet window.
+public class WindowEvents extends Applet
+implements MouseListener, MouseMotionListener {
+SampleFrame f;
+String msg = "";
+int mouseX=0, mouseY=10;
+int movX=0, movY=0;
+// Create a frame window.
+public void init() {
+f = new SampleFrame("Handle Mouse Events");
+f.setSize(300, 200);
+f.setVisible(true);
+// register this object to receive its own mouse events
+addMouseListener(this);
+addMouseMotionListener(this);
+}
+// Remove frame window when stopping applet.
+public void stop() {
+f.setVisible(false);
+}
+// Show frame window when starting applet.
+public void start() {
+f.setVisible(true);
+}
+// Handle mouse clicked.
+public void mouseClicked(MouseEvent me) {
+}
+// Handle mouse entered.
+public void mouseEntered(MouseEvent me) {
+// save coordinates
+mouseX = 0;
+mouseY = 24;
+msg = "Mouse just entered applet window.";
+repaint();
+700 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+}// Handle mouse exited.
+public void mouseExited(MouseEvent me) {
+// save coordinates
+mouseX = 0;
+mouseY = 24;
+msg = "Mouse just left applet window.";
+repaint();
+}
+// Handle button pressed.
+public void mousePressed(MouseEvent me) {
+// save coordinates
+mouseX = me.getX();
+mouseY = me.getY();
+msg = "Down";
+repaint();
+}
+// Handle button released.
+public void mouseReleased(MouseEvent me) {
+// save coordinates
+mouseX = me.getX();
+mouseY = me.getY();
+msg = "Up";
+repaint();
+}
+// Handle mouse dragged.
+public void mouseDragged(MouseEvent me) {
+// save coordinates
+mouseX = me.getX();
+mouseY = me.getY();
+movX = me.getX();
+movY = me.getY();
+msg = "*";
+repaint();
+}
+// Handle mouse moved.
+public void mouseMoved(MouseEvent me) {
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 701
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+// save coordinates
+movX = me.getX();
+movY = me.getY();
+repaint(0, 0, 100, 20);
+}
+// Display msg in applet window.
+public void paint(Graphics g) {
+g.drawString(msg, mouseX, mouseY);
+g.drawString("Mouse at " + movX + ", " + movY, 0, 10);
+}
+}
+Sample output from this program is shown here:
+Creating a Windowed Program
+Although creating applets is the most common use for Java’s AWT, it is possible to
+create stand-alone AWT-based applications, too. To do this, simply create an instance
+of the window or windows you need inside main( ). For example, the following
+program creates a frame window that responds to mouse clicks and keystrokes:
+// Create an AWT-based application.
+import java.awt.*;
+702 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+import java.awt.event.*;
+import java.applet.*;
+// Create a frame window.
+public class AppWindow extends Frame {
+String keymsg = "This is a test.";
+String mousemsg = "";
+int mouseX=30, mouseY=30;
+public AppWindow() {
+addKeyListener(new MyKeyAdapter(this));
+addMouseListener(new MyMouseAdapter(this));
+addWindowListener(new MyWindowAdapter());
+}
+public void paint(Graphics g) {
+g.drawString(keymsg, 10, 40);
+g.drawString(mousemsg, mouseX, mouseY);
+}
+// Create the window.
+public static void main(String args[]) {
+AppWindow appwin = new AppWindow();
+appwin.setSize(new Dimension(300, 200));
+appwin.setTitle("An AWT-Based Application");
+appwin.setVisible(true);
+}
+}
+class MyKeyAdapter extends KeyAdapter {
+AppWindow appWindow;
+public MyKeyAdapter(AppWindow appWindow) {
+this.appWindow = appWindow;
+}
+public void keyTyped(KeyEvent ke) {
+appWindow.keymsg += ke.getKeyChar();
+appWindow.repaint();
+};
+}
+class MyMouseAdapter extends MouseAdapter {
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 703
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+AppWindow appWindow;
+public MyMouseAdapter(AppWindow appWindow) {
+this.appWindow = appWindow;
+}
+public void mousePressed(MouseEvent me) {
+appWindow.mouseX = me.getX();
+appWindow.mouseY = me.getY();
+appWindow.mousemsg = "Mouse Down at " + appWindow.mouseX +
+", " + appWindow.mouseY;
+appWindow.repaint();
+}
+}
+class MyWindowAdapter extends WindowAdapter {
+public void windowClosing(WindowEvent we) {
+System.exit(0);
+}
+}
+Sample output from this program is shown here:
+Once created, a frame window takes on a life of its own. Notice that main( ) ends
+with the call to appwin.setVisible(true). However, the program keeps running until
+you close the window. In essence, when creating a windowed application, you will use
+main( ) to launch its top-level window. After that, your program will function as a
+GUI-based application, not like the console-based programs used earlier.
+Displaying Information Within a Window
+In the most general sense, a window is a container for information. Although we have
+already output small amounts of text to a window in the preceding examples, we have
+704 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+not begun to take advantage of a window’s ability to present high-quality text and
+graphics. Indeed, much of the power of the AWT comes from its support for these
+items. For this reason, the remainder of this chapter discusses Java’s text-, graphics-,
+and font-handling capabilities. As you will see, they are both powerful and flexible.
+Working with Graphics
+The AWT supports a rich assortment of graphics methods. All graphics are drawn
+relative to a window. This can be the main window of an applet, a child window of
+an applet, or a stand-alone application window. The origin of each window is at the
+top-left corner and is 0,0. Coordinates are specified in pixels. All output to a window
+takes place through a graphics context. A graphics context is encapsulated by the
+Graphics class and is obtained in two ways:
+■ It is passed to an applet when one of its various methods, such as paint( ) or
+update( ), is called.
+■ It is returned by the getGraphics( ) method of Component.
+For the remainder of the examples in this chapter, we will be demonstrating
+graphics in the main applet window. However, the same techniques will apply to any
+other window.
+The Graphics class defines a number of drawing functions. Each shape can be
+drawn edge-only or filled. Objects are drawn and filled in the currently selected
+graphics color, which is black by default. When a graphics object is drawn that exceeds
+the dimensions of the window, output is automatically clipped. Let’s take a look at
+several of the drawing methods.
+Drawing Lines
+Lines are drawn by means of the drawLine( ) method, shown here:
+void drawLine(int startX, int startY, int endX, int endY)
+drawLine( ) displays a line in the current drawing color that begins at startX,startY and
+ends at endX,endY.
+The following applet draws several lines:
+// Draw lines
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="Lines" width=300 height=200>
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 705
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+</applet>
+*/
+public class Lines extends Applet {
+public void paint(Graphics g) {
+g.drawLine(0, 0, 100, 100);
+g.drawLine(0, 100, 100, 0);
+g.drawLine(40, 25, 250, 180);
+g.drawLine(75, 90, 400, 400);
+g.drawLine(20, 150, 400, 40);
+g.drawLine(5, 290, 80, 19);
+}
+}
+Sample output from this program is shown here:
+Drawing Rectangles
+The drawRect( ) and fillRect( ) methods display an outlined and filled rectangle,
+respectively. They are shown here:
+void drawRect(int top, int left, int width, int height)
+void fillRect(int top, int left, int width, int height)
+The upper-left corner of the rectangle is at top,left. The dimensions of the rectangle are
+specified by width and height.
+To draw a rounded rectangle, use drawRoundRect( ) or fillRoundRect( ), both
+shown here:
+void drawRoundRect(int top, int left, int width, int height,
+int xDiam, int yDiam)
+706 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+void fillRoundRect(int top, int left, int width, int height,
+int xDiam, int yDiam)
+A rounded rectangle has rounded corners. The upper-left corner of the rectangle
+is at top,left. The dimensions of the rectangle are specified by width and height. The
+diameter of the rounding arc along the X axis is specified by xDiam. The diameter of
+the rounding arc along the Y axis is specified by yDiam.
+The following applet draws several rectangles:
+// Draw rectangles
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="Rectangles" width=300 height=200>
+</applet>
+*/
+public class Rectangles extends Applet {
+public void paint(Graphics g) {
+g.drawRect(10, 10, 60, 50);
+g.fillRect(100, 10, 60, 50);
+g.drawRoundRect(190, 10, 60, 50, 15, 15);
+g.fillRoundRect(70, 90, 140, 100, 30, 40);
+}
+}
+Sample output from this program is shown here:
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 707
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Drawing Ellipses and Circles
+To draw an ellipse, use drawOval( ). To fill an ellipse, use fillOval( ). These methods
+are shown here:
+void drawOval(int top, int left, int width, int height)
+void fillOval(int top, int left, int width, int height)
+The ellipse is drawn within a bounding rectangle whose upper-left corner is specified
+by top,left and whose width and height are specified by width and height.
+To draw a circle, specify a square as the bounding rectangle.
+The following program draws several ellipses:
+// Draw Ellipses
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="Ellipses" width=300 height=200>
+</applet>
+*/
+public class Ellipses extends Applet {
+public void paint(Graphics g) {
+g.drawOval(10, 10, 50, 50);
+g.fillOval(100, 10, 75, 50);
+g.drawOval(190, 10, 90, 30);
+g.fillOval(70, 90, 140, 100);
+}
+}
+Sample output from this program is shown here:
+708 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Drawing Arcs
+Arcs can be drawn with drawArc( ) and fillArc( ), shown here:
+void drawArc(int top, int left, int width, int height, int startAngle,
+int sweepAngle)
+void fillArc(int top, int left, int width, int height, int startAngle,
+int sweepAngle)
+The arc is bounded by the rectangle whose upper-left corner is specified by top,left
+and whose width and height are specified by width and height. The arc is drawn from
+startAngle through the angular distance specified by sweepAngle. Angles are specified
+in degrees. Zero degrees is on the horizontal, at the three o’clock position. The arc is
+drawn counterclockwise if sweepAngle is positive, and clockwise if sweepAngle is
+negative. Therefore, to draw an arc from twelve o’clock to six o’clock, the start angle
+would be 90 and the sweep angle 180.
+The following applet draws several arcs:
+// Draw Arcs
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="Arcs" width=300 height=200>
+</applet>
+*/
+public class Arcs extends Applet {
+public void paint(Graphics g) {
+g.drawArc(10, 40, 70, 70, 0, 75);
+g.fillArc(100, 40, 70, 70, 0, 75);
+g.drawArc(10, 100, 70, 80, 0, 175);
+g.fillArc(100, 100, 70, 90, 0, 270);
+g.drawArc(200, 80, 80, 80, 0, 180);
+}
+}
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 709
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Sample output from this program is shown here:
+Drawing Polygons
+It is possible to draw arbitrarily shaped figures using drawPolygon( ) and fillPolygon( ),
+shown here:
+void drawPolygon(int x[ ], int y[ ], int numPoints)
+void fillPolygon(int x[ ], int y[ ], int numPoints)
+The polygon’s endpoints are specified by the coordinate pairs contained within the x and
+y arrays. The number of points defined by x and y is specified by numPoints. There are
+alternative forms of these methods in which the polygon is specified by a Polygon object.
+The following applet draws an hourglass shape:
+// Draw Polygon
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="HourGlass" width=230 height=210>
+</applet>
+*/
+public class HourGlass extends Applet {
+public void paint(Graphics g) {
+int xpoints[] = {30, 200, 30, 200, 30};
+int ypoints[] = {30, 30, 200, 200, 30};
+int num = 5;
+g.drawPolygon(xpoints, ypoints, num);
+710 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+}}
+Sample output from this program is shown here:
+Sizing Graphics
+Often, you will want to size a graphics object to fit the current size of the window in
+which it is drawn. To do so, first obtain the current dimensions of the window by
+calling getSize( ) on the window object. It returns the dimensions of the window
+encapsulated within a Dimension object. Once you have the current size of the
+window, you can scale your graphical output accordingly.
+To demonstrate this technique, here is an applet that will start as a 200×200-pixel
+square and grow by 25 pixels in width and height with each mouse click until the
+applet gets larger than 500×500. At that point, the next click will return it to 200×200,
+and the process starts over. Within the window, a rectangle is drawn around the inner
+border of the window; within that rectangle, an X is drawn so that it fills the window.
+This applet works in appletviewer, but it may not work in a browser window.
+// Resizing output to fit the current size of a window.
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+/*
+<applet code="ResizeMe" width=200 height=200>
+</applet>
+*/
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 711
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+public class ResizeMe extends Applet {
+final int inc = 25;
+int max = 500;
+int min = 200;
+Dimension d;
+public ResizeMe() {
+addMouseListener(new MouseAdapter() {
+public void mouseReleased(MouseEvent me) {
+int w = (d.width + inc) > max?min :(d.width + inc);
+int h = (d.height + inc) > max?min :(d.height + inc);
+setSize(new Dimension(w, h));
+}
+});
+}
+public void paint(Graphics g) {
+d = getSize();
+g.drawLine(0, 0, d.width-1, d.height-1);
+g.drawLine(0, d.height-1, d.width-1, 0);
+g.drawRect(0, 0, d.width-1, d.height-1);
+}
+}
+Working with Color
+Java supports color in a portable, device-independent fashion. The AWT color system
+allows you to specify any color you want. It then finds the best match for that color,
+given the limits of the display hardware currently executing your program or applet.
+Thus, your code does not need to be concerned with the differences in the way color is
+supported by various hardware devices. Color is encapsulated by the Color class.
+As you saw in Chapter 19, Color defines several constants (for example, Color.black)
+to specify a number of common colors. You can also create your own colors, using one of
+the color constructors. The most commonly used forms are shown here:
+Color(int red, int green, int blue)
+Color(int rgbValue)
+Color(float red, float green, float blue)
+The first constructor takes three integers that specify the color as a mix of red, green,
+and blue. These values must be between 0 and 255, as in this example:
+new Color(255, 100, 100); // light red.
+712 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The second color constructor takes a single integer that contains the mix of red, green,
+and blue packed into an integer. The integer is organized with red in bits 16 to 23,
+green in bits 8 to 15, and blue in bits 0 to 7. Here is an example of this constructor:
+int newRed = (0xff000000 | (0xc0 << 16) | (0x00 << 8) | 0x00);
+Color darkRed = new Color(newRed);
+The final constructor, Color(float, float, float), takes three float values (between 0.0
+and 1.0) that specify the relative mix of red, green, and blue.
+Once you have created a color, you can use it to set the foreground and/or
+background color by using the setForeground( ) and setBackground( ) methods
+described in Chapter 19. You can also select it as the current drawing color.
+Color Methods
+The Color class defines several methods that help manipulate colors. They are
+examined here.
+Using Hue, Saturation, and Brightness
+The hue-saturation-brightness (HSB) color model is an alternative to red-green-blue
+(RGB) for specifying particular colors. Figuratively, hue is a wheel of color. The hue is
+specified with a number between 0.0 and 1.0 (the colors are approximately: red, orange,
+yellow, green, blue, indigo, and violet). Saturation is another scale ranging from 0.0 to
+1.0, representing light pastels to intense hues. Brightness values also range from 0.0 to
+1.0, where 1 is bright white and 0 is black. Color supplies two methods that let you
+convert between RGB and HSB. They are shown here:
+static int HSBtoRGB(float hue, float saturation, float brightness)
+static float[ ] RGBtoHSB(int red, int green, int blue, float values[ ])
+HSBtoRGB( ) returns a packed RGB value compatible with the Color(int) constructor.
+RGBtoHSB( ) returns a float array of HSB values corresponding to RGB integers. If
+values is not null, then this array is given the HSB values and returned. Otherwise, a
+new array is created and the HSB values are returned in it. In either case, the array
+contains the hue at index 0, saturation at index 1, and brightness at index 2.
+getRed( ), getGreen( ), getBlue( )
+You can obtain the red, green, and blue components of a color independently using
+getRed( ), getGreen( ), and getBlue( ), shown here:
+int getRed( )
+int getGreen( )
+int getBlue( )
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 713
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Each of these methods returns the RGB color component found in the invoking Color
+object in the lower 8 bits of an integer.
+getRGB( )
+To obtain a packed, RGB representation of a color, use getRGB( ), shown here:
+int getRGB( )
+The return value is organized as described earlier.
+Setting the Current Graphics Color
+By default, graphics objects are drawn in the current foreground color. You can change
+this color by calling the Graphics method setColor( ):
+void setColor(Color newColor)
+Here, newColor specifies the new drawing color.
+You can obtain the current color by calling getColor( ), shown here:
+Color getColor( )
+A Color Demonstration Applet
+The following applet constructs several colors and draws various objects using
+these colors:
+// Demonstrate color.
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="ColorDemo" width=300 height=200>
+</applet>
+*/
+public class ColorDemo extends Applet {
+// draw lines
+public void paint(Graphics g) {
+Color c1 = new Color(255, 100, 100);
+Color c2 = new Color(100, 255, 100);
+Color c3 = new Color(100, 100, 255);
+g.setColor(c1);
+g.drawLine(0, 0, 100, 100);
+714 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+g.drawLine(0, 100, 100, 0);
+g.setColor(c2);
+g.drawLine(40, 25, 250, 180);
+g.drawLine(75, 90, 400, 400);
+g.setColor(c3);
+g.drawLine(20, 150, 400, 40);
+g.drawLine(5, 290, 80, 19);
+g.setColor(Color.red);
+g.drawOval(10, 10, 50, 50);
+g.fillOval(70, 90, 140, 100);
+g.setColor(Color.blue);
+g.drawOval(190, 10, 90, 30);
+g.drawRect(10, 10, 60, 50);
+g.setColor(Color.cyan);
+g.fillRect(100, 10, 60, 50);
+g.drawRoundRect(190, 10, 60, 50, 15, 15);
+}
+}
+Setting the Paint Mode
+The paint mode determines how objects are drawn in a window. By default, new output
+to a window overwrites any preexisting contents. However, it is possible to have new
+objects XORed onto the window by using setXORMode( ), as follows:
+void setXORMode(Color xorColor)
+Here, xorColor specifies the color that will be XORed to the window when an object is
+drawn. The advantage of XOR mode is that the new object is always guaranteed to be
+visible no matter what color the object is drawn over.
+To return to overwrite mode, call setPaintMode( ), shown here:
+void setPaintMode( )
+In general, you will want to use overwrite mode for normal output, and XOR mode for
+special purposes. For example, the following program displays cross hairs that track
+the mouse pointer. The cross hairs are XORed onto the window and are always visible,
+no matter what the underlying color is.
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 715
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+// Demonstrate XOR mode.
+import java.awt.*;
+import java.awt.event.*;
+import java.applet.*;
+/*
+<applet code="XOR" width=400 height=200>
+</applet>
+*/
+public class XOR extends Applet {
+int chsX=100, chsY=100;
+public XOR() {
+addMouseMotionListener(new MouseMotionAdapter() {
+public void mouseMoved(MouseEvent me) {
+int x = me.getX();
+int y = me.getY();
+chsX = x-10;
+chsY = y-10;
+repaint();
+}
+});
+}
+public void paint(Graphics g) {
+g.drawLine(0, 0, 100, 100);
+g.drawLine(0, 100, 100, 0);
+g.setColor(Color.blue);
+g.drawLine(40, 25, 250, 180);
+g.drawLine(75, 90, 400, 400);
+g.setColor(Color.green);
+g.drawRect(10, 10, 60, 50);
+g.fillRect(100, 10, 60, 50);
+g.setColor(Color.red);
+g.drawRoundRect(190, 10, 60, 50, 15, 15);
+g.fillRoundRect(70, 90, 140, 100, 30, 40);
+g.setColor(Color.cyan);
+g.drawLine(20, 150, 400, 40);
+g.drawLine(5, 290, 80, 19);
+// xor cross hairs
+g.setXORMode(Color.black);
+g.drawLine(chsX-10, chsY, chsX+10, chsY);
+716 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+g.drawLine(chsX, chsY-10, chsX, chsY+10);
+g.setPaintMode();
+}
+}
+Sample output from this program is shown here:
+Working with Fonts
+The AWT supports multiple type fonts. Fonts have emerged from the domain of
+traditional typesetting to become an important part of computer-generated documents
+and displays. The AWT provides flexibility by abstracting font-manipulation
+operations and allowing for dynamic selection of fonts.
+Beginning with Java 2, fonts have a family name, a logical font name, and a face
+name. The family name is the general name of the font, such as Courier. The logical name
+specifies a category of font, such as Monospaced. The face name specifies a specific font,
+such as Courier Italic.
+Fonts are encapsulated by the Font class. Several of the methods defined by Font
+are listed in Table 21-2.
+The Font class defines these variables:
+Variable Meaning
+String name Name of the font
+float pointSize Size of the font in points
+int size Size of the font in points
+int style Font style
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 717
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+718 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static Font decode(String str) Returns a font given its name.
+boolean equals(Object FontObj) Returns true if the invoking object contains
+the same font as that specified by FontObj.
+Otherwise, it returns false.
+String getFamily( ) Returns the name of the font family to
+which the invoking font belongs.
+static Font getFont(String property) Returns the font associated with the system
+property specified by property. null is
+returned if property does not exist.
+static Font getFont(String property,
+Font defaultFont)
+Returns the font associated with the system
+property specified by property. The font
+specified by defaultFont is returned if
+property does not exist.
+String getFontName() Returns the face name of the invoking font.
+(Added by Java 2)
+String getName( ) Returns the logical name of the
+invoking font.
+int getSize( ) Returns the size, in points, of the
+invoking font.
+int getStyle( ) Returns the style values of the invoking font.
+int hashCode( ) Returns the hash code associated with the
+invoking object.
+boolean isBold( ) Returns true if the font includes the BOLD
+style value. Otherwise, false is returned.
+boolean isItalic( ) Returns true if the font includes the ITALIC
+style value. Otherwise, false is returned.
+boolean isPlain( ) Returns true if the font includes the PLAIN
+style value. Otherwise, false is returned.
+String toString( ) Returns the string equivalent of the
+invoking font.
+Table 21-2. Some Methods Defined by Font
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 719
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Determining the Available Fonts
+When working with fonts, often you need to know which fonts are available on your
+machine. To obtain this information, you can use the getAvailableFontFamilyNames( )
+method defined by the GraphicsEnvironment class. It is shown here:
+String[ ] getAvailableFontFamilyNames( )
+This method returns an array of strings that contains the names of the available
+font families.
+In addition, the getAllFonts( ) method is defined by the GraphicsEnvironment
+class. It is shown here:
+Font[ ] getAllFonts( )
+This method returns an array of Font objects for all of the available fonts.
+Since these methods are members of GraphicsEnvironment, you need a
+GraphicsEnvironment reference to call them. You can obtain this reference by
+using the getLocalGraphicsEnvironment( ) static method, which is defined
+by GraphicsEnvironment. It is shown here:
+static GraphicsEnvironment getLocalGraphicsEnvironment( )
+Here is an applet that shows how to obtain the names of the available font families:
+// Display Fonts
+/*
+<applet code="ShowFonts" width=550 height=60>
+</applet>
+*/
+import java.applet.*;
+import java.awt.*;
+public class ShowFonts extends Applet {
+public void paint(Graphics g) {
+String msg = "";
+String FontList[];
+GraphicsEnvironment ge =
+GraphicsEnvironment.getLocalGraphicsEnvironment();
+FontList = ge.getAvailableFontFamilyNames();
+for(int i = 0; i < FontList.length; i++)
+msg += FontList[i] + " ";
+g.drawString(msg, 4, 16);
+}
+}
+Sample output from this program is shown next. However, when you run this
+program, you may see a different list of fonts than the one shown in this illustration.
+Prior to Java 2, you would use the method getFontList( ) defined by the Toolkit class
+to obtain a list of fonts. This method is now deprecated and should not be used by
+new programs.
+Creating and Selecting a Font
+To select a new font, you must first construct a Font object that describes that font.
+One Font constructor has this general form:
+Font(String fontName, int fontStyle, int pointSize)
+Here, fontName specifies the name of the desired font. The name can be specified using
+either the logical or face name. All Java environments will support the following fonts:
+Dialog, DialogInput, Sans Serif, Serif, Monospaced, and Symbol. Dialog is the font used
+by your system’s dialog boxes. Dialog is also the default if you don’t explicitly set a
+font. You can also use any other fonts supported by your particular environment, but
+be careful—these other fonts may not be universally available.
+The style of the font is specified by fontStyle. It may consist of one or more of these
+three constants: Font.PLAIN, Font.BOLD, and Font.ITALIC. To combine styles, OR
+them together. For example, Font.BOLD | Font.ITALIC specifies a bold, italics style.
+The size, in points, of the font is specified by pointSize.
+To use a font that you have created, you must select it using setFont( ), which is
+defined by Component. It has this general form:
+void setFont(Font fontObj)
+Here, fontObj is the object that contains the desired font.
+The following program outputs a sample of each standard font. Each time you click
+the mouse within its window, a new font is selected and its name is displayed.
+720 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+// Show fonts.
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+/*
+<applet code="SampleFonts" width=200 height=100>
+</applet>
+*/
+public class SampleFonts extends Applet {
+int next = 0;
+Font f;
+String msg;
+public void init() {
+f = new Font("Dialog", Font.PLAIN, 12);
+msg = "Dialog";
+setFont(f);
+addMouseListener(new MyMouseAdapter(this));
+}
+public void paint(Graphics g) {
+g.drawString(msg, 4, 20);
+}
+}
+class MyMouseAdapter extends MouseAdapter {
+SampleFonts sampleFonts;
+public MyMouseAdapter(SampleFonts sampleFonts) {
+this.sampleFonts = sampleFonts;
+}
+public void mousePressed(MouseEvent me) {
+// Switch fonts with each mouse click.
+sampleFonts.next++;
+switch(sampleFonts.next) {
+case 0:
+sampleFonts.f = new Font("Dialog", Font.PLAIN, 12);
+sampleFonts.msg = "Dialog";
+break;
+case 1:
+sampleFonts.f = new Font("DialogInput", Font.PLAIN, 12);
+sampleFonts.msg = "DialogInput";
+break;
+case 2:
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 721
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+722 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+sampleFonts.f = new Font("SansSerif", Font.PLAIN, 12);
+sampleFonts.msg = "SansSerif";
+break;
+case 3:
+sampleFonts.f = new Font("Serif", Font.PLAIN, 12);
+sampleFonts.msg = "Serif";
+break;
+case 4:
+sampleFonts.f = new Font("Monospaced", Font.PLAIN, 12);
+sampleFonts.msg = "Monospaced";
+break;
+}
+if(sampleFonts.next == 4) sampleFonts.next = -1;
+sampleFonts.setFont(sampleFonts.f);
+sampleFonts.repaint();
+}
+}
+Sample output from this program is shown here:
+Obtaining Font Information
+Suppose you want to obtain information about the currently selected font. To do this,
+you must first get the current font by calling getFont( ). This method is defined by the
+Graphics class, as shown here:
+Font getFont( )
+Once you have obtained the currently selected font, you can retrieve information about
+it using various methods defined by Font. For example, this applet displays the name,
+family, size, and style of the currently selected font:
+// Display font info.
+import java.applet.*;
+import java.awt.*;
+/*
+<applet code="FontInfo" width=350 height=60>
+</applet>
+*/
+public class FontInfo extends Applet {
+public void paint(Graphics g) {
+Font f = g.getFont();
+String fontName = f.getName();
+String fontFamily = f.getFamily();
+int fontSize = f.getSize();
+int fontStyle = f.getStyle();
+String msg = "Family: " + fontName;
+msg += ", Font: " + fontFamily;
+msg += ", Size: " + fontSize + ", Style: ";
+if((fontStyle & Font.BOLD) == Font.BOLD)
+msg += "Bold ";
+if((fontStyle & Font.ITALIC) == Font.ITALIC)
+msg += "Italic ";
+if((fontStyle & Font.PLAIN) == Font.PLAIN)
+msg += "Plain ";
+g.drawString(msg, 4, 16);
+}
+}
+Managing Text Output Using FontMetrics
+As just explained, Java supports a number of fonts. For most fonts, characters are
+not all the same dimension—most fonts are proportional. Also, the height of each
+character, the length of descenders (the hanging parts of letters, such as y), and the
+amount of space between horizontal lines vary from font to font. Further, the point size
+of a font can be changed. That these (and other) attributes are variable would not be of
+too much consequence except that Java demands that you, the programmer, manually
+manage virtually all text output.
+Given that the size of each font may differ and that fonts may be changed while
+your program is executing, there must be some way to determine the dimensions and
+various other attributes of the currently selected font. For example, to write one line of
+text after another implies that you have some way of knowing how tall the font is and
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 723
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+how many pixels are needed between lines. To fill this need, the AWT includes the
+FontMetrics class, which encapsulates various information about a font. Let’s begin by
+defining the common terminology used when describing fonts:
+Height The top-to-bottom size of the tallest character in the font
+Baseline The line that the bottoms of characters are aligned to (not
+counting descent)
+Ascent The distance from the baseline to the top of a character
+Descent The distance from the baseline to the bottom of a character
+Leading The distance between the bottom of one line of text and the
+top of the next
+As you know, we have used the drawString( ) method in many of the previous
+examples. It paints a string in the current font and color, beginning at a specified
+location. However, this location is at the left edge of the baseline of the characters, not
+at the upper-left corner as is usual with other drawing methods. It is a common error
+to draw a string at the same coordinate that you would draw a box. For example, if
+you were to draw a rectangle at coordinate 0,0 of your applet, you would see a full
+rectangle. If you were to draw the string “Typesetting” at 0,0, you would only see the
+tails (or descenders) of the y, p, and g. As you will see, by using font metrics, you can
+determine the proper placement of each string that you display.
+FontMetrics defines several methods that help you manage text output. The most
+commonly used are listed in Table 21-3. These methods help you properly display text
+in a window. Let’s look at some examples.
+724 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+int bytesWidth(byte b[ ], int start,
+int numBytes)
+Returns the width of numBytes characters
+held in array b, beginning at start.
+int charWidth(char c[ ], int start,
+int numChars)
+Returns the width of numChars characters
+held in array c, beginning at start.
+int charWidth(char c) Returns the width of c.
+int charWidth(int c) Returns the width of c.
+int getAscent( ) Returns the ascent of the font.
+Table 21-3. Some Methods Defined by FontMetrics
+Displaying Multiple Lines of Text
+Perhaps the most common use of FontMetrics is to determine the spacing between
+lines of text. The second most common use is to determine the length of a string that is
+being displayed. Here, you will see how to accomplish these tasks.
+In general, to display multiple lines of text, your program must manually keep
+track of the current output position. Each time a newline is desired, the Y coordinate
+must be advanced to the beginning of the next line. Each time a string is displayed, the
+X coordinate must be set to the point at which the string ends. This allows the next
+string to be written so that it begins at the end of the preceding one.
+To determine the spacing between lines, you can use the value returned by
+getLeading( ). To determine the total height of the font, add the value returned by
+getAscent( ) to the value returned by getDescent( ). You can then use these values to
+position each line of text you output. However, in many cases, you will not need to use
+these individual values. Often, all that you will need to know is the total height of a
+line, which is the sum of the leading space and the font’s ascent and descent values.
+The easiest way to obtain this value is to call getHeight( ). Simply increment the Y
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 725
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+int getDescent( ) Returns the descent of the font.
+Font getFont( ) Returns the font.
+int getHeight( ) Returns the height of a line of text. This value
+can be used to output multiple lines of text in
+a window.
+int getLeading( ) Returns the space between lines of text.
+int getMaxAdvance( ) Returns the width of the widest character. –1
+is returned if this value is not available.
+int getMaxAscent( ) Returns the maximum ascent.
+int getMaxDescent( ) Returns the maximum descent.
+int[ ] getWidths( ) Returns the widths of the first 256 characters.
+int stringWidth(String str) Returns the width of the string specified by str.
+String toString( ) Returns the string equivalent of the
+invoking object.
+Table 21-3. Some Methods Defined by FontMetrics (continued)
+coordinate by this value each time you want to advance to the next line when
+outputting text.
+To start output at the end of previous output on the same line, you must know
+the length, in pixels, of each string that you display. To obtain this value, call
+stringWidth( ). You can use this value to advance the X coordinate each time you
+display a line.
+The following applet shows how to output multiple lines of text in a window. It
+also displays multiple sentences on the same line. Notice the variables curX and curY.
+They keep track of the current text output position.
+// Demonstrate multiline output.
+import java.applet.*;
+import java.awt.*;
+/*
+<applet code="MultiLine" width=300 height=100>
+</applet>
+*/
+public class MultiLine extends Applet {
+int curX=0, curY=0; // current position
+public void init() {
+Font f = new Font("SansSerif", Font.PLAIN, 12);
+setFont(f);
+}
+public void paint(Graphics g) {
+FontMetrics fm = g.getFontMetrics();
+nextLine("This is on line one.", g);
+nextLine("This is on line two.", g);
+sameLine(" This is on same line.", g);
+sameLine(" This, too.", g);
+nextLine("This is on line three.", g);
+}
+// Advance to next line.
+void nextLine(String s, Graphics g) {
+FontMetrics fm = g.getFontMetrics();
+curY += fm.getHeight(); // advance to next line
+curX = 0;
+g.drawString(s, curX, curY);
+726 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+curX = fm.stringWidth(s); // advance to end of line
+}
+// Display on same line.
+void sameLine(String s, Graphics g) {
+FontMetrics fm = g.getFontMetrics();
+g.drawString(s, curX, curY);
+curX += fm.stringWidth(s); // advance to end of line
+}
+}
+Sample output from this program is shown here:
+Centering Text
+Here is an example that centers text, left to right, top to bottom, in a window. It obtains
+the ascent, descent, and width of the string and computes the position at which it must
+be displayed to be centered.
+// Center text.
+import java.applet.*;
+import java.awt.*;
+/*
+<applet code="CenterText" width=200 height=100>
+</applet>
+*/
+public class CenterText extends Applet {
+final Font f = new Font("SansSerif", Font.BOLD, 18);
+public void paint(Graphics g) {
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 727
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Dimension d = this.getSize();
+g.setColor(Color.white);
+g.fillRect(0, 0, d.width,d.height);
+g.setColor(Color.black);
+g.setFont(f);
+drawCenteredString("This is centered.", d.width, d.height, g);
+g.drawRect(0, 0, d.width-1, d.height-1);
+}
+public void drawCenteredString(String s, int w, int h,
+Graphics g) {
+FontMetrics fm = g.getFontMetrics();
+int x = (w - fm.stringWidth(s)) / 2;
+int y = (fm.getAscent() + (h - (fm.getAscent()
++ fm.getDescent()))/2);
+g.drawString(s, x, y);
+}
+}
+Following is a sample output from this program:
+Multiline Text Alignment
+If you’ve used a word processor, you’ve seen text aligned so that one or more of
+the edges of the text make a straight line. For example, most word processors can
+left-justify and/or right-justify text. Most can also center text. In the following
+program, you will see how to accomplish these actions.
+In the program, the string to be justified is broken into individual words. For each
+word, the program keeps track of its length in the current font and automatically
+advances to the next line if the word will not fit on the current line. Each completed
+line is displayed in the window in the currently selected alignment style. Each time you
+click the mouse in the applet’s window, the alignment style is changed. Sample output
+from this program is shown here:
+728 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+// Demonstrate text alignment.
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+/* <title>Text Layout</title>
+<applet code="TextLayout" width=200 height=200>
+<param name="text" value="Output to a Java window is actually
+quite easy.
+As you have seen, the AWT provides support for
+fonts, colors, text, and graphics. <P>  Of course,
+you must effectively utilize these items
+if you are to achieve professional results.">
+<param name="fontname" value="Serif">
+<param name="fontSize" value="14">
+</applet>
+*/
+public class TextLayout extends Applet {
+final int LEFT = 0;
+final int RIGHT = 1;
+final int CENTER = 2;
+final int LEFTRIGHT =3;
+int align;
+Dimension d;
+Font f;
+FontMetrics fm;
+int fontSize;
+int fh, bl;
+int space;
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 729
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+String text;
+public void init() {
+setBackground(Color.white);
+text = getParameter("text");
+try {
+fontSize = Integer.parseInt(getParameter("fontSize"));}
+catch (NumberFormatException e) {
+fontSize=14;
+}
+align = LEFT;
+addMouseListener(new MyMouseAdapter(this));
+}
+public void paint(Graphics g) {
+update(g);
+}
+public void update(Graphics g) {
+d = getSize();
+g.setColor(getBackground());
+g.fillRect(0,0,d.width, d.height);
+if(f==null) f = new Font(getParameter("fontname"),
+Font.PLAIN, fontSize);
+g.setFont(f);
+if(fm == null) {
+fm = g.getFontMetrics();
+bl = fm.getAscent();
+fh = bl + fm.getDescent();
+space = fm.stringWidth(" ");
+}
+g.setColor(Color.black);
+StringTokenizer st = new StringTokenizer(text);
+int x = 0;
+int nextx;
+int y = 0;
+String word, sp;
+int wordCount = 0;
+String line = "";
+while (st.hasMoreTokens()) {
+word = st.nextToken();
+730 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+if(word.equals("<P>")) {
+drawString(g, line, wordCount,
+fm.stringWidth(line), y+bl);
+line = "";
+wordCount = 0;
+x = 0;
+y = y + (fh * 2);
+}
+else {
+int w = fm.stringWidth(word);
+if(( nextx = (x+space+w)) > d.width ) {
+drawString(g, line, wordCount,
+fm.stringWidth(line), y+bl);
+line = "";
+wordCount = 0;
+x = 0;
+y = y + fh;
+}
+if(x!=0) {sp = " ";} else {sp = "";}
+line = line + sp + word;
+x = x + space + w;
+wordCount++;
+}
+}
+drawString(g, line, wordCount, fm.stringWidth(line), y+bl);
+}
+public void drawString(Graphics g, String line,
+int wc, int lineW, int y) {
+switch(align) {
+case LEFT: g.drawString(line, 0, y);
+break;
+case RIGHT: g.drawString(line, d.width-lineW ,y);
+break;
+case CENTER: g.drawString(line, (d.width-lineW)/2, y);
+break;
+case LEFTRIGHT:
+if(lineW < (int)(d.width*.75)) {
+g.drawString(line, 0, y);
+}
+else {
+int toFill = (int)((d.width - lineW)/wc);
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 731
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+int nudge = d.width - lineW - (toFill*wc);
+int s = fm.stringWidth(" ");
+StringTokenizer st = new StringTokenizer(line);
+int x = 0;
+while(st.hasMoreTokens()) {
+String word = st.nextToken();
+g.drawString(word, x, y);
+if(nudge>0) {
+x = x + fm.stringWidth(word) + space + toFill + 1;
+nudge--;
+} else {
+x = x + fm.stringWidth(word) + space + toFill;
+}
+}
+}
+break;
+}
+}
+}
+class MyMouseAdapter extends MouseAdapter {
+TextLayout tl;
+public MyMouseAdapter(TextLayout tl) {
+this.tl = tl;
+}
+public void mouseClicked(MouseEvent me) {
+tl.align = (tl.align + 1) % 4;
+tl.repaint();
+}
+}
+Let’s take a closer look at how this applet works. The applet first creates several
+constants that will be used to determine the alignment style, and then declares several
+variables. The init( ) method obtains the text that will be displayed. It then initializes
+the font size in a try-catch block, which will set the font size to 14 if the fontSize
+parameter is missing from the HTML. The text parameter is a long string of text,
+with the HTML tag <P> as a paragraph separator.
+The update( ) method is the engine for this example. It sets the font and gets the
+baseline and font height from a font metrics object. Next, it creates a StringTokenizer
+and uses it to retrieve the next token (a string separated by whitespace) from the string
+specified by text. If the next token is <P>, it advances the vertical spacing. Otherwise,
+update( ) checks to see if the length of this token in the current font will go beyond the
+732 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+width of the column. If the line is full of text or if there are no more tokens, the line is
+output by a custom version of drawString( ).
+The first three cases in drawString( ) are simple. Each aligns the string that is
+passed in line to the left or right edge or to the center of the column, depending upon
+the alignment style. The LEFTRIGHT case aligns both the left and right sides of the
+string. This means that we need to calculate the remaining whitespace (the difference
+between the width of the string and the width of the column) and distribute that space
+between each of the words. The last method in this class advances the alignment style
+each time you click the mouse on the applet’s window.
+Exploring Text and Graphics
+Although this chapter covers the most important attributes and common techniques
+that you will use when displaying text or graphics, it only scratches the surface of
+Java’s capabilities. This is an area in which further refinements and enhancements
+are expected as Java and the computing environment continue to evolve. For example,
+Java 2 added a subsystem to the AWT called Java 2D. Java 2D supports enhanced
+control over graphics, including such things as coordinate translations, rotation, and
+scaling. It also provides advanced imaging features. If advanced graphics handling is
+of interest to you, then you will definitely want to explore Java 2D in detail.
+C h a p t e r 2 1 : I n t r o d u c i n g t h e A W T : W o r k i n g w i t h W i n d o w s , G r a p h i c s , a n d T e x t 733
+This page intentionally left blank.
+Chapter 22
+Using AWT Controls,
+Layout Managers,
+and Menus
+735

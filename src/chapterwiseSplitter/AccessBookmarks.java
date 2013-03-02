@@ -12,8 +12,71 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 import org.apache.pdfbox.util.PDFTextStripper;
 
 public class AccessBookmarks {
+
+	private static PDDocument doc;
 	
 	public static void main(String args[]) throws IOException
+	{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Enter path of input pdf: ");
+		String inputPdf = "/home/lekha/Documents/files/java.pdf";//br.readLine();
+		
+		doc = PDDocument.load(inputPdf);
+		
+		PDDocumentOutline root = doc.getDocumentCatalog().getDocumentOutline();
+		PDOutlineItem item = root.getFirstChild();
+		
+		handleItem(item);
+		
+		
+	}
+	
+	public static void handleItem(PDOutlineItem item) throws IOException
+	{
+		if(item == null)
+		{
+			System.out.println("Error: The item is null!");
+			return;
+		}
+		if(item.getFirstChild() == null)
+		{
+			//it is a leaf
+			System.out.println("Leaf: "+item.getTitle());
+			
+			PDFTextStripper stripper = new PDFTextStripper();
+			String outputFilename = item.getTitle()+".out";
+			
+			//replace below code to remove all illegal characters from filename (if any)
+			outputFilename = outputFilename.replace(',', ' ');
+			outputFilename = outputFilename.replace('/', ' ');
+			
+			//code to be replaced ends here
+			
+			//System.out.println("000000000"+outputFilename);
+			
+			FileWriter outputStream = new FileWriter(new File(outputFilename));
+			stripper.setStartBookmark(item);
+			//the problem below is that for a node with no next sibling we get text starting from the node to end of book whereas we just want from the node to next node
+			stripper.setEndBookmark(item.getNextSibling());
+			stripper.writeText(doc, outputStream);
+			outputStream.flush();
+			outputStream.close();
+			
+		}
+		else
+		{// internal node
+			PDOutlineItem child = item.getFirstChild();
+			while(child != null)
+			{
+				handleItem(child);
+				child = child.getNextSibling();
+			}
+		}
+		
+		
+	}
+	
+	public static void main2(String args[]) throws IOException
 	{
 			//take user input of path of input pdf
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

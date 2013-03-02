@@ -1,0 +1,565 @@
+Chapter 1
+The Genesis of Java
+3
+4 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+When the chronicle of computer languages is written, the following will be said:B led to C, C evolved into C++, and C++ set the stage for Java. To understandJava is to understand the reasons that drove its creation, the forces that
+shaped it, and the legacy that it inherits. Like the successful computer languages that
+came before, Java is a blend of the best elements of its rich heritage combined with the
+innovative concepts required by its unique environment. While the remaining chapters
+of this book describe the practical aspects of Java—including its syntax, libraries, and
+applications—in this chapter, you will learn how and why Java came about, and what
+makes it so important.
+Although Java has become inseparably linked with the online environment of the
+Internet, it is important to remember that Java is first and foremost a programming
+language. Computer language innovation and development occurs for two fundamental
+reasons:
+■ To adapt to changing environments and uses
+■ To implement refinements and improvements in the art of programming
+As you will see, the creation of Java was driven by both elements in nearly
+equal measure.
+Java’s Lineage
+Java is related to C++, which is a direct descendent of C. Much of the character of Java
+is inherited from these two languages. From C, Java derives its syntax. Many of Java’s
+object-oriented features were influenced by C++. In fact, several of Java’s defining
+characteristics come from—or are responses to—its predecessors. Moreover, the creation
+of Java was deeply rooted in the process of refinement and adaptation that has been
+occurring in computer programming languages for the past three decades. For these
+reasons, this section reviews the sequence of events and forces that led up to Java. As
+you will see, each innovation in language design was driven by the need to solve a
+fundamental problem that the preceding languages could not solve. Java is no exception.
+The Birth of Modern Programming: C
+The C language shook the computer world. Its impact should not be underestimated,
+because it fundamentally changed the way programming was approached and thought
+about. The creation of C was a direct result of the need for a structured, efficient, high-
+level language that could replace assembly code when creating systems programs. As
+you probably know, when a computer language is designed, trade-offs are often made,
+such as the following:
+■ Ease-of-use versus power
+■ Safety versus efficiency
+■ Rigidity versus extensibility
+Prior to C, programmers usually had to choose between languages that optimized
+one set of traits or the other. For example, although FORTRAN could be used to write
+fairly efficient programs for scientific applications, it was not very good for systems
+code. And while BASIC was easy to learn, it wasn’t very powerful, and its lack of
+structure made its usefulness questionable for large programs. Assembly language
+can be used to produce highly efficient programs, but it is not easy to learn or use
+effectively. Further, debugging assembly code can be quite difficult.
+Another compounding problem was that early computer languages such as BASIC,
+COBOL, and FORTRAN were not designed around structured principles. Instead, they
+relied upon the GOTO as a primary means of program control. As a result, programs
+written using these languages tended to produce “spaghetti code”—a mass of tangled
+jumps and conditional branches that make a program virtually impossible to
+understand. While languages like Pascal are structured, they were not designed for
+efficiency, and failed to include certain features necessary to make them applicable to
+a wide range of programs. (Specifically, given the standard dialects of Pascal available
+at the time, it was not practical to consider using Pascal for systems-level code.)
+So, just prior to the invention of C, no one language had reconciled the conflicting
+attributes that had dogged earlier efforts. Yet the need for such a language was
+pressing. By the early 1970s, the computer revolution was beginning to take hold, and
+the demand for software was rapidly outpacing programmers’ ability to produce it.
+A great deal of effort was being expended in academic circles in an attempt to create a
+better computer language. But, and perhaps most importantly, a secondary force was
+beginning to be felt. Computer hardware was finally becoming common enough that a
+critical mass was being reached. No longer were computers kept behind locked doors.
+For the first time, programmers were gaining virtually unlimited access to their
+machines. This allowed the freedom to experiment. It also allowed programmers to
+begin to create their own tools. On the eve of C’s creation, the stage was set for a
+quantum leap forward in computer languages.
+Invented and first implemented by Dennis Ritchie on a DEC PDP-11 running the
+UNIX operating system, C was the result of a development process that started with
+an older language called BCPL, developed by Martin Richards. BCPL influenced a
+language called B, invented by Ken Thompson, which led to the development of C
+in the 1970s. For many years, the de facto standard for C was the one supplied with
+the UNIX operating system and described in The C Programming Language by Brian
+Kernighan and Dennis Ritchie (Prentice-Hall, 1978). C was formally standardized in
+December 1989, when the American National Standards Institute (ANSI) standard for
+C was adopted.
+The creation of C is considered by many to have marked the beginning of the
+modern age of computer languages. It successfully synthesized the conflicting
+attributes that had so troubled earlier languages. The result was a powerful, efficient,
+structured language that was relatively easy to learn. It also included one other, nearly
+intangible aspect: it was a programmer’s language. Prior to the invention of C, computer
+languages were generally designed either as academic exercises or by bureaucratic
+committees. C is different. It was designed, implemented, and developed by real,
+C h a p t e r 1 : T h e G e n e s i s o f J a v a 5
+TH
+E
+JA
+V
+A
+LA
+N
+G
+U
+A
+G
+E
+working programmers, reflecting the way that they approached the job of programming.
+Its features were honed, tested, thought about, and rethought by the people who
+actually used the language. The result was a language that programmers liked to use.
+Indeed, C quickly attracted many followers who had a near-religious zeal for it. As
+such, it found wide and rapid acceptance in the programmer community. In short,
+C is a language designed by and for programmers. As you will see, Java has inherited
+this legacy.
+The Need for C++
+During the late 1970s and early 1980s, C became the dominant computer programming
+language, and it is still widely used today. Since C is a successful and useful language,
+you might ask why a need for something else existed. The answer is complexity.
+Throughout the history of programming, the increasing complexity of programs has
+driven the need for better ways to manage that complexity. C++ is a response to that
+need. To better understand why managing program complexity is fundamental to the
+creation of C++, consider the following.
+Approaches to programming have changed dramatically since the invention of the
+computer. For example, when computers were first invented, programming was done
+by manually toggling in the binary machine instructions by use of the front panel. As
+long as programs were just a few hundred instructions long, this approach worked.
+As programs grew, assembly language was invented so that a programmer could deal
+with larger, increasingly complex programs by using symbolic representations of the
+machine instructions. As programs continued to grow, high-level languages were
+introduced that gave the programmer more tools with which to handle complexity.
+The first widespread language was, of course, FORTRAN. While FORTRAN was
+an impressive first step, it is hardly a language that encourages clear and easy-to-
+understand programs. The 1960s gave birth to structured programming. This is the
+method of programming championed by languages such as C. The use of structured
+languages enabled programmers to write, for the first time, moderately complex
+programs fairly easily. However, even with structured programming methods, once a
+project reaches a certain size, its complexity exceeds what a programmer can manage.
+By the early 1980s, many projects were pushing the structured approach past its limits.
+To solve this problem, a new way to program was invented, called object-oriented
+programming (OOP). Object-oriented programming is discussed in detail later in this
+book, but here is a brief definition: OOP is a programming methodology that helps
+organize complex programs through the use of inheritance, encapsulation, and
+polymorphism.
+In the final analysis, although C is one of the world’s great programming languages,
+there is a limit to its ability to handle complexity. Once a program exceeds somewhere
+between 25,000 and 100,000 lines of code, it becomes so complex that it is difficult to
+grasp as a totality. C++ allows this barrier to be broken, and helps the programmer
+comprehend and manage larger programs.
+6 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+TH
+E
+JA
+V
+A
+LA
+N
+G
+U
+A
+G
+E
+C++ was invented by Bjarne Stroustrup in 1979, while he was working at Bell
+Laboratories in Murray Hill, New Jersey. Stroustrup initially called the new language
+“C with Classes.” However, in 1983, the name was changed to C++. C++ extends C
+by adding object-oriented features. Because C++ is built upon the foundation of C,
+it includes all of C’s features, attributes, and benefits. This is a crucial reason for the
+success of C++ as a language. The invention of C++ was not an attempt to create a
+completely new programming language. Instead, it was an enhancement to an already
+highly successful one.
+The Stage Is Set for Java
+By the end of the 1980s and the early 1990s, object-oriented programming using C++
+took hold. Indeed, for a brief moment it seemed as if programmers had finally found
+the perfect language. Because C++ blended the high efficiency and stylistic elements of
+C with the object-oriented paradigm, it was a language that could be used to create a
+wide range of programs. However, just as in the past, forces were brewing that would,
+once again, drive computer language evolution forward. Within a few years, the World
+Wide Web and the Internet would reach critical mass. This event would precipitate
+another revolution in programming.
+The Creation of Java
+Java was conceived by James Gosling, Patrick Naughton, Chris Warth, Ed Frank, and
+Mike Sheridan at Sun Microsystems, Inc. in 1991. It took 18 months to develop the first
+working version. This language was initially called “Oak” but was renamed “Java”
+in 1995. Between the initial implementation of Oak in the fall of 1992 and the public
+announcement of Java in the spring of 1995, many more people contributed to the design
+and evolution of the language. Bill Joy, Arthur van Hoff, Jonathan Payne, Frank Yellin,
+and Tim Lindholm were key contributors to the maturing of the original prototype.
+Somewhat surprisingly, the original impetus for Java was not the Internet! Instead,
+the primary motivation was the need for a platform-independent (that is, architecture-
+neutral) language that could be used to create software to be embedded in various
+consumer electronic devices, such as microwave ovens and remote controls. As you
+can probably guess, many different types of CPUs are used as controllers. The trouble
+with C and C++ (and most other languages) is that they are designed to be compiled
+for a specific target. Although it is possible to compile a C++ program for just about
+any type of CPU, to do so requires a full C++ compiler targeted for that CPU. The
+problem is that compilers are expensive and time-consuming to create. An easier—
+and more cost-efficient—solution was needed. In an attempt to find such a solution,
+Gosling and others began work on a portable, platform-independent language that
+could be used to produce code that would run on a variety of CPUs under differing
+environments. This effort ultimately led to the creation of Java.
+C h a p t e r 1 : T h e G e n e s i s o f J a v a 7
+8 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+About the time that the details of Java were being worked out, a second, and
+ultimately more important, factor was emerging that would play a crucial role
+in the future of Java. This second force was, of course, the World Wide Web. Had
+the Web not taken shape at about the same time that Java was being implemented,
+Java might have remained a useful but obscure language for programming consumer
+electronics. However, with the emergence of the World Wide Web, Java was propelled
+to the forefront of computer language design, because the Web, too, demanded
+portable programs.
+Most programmers learn early in their careers that portable programs are as
+elusive as they are desirable. While the quest for a way to create efficient, portable
+(platform-independent) programs is nearly as old as the discipline of programming
+itself, it had taken a back seat to other, more pressing problems. Further, because much
+of the computer world had divided itself into the three competing camps of Intel,
+Macintosh, and UNIX, most programmers stayed within their fortified boundaries,
+and the urgent need for portable code was reduced. However, with the advent of the
+Internet and the Web, the old problem of portability returned with a vengeance. After
+all, the Internet consists of a diverse, distributed universe populated with many types
+of computers, operating systems, and CPUs. Even though many types of platforms
+are attached to the Internet, users would like them all to be able to run the same
+program. What was once an irritating but low-priority problem had become a
+high-profile necessity.
+By 1993, it became obvious to members of the Java design team that the problems
+of portability frequently encountered when creating code for embedded controllers
+are also found when attempting to create code for the Internet. In fact, the same problem
+that Java was initially designed to solve on a small scale could also be applied to the
+Internet on a large scale. This realization caused the focus of Java to switch from
+consumer electronics to Internet programming. So, while the desire for an architecture-
+neutral programming language provided the initial spark, the Internet ultimately led to
+Java’s large-scale success.
+As mentioned earlier, Java derives much of its character from C and C++. This is
+by intent. The Java designers knew that using the familiar syntax of C and echoing
+the object-oriented features of C++ would make their language appealing to the
+legions of experienced C/C++ programmers. In addition to the surface similarities,
+Java shares some of the other attributes that helped make C and C++ successful. First,
+Java was designed, tested, and refined by real, working programmers. It is a language
+grounded in the needs and experiences of the people who devised it. Thus, Java is also
+a programmer’s language. Second, Java is cohesive and logically consistent. Third,
+except for those constraints imposed by the Internet environment, Java gives you, the
+programmer, full control. If you program well, your programs reflect it. If you program
+poorly, your programs reflect that, too. Put differently, Java is not a language with
+training wheels. It is a language for professional programmers.
+Because of the similarities between Java and C++, it is tempting to think of Java as
+simply the “Internet version of C++.” However, to do so would be a large mistake. Java
+has significant practical and philosophical differences. While it is true that Java was
+influenced by C++, it is not an enhanced version of C++. For example, Java is neither
+upwardly nor downwardly compatible with C++. Of course, the similarities with C++
+are significant, and if you are a C++ programmer, then you will feel right at home with
+Java. One other point: Java was not designed to replace C++. Java was designed to
+solve a certain set of problems. C++ was designed to solve a different set of problems.
+Both will coexist for many years to come.
+As mentioned at the start of this chapter, computer languages evolve for two
+reasons: to adapt to changes in environment and to implement advances in the art
+of programming. The environmental change that prompted Java was the need for
+platform-independent programs destined for distribution on the Internet. However,
+Java also embodies changes in the way that people approach the writing of programs.
+Specifically, Java enhances and refines the object-oriented paradigm used by C++.
+Thus, Java is not a language that exists in isolation. Rather, it is part of an ongoing
+process begun many years ago. This fact alone is enough to ensure Java a place in
+computer language history. Java is to Internet programming what C was to systems
+programming: a revolutionary force that changed the world.
+The C# Connection
+The reach and power of Java continues to be felt in the world of computer language
+development. Many of its innovative features, constructs, and concepts have become
+part of the baseline for any new language. The success of Java is simply too important
+to ignore.
+Perhaps the most important example of Java’s influence is C#. Recently created by
+Microsoft to support the .NET Framework, C# is closely related to Java. For example,
+both share the same general C++-style syntax, support distributed programming, and
+utilize the same object model. There are, of course, differences between Java and C#,
+but the overall “look and feel” of these languages is very similar. This “cross-pollination”
+from Java to C# is the strongest testimonial to date that Java redefined the way we
+think about and use a computer language.
+Why Java Is Important to the Internet
+The Internet helped catapult Java to the forefront of programming, and Java, in turn,
+has had a profound effect on the Internet. The reason for this is quite simple: Java
+expands the universe of objects that can move about freely in cyberspace. In a network,
+two very broad categories of objects are transmitted between the server and your
+personal computer: passive information and dynamic, active programs. For example,
+C h a p t e r 1 : T h e G e n e s i s o f J a v a 9
+TH
+E
+JA
+V
+A
+LA
+N
+G
+U
+A
+G
+E
+when you read your e-mail, you are viewing passive data. Even when you download a
+program, the program’s code is still only passive data until you execute it. However, a
+second type of object can be transmitted to your computer: a dynamic, self-executing
+program. Such a program is an active agent on the client computer, yet is initiated by
+the server. For example, a program might be provided by the server to display properly
+the data that the server is sending.
+As desirable as dynamic, networked programs are, they also present serious
+problems in the areas of security and portability. Prior to Java, cyberspace was
+effectively closed to half the entities that now live there. As you will see, Java addresses
+those concerns and, by doing so, has opened the door to an exciting new form of
+program: the applet.
+Java Applets and Applications
+Java can be used to create two types of programs: applications and applets. An
+application is a program that runs on your computer, under the operating system of that
+computer. That is, an application created by Java is more or less like one created using C
+or C++. When used to create applications, Java is not much different from any other
+computer language. Rather, it is Java’s ability to create applets that makes it important.
+An applet is an application designed to be transmitted over the Internet and executed by
+a Java-compatible Web browser. An applet is actually a tiny Java program, dynamically
+downloaded across the network, just like an image, sound file, or video clip. The
+important difference is that an applet is an intelligent program, not just an animation or
+media file. In other words, an applet is a program that can react to user input and
+dynamically change—not just run the same animation or sound over and over.
+As exciting as applets are, they would be nothing more than wishful thinking if
+Java were not able to address the two fundamental problems associated with them:
+security and portability. Before continuing, let’s define what these two terms mean
+relative to the Internet.
+Security
+As you are likely aware, every time that you download a “normal” program, you
+are risking a viral infection. Prior to Java, most users did not download executable
+programs frequently, and those who did scanned them for viruses prior to execution.
+Even so, most users still worried about the possibility of infecting their systems with
+a virus. In addition to viruses, another type of malicious program exists that must be
+guarded against. This type of program can gather private information, such as credit
+card numbers, bank account balances, and passwords, by searching the contents of
+your computer’s local file system. Java answers both of these concerns by providing
+a “firewall” between a networked application and your computer.
+When you use a Java-compatible Web browser, you can safely download Java
+applets without fear of viral infection or malicious intent. Java achieves this protection
+by confining a Java program to the Java execution environment and not allowing it
+10 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+access to other parts of the computer. (You will see how this is accomplished shortly.)
+The ability to download applets with confidence that no harm will be done and that
+no security will be breached is considered by many to be the single most important
+aspect of Java.
+Portability
+As discussed earlier, many types of computers and operating systems are in use
+throughout the world—and many are connected to the Internet. For programs to
+be dynamically downloaded to all the various types of platforms connected to the
+Internet, some means of generating portable executable code is needed. As you will
+soon see, the same mechanism that helps ensure security also helps create portability.
+Indeed, Java’s solution to these two problems is both elegant and efficient.
+Java’s Magic: The Bytecode
+The key that allows Java to solve both the security and the portability problems just
+described is that the output of a Java compiler is not executable code. Rather, it is
+bytecode. Bytecode is a highly optimized set of instructions designed to be executed
+by the Java run-time system, which is called the Java Virtual Machine (JVM). That is,
+in its standard form, the JVM is an interpreter for bytecode. This may come as a bit of
+a surprise. As you know, C++ is compiled to executable code. In fact, most modern
+languages are designed to be compiled, not interpreted—mostly because of
+performance concerns. However, the fact that a Java program is executed by the
+JVM helps solve the major problems associated with downloading programs over
+the Internet. Here is why.
+Translating a Java program into bytecode helps makes it much easier to run a
+program in a wide variety of environments. The reason is straightforward: only the
+JVM needs to be implemented for each platform. Once the run-time package exists
+for a given system, any Java program can run on it. Remember, although the details
+of the JVM will differ from platform to platform, all interpret the same Java bytecode.
+If a Java program were compiled to native code, then different versions of the same
+program would have to exist for each type of CPU connected to the Internet. This is,
+of course, not a feasible solution. Thus, the interpretation of bytecode is the easiest way
+to create truly portable programs.
+The fact that a Java program is interpreted also helps to make it secure. Because the
+execution of every Java program is under the control of the JVM, the JVM can contain
+the program and prevent it from generating side effects outside of the system. As you
+will see, safety is also enhanced by certain restrictions that exist in the Java language.
+When a program is interpreted, it generally runs substantially slower than it would
+run if compiled to executable code. However, with Java, the differential between the
+two is not so great. The use of bytecode enables the Java run-time system to execute
+programs much faster than you might expect.
+C h a p t e r 1 : T h e G e n e s i s o f J a v a 11
+TH
+E
+JA
+V
+A
+LA
+N
+G
+U
+A
+G
+E
+12 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Although Java was designed for interpretation, there is technically nothing about
+Java that prevents on-the-fly compilation of bytecode into native code. Along these
+lines, Sun supplies its Just In Time (JIT) compiler for bytecode, which is included in
+the Java 2 release. When the JIT compiler is part of the JVM, it compiles bytecode into
+executable code in real time, on a piece-by-piece, demand basis. It is important to
+understand that it is not possible to compile an entire Java program into executable
+code all at once, because Java performs various run-time checks that can be done only
+at run time. Instead, the JIT compiles code as it is needed, during execution. However,
+the just-in-time approach still yields a significant performance boost. Even when
+dynamic compilation is applied to bytecode, the portability and safety features still
+apply, because the run-time system (which performs the compilation) still is in charge
+of the execution environment. Whether your Java program is actually interpreted in the
+traditional way or compiled on-the-fly, its functionality is the same.
+The Java Buzzwords
+No discussion of the genesis of Java is complete without a look at the Java buzzwords.
+Although the fundamental forces that necessitated the invention of Java are portability
+and security, other factors also played an important role in molding the final form of
+the language. The key considerations were summed up by the Java team in the
+following list of buzzwords:
+■ Simple
+■ Secure
+■ Portable
+■ Object-oriented
+■ Robust
+■ Multithreaded
+■ Architecture-neutral
+■ Interpreted
+■ High performance
+■ Distributed
+■ Dynamic
+Two of these buzzwords have already been discussed: secure and portable. Let’s
+examine what each of the others implies.
+C h a p t e r 1 : T h e G e n e s i s o f J a v a 13
+TH
+E
+JA
+V
+A
+LA
+N
+G
+U
+A
+G
+E
+Simple
+Java was designed to be easy for the professional programmer to learn and use
+effectively. Assuming that you have some programming experience, you will not find
+Java hard to master. If you already understand the basic concepts of object-oriented
+programming, learning Java will be even easier. Best of all, if you are an experienced
+C++ programmer, moving to Java will require very little effort. Because Java inherits
+the C/C++ syntax and many of the object-oriented features of C++, most programmers
+have little trouble learning Java. Also, some of the more confusing concepts from C++
+are either left out of Java or implemented in a cleaner, more approachable manner.
+Beyond its similarities with C/C++, Java has another attribute that makes it easy
+to learn: it makes an effort not to have surprising features. In Java, there are a small
+number of clearly defined ways to accomplish a given task.
+Object-Oriented
+Although influenced by its predecessors, Java was not designed to be source-code
+compatible with any other language. This allowed the Java team the freedom to design
+with a blank slate. One outcome of this was a clean, usable, pragmatic approach to
+objects. Borrowing liberally from many seminal object-software environments of the
+last few decades, Java manages to strike a balance between the purist’s “everything is
+an object” paradigm and the pragmatist’s “stay out of my way” model. The object
+model in Java is simple and easy to extend, while simple types, such as integers, are
+kept as high-performance nonobjects.
+Robust
+The multiplatformed environment of the Web places extraordinary demands on a
+program, because the program must execute reliably in a variety of systems. Thus, the
+ability to create robust programs was given a high priority in the design of Java. To
+gain reliability, Java restricts you in a few key areas, to force you to find your mistakes
+early in program development. At the same time, Java frees you from having to worry
+about many of the most common causes of programming errors. Because Java is a
+strictly typed language, it checks your code at compile time. However, it also checks
+your code at run time. In fact, many hard-to-track-down bugs that often turn up in
+hard-to-reproduce run-time situations are simply impossible to create in Java.
+Knowing that what you have written will behave in a predictable way under diverse
+conditions is a key feature of Java.
+To better understand how Java is robust, consider two of the main reasons for
+program failure: memory management mistakes and mishandled exceptional
+conditions (that is, run-time errors). Memory management can be a difficult, tedious
+task in traditional programming environments. For example, in C/C++, the
+programmer must manually allocate and free all dynamic memory. This sometimes
+leads to problems, because programmers will either forget to free memory that has
+been previously allocated or, worse, try to free some memory that another part of
+their code is still using. Java virtually eliminates these problems by managing memory
+allocation and deallocation for you. (In fact, deallocation is completely automatic,
+because Java provides garbage collection for unused objects.) Exceptional conditions in
+traditional environments often arise in situations such as division by zero or “file not
+found,” and they must be managed with clumsy and hard-to-read constructs. Java
+helps in this area by providing object-oriented exception handling. In a well-written
+Java program, all run-time errors can—and should—be managed by your program.
+Multithreaded
+Java was designed to meet the real-world requirement of creating interactive,
+networked programs. To accomplish this, Java supports multithreaded programming,
+which allows you to write programs that do many things simultaneously. The Java
+run-time system comes with an elegant yet sophisticated solution for multiprocess
+synchronization that enables you to construct smoothly running interactive systems.
+Java’s easy-to-use approach to multithreading allows you to think about the specific
+behavior of your program, not the multitasking subsystem.
+Architecture-Neutral
+A central issue for the Java designers was that of code longevity and portability. One
+of the main problems facing programmers is that no guarantee exists that if you write
+a program today, it will run tomorrow—even on the same machine. Operating system
+upgrades, processor upgrades, and changes in core system resources can all combine
+to make a program malfunction. The Java designers made several hard decisions in the
+Java language and the Java Virtual Machine in an attempt to alter this situation. Their
+goal was “write once; run anywhere, any time, forever.” To a great extent, this goal
+was accomplished.
+Interpreted and High Performance
+As described earlier, Java enables the creation of cross-platform programs by compiling
+into an intermediate representation called Java bytecode. This code can be interpreted
+on any system that provides a Java Virtual Machine. Most previous attempts at cross-
+platform solutions have done so at the expense of performance. Other interpreted
+systems, such as BASIC, Tcl, and PERL, suffer from almost insurmountable performance
+deficits. Java, however, was designed to perform well on very low-power CPUs. As
+explained earlier, while it is true that Java was engineered for interpretation, the Java
+bytecode was carefully designed so that it would be easy to translate directly into native
+machine code for very high performance by using a just-in-time compiler. Java run-time
+systems that provide this feature lose none of the benefits of the platform-independent
+code. “High-performance cross-platform” is no longer an oxymoron.
+14 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Distributed
+Java is designed for the distributed environment of the Internet, because it handles
+TCP/IP protocols. In fact, accessing a resource using a URL is not much different
+from accessing a file. The original version of Java (Oak) included features for intra-
+address-space messaging. This allowed objects on two different computers to execute
+procedures remotely. Java revived these interfaces in a package called Remote Method
+Invocation (RMI). This feature brings an unparalleled level of abstraction to client/
+server programming.
+Dynamic
+Java programs carry with them substantial amounts of run-time type information that
+is used to verify and resolve accesses to objects at run time. This makes it possible to
+dynamically link code in a safe and expedient manner. This is crucial to the robustness
+of the applet environment, in which small fragments of bytecode may be dynamically
+updated on a running system.
+The Continuing Revolution
+The initial release of Java was nothing short of revolutionary, but it did not mark the
+end of Java’s era of rapid innovation. Unlike most other software systems that usually
+settle into a pattern of small, incremental improvements, Java continued to evolve at
+an explosive pace. Soon after the release of Java 1.0, the designers of Java had already
+created Java 1.1. The features added by Java 1.1 were more significant and substantial
+than the increase in the minor revision number would have you think. Java 1.1 added
+many new library elements, redefined the way events are handled by applets, and
+reconfigured many features of the 1.0 library. It also deprecated (rendered obsolete)
+several features originally defined by Java 1.0. Thus, Java 1.1 both added and
+subtracted attributes from its original specification.
+The next major release of Java was Java 2. Java 2 was a watershed event, marking
+the beginning of the “modern age” of this rapidly evolving language! The first release
+of Java 2 carried the version number 1.2. It may seem odd that the first release of Java 2
+used the 1.2 version number. The reason is that it originally referred to the version of
+the Java libraries, but it was generalized to refer to the entire release, itself. Java 2
+added support for a number of new features, such as Swing and the Collections
+framework, and it enhanced the Java Virtual Machine and various programming tools.
+Java 2 also contained a few deprecations. The most important affected the Thread class
+in which the methods suspend( ), resume( ), and stop( ) were deprecated.
+The next release of Java was Java 2, version 1.3. This version of Java was the first
+major upgrade to the original Java 2 release. For the most part it added to existing
+functionality and “tightened up” the development environment. In general, programs
+written for version 1.2 and those written for version 1.3 are source-code compatible.
+Although version 1.3 contained a smaller set of changes than the preceding three major
+releases, it was nevertheless important.
+C h a p t e r 1 : T h e G e n e s i s o f J a v a 15
+TH
+E
+JA
+V
+A
+LA
+N
+G
+U
+A
+G
+E
+The current release of Java is Java 2, version 1.4. This release contains several important
+upgrades, enhancements, and additions. For example, it adds the new keyword assert,
+chained exceptions, and a channel-based I/O subsystem. It also makes changes to the
+Collections Framework and the networking classes. In addition, numerous small changes
+are made throughout. Despite the significant number of new features, version 1.4
+maintains nearly 100 percent source-code compatibility with prior versions.
+This book covers all versions of Java 2. Of course, most of the material applies to
+earlier versions of Java, too. Throughout this book, when a feature applies to a specific
+version of Java, it will be so noted. Otherwise, you can simply assume that it applies to
+Java, in general. Also, when referring to those features common to all versions of Java 2,
+this book will simply use the term Java 2, without a reference to a version number.
+16 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 2
+An Overview of Java
+17

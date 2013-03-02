@@ -1,0 +1,2639 @@
+Chapter 15
+java.util Part 1: The
+Collections Framework
+439
+The java.util package contains one of Java’s most powerful subsystems: collections.Collections were added by the initial release of Java 2, and enhanced by Java 2,version 1.4. A collection is a group of objects. The addition of collections caused
+fundamental alterations in the structure and architecture of many elements in java.util.
+It also expanded the domain of tasks to which the package can be applied. Collections
+are a state-of-the-art technology that merits close attention by all Java programmers.
+In addition to collections, java.util contains a wide assortment of classes and
+interfaces that support a broad range of functionality. These classes and interfaces are
+used throughout the core Java packages and, of course, are also available for use in
+programs that you write. Their applications include generating pseudorandom numbers,
+manipulating date and time, observing events, manipulating sets of bits, and tokenizing
+strings. Because of its many features, java.util is one of Java’s most widely used packages.
+The java.util classes are listed here.
+AbstractCollection (Java 2) EventObject PropertyResourceBundle
+AbstractList (Java 2) GregorianCalendar Random
+AbstractMap (Java 2) HashMap (Java 2) ResourceBundle
+AbstractSequentialList (Java 2) HashSet (Java 2) SimpleTimeZone
+AbstractSet (Java 2) Hashtable Stack
+ArrayList (Java 2) IdentityHashMap (Java 2, v1.4) StringTokenizer
+Arrays (Java 2) LinkedHashMap (Java 2, v1.4) Timer (Java 2, v1.3)
+BitSet LinkedHashSet (Java 2, v1.4) TimerTask (Java 2, v1.3)
+Calendar LinkedList (Java 2) TimeZone
+Collections (Java 2) ListResourceBundle TreeMap (Java 2)
+Currency (Java 2, v1.4) Locale TreeSet (Java 2)
+Date Observable Vector
+Dictionary Properties WeakHashMap (Java 2)
+EventListenerProxy (Java 2, v1.4) PropertyPermission (Java 2)
+java.util defines the following interfaces. Notice that most were added by Java 2.
+Collection (Java 2) List (Java 2) RandomAccess (Java 2, v1.4)
+Comparator (Java 2) ListIterator (Java 2) Set (Java 2)
+Enumeration Map (Java 2) SortedMap (Java 2)
+EventListener Map.Entry (Java 2) SortedSet (Java 2)
+Iterator (Java 2) Observer
+440 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 441
+The ResourceBundle, ListResourceBundle, and PropertyResourceBundle classes
+aid in the internationalization of large programs with many locale-specific resources.
+These classes are not examined here. PropertyPermission, which allows you to grant
+a read/write permission to a system property, is also beyond the scope of this book.
+EventObject, EventListener, and EventListenerProxy are described in Chapter 20. The
+remaining classes and interfaces are examined in detail.
+Because java.util is quite large, its description is broken into two chapters. This
+chapter examines those members of java.util that relate to collections of objects.
+Chapter 16 discusses the other classes and interfaces.
+Collections Overview
+The Java collections framework standardizes the way in which groups of objects are
+handled by your programs. Prior to Java 2, Java provided ad hoc classes such as
+Dictionary, Vector, Stack, and Properties to store and manipulate groups of objects.
+Although these classes were quite useful, they lacked a central, unifying theme. Thus,
+the way that you used Vector was different from the way that you used Properties, for
+example. Also, the previous, ad hoc approach was not designed to be easily extensible
+or adaptable. Collections are an answer to these (and other) problems.
+The collections framework was designed to meet several goals. First, the framework
+had to be high-performance. The implementations for the fundamental collections
+(dynamic arrays, linked lists, trees, and hash tables) are highly efficient. You seldom, if
+ever, need to code one of these “data engines” manually. Second, the framework had to
+allow different types of collections to work in a similar manner and with a high degree of
+interoperability. Third, extending and/or adapting a collection had to be easy. Toward this
+end, the entire collections framework is designed around a set of standard interfaces.
+Several standard implementations (such as LinkedList, HashSet, and TreeSet) of these
+interfaces are provided that you may use as-is. You may also implement your own
+collection, if you choose. Various special-purpose implementations are created for your
+convenience, and some partial implementations are provided that make creating your own
+collection class easier. Finally, mechanisms were added that allow the integration of
+standard arrays into the collections framework.
+Algorithms are another important part of the collection mechanism. Algorithms
+operate on collections and are defined as static methods within the Collections class.
+Thus, they are available for all collections. Each collection class need not implement its
+own versions. The algorithms provide a standard means of manipulating collections.
+Another item created by the collections framework is the Iterator interface. An
+iterator gives you a general-purpose, standardized way of accessing the elements
+within a collection, one at a time. Thus, an iterator provides a means of enumerating the
+contents of a collection. Because each collection implements Iterator, the elements of any
+collection class can be accessed through the methods defined by Iterator. Thus, with
+only small changes, the code that cycles through a set can also be used to cycle through
+a list, for example.
+In addition to collections, the framework defines several map interfaces and classes.
+Maps store key/value pairs. Although maps are not “collections” in the proper use of
+the term, they are fully integrated with collections. In the language of the collections
+framework, you can obtain a collection-view of a map. Such a view contains the elements
+from the map stored in a collection. Thus, you can process the contents of a map as a
+collection, if you choose.
+The collection mechanism was retrofitted to some of the original classes defined by
+java.util so that they too could be integrated into the new system. It is important to
+understand that although the addition of collections altered the architecture of many
+of the original utility classes, it did not cause the deprecation of any. Collections simply
+provide a better way of doing several things.
+One last thing: If you are familiar with C++, then you will find it helpful to know
+that the Java collections technology is similar in spirit to the Standard Template Library
+(STL) defined by C++. What C++ calls a container, Java calls a collection.
+The Collection Interfaces
+The collections framework defines several interfaces. This section provides an overview of
+each interface. Beginning with the collection interfaces is necessary because they determine
+the fundamental nature of the collection classes. Put differently, the concrete classes simply
+provide different implementations of the standard interfaces. The interfaces that underpin
+collections are summarized in the following table:
+Interface Description
+Collection Enables you to work with groups of objects; it is at the top of the
+collections hierarchy
+List Extends Collection to handle sequences (lists of objects)
+Set Extends Collection to handle sets, which must contain unique elements
+SortedSet Extends Set to handle sorted sets
+In addition to the collection interfaces, collections also use the Comparator, Iterator,
+ListIterator and RandomAccess interfaces, which are described in depth later in this
+chapter. Briefly, Comparator defines how two objects are compared; Iterator and
+ListIterator enumerate the objects within a collection. By implementing RandomAccess,
+a list indicates that it supports efficient, random access to its elements.
+To provide the greatest flexibility in their use, the collection interfaces allow some
+methods to be optional. The optional methods enable you to modify the contents of a
+collection. Collections that support these methods are called modifiable. Collections that
+do not allow their contents to be changed are called unmodifiable. If an attempt is made
+442 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+to use one of these methods on an unmodifiable collection, an
+UnsupportedOperationException is thrown. All the built-in collections are modifiable.
+The following sections examine the collection interfaces.
+The Collection Interface
+The Collection interface is the foundation upon which the collections framework is
+built. It declares the core methods that all collections will have. These methods are
+summarized in Table 15-1. Because all collections implement Collection, familiarity
+with its methods is necessary for a clear understanding of the framework. Several of
+these methods can throw an UnsupportedOperationException. As explained, this
+occurs if a collection cannot be modified. A ClassCastException is generated when
+one object is incompatible with another, such as when an attempt is made to add an
+incompatible object to a collection.
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 443
+Method Description
+boolean add(Object obj) Adds obj to the invoking collection. Returns
+true if obj was added to the collection. Returns
+false if obj is already a member of the
+collection, or if the collection does not allow
+duplicates.
+boolean addAll(Collection c) Adds all the elements of c to the invoking
+collection. Returns true if the operation
+succeeded (i.e., the elements were added).
+Otherwise, returns false.
+void clear( ) Removes all elements from the invoking
+collection.
+boolean contains(Object obj) Returns true if obj is an element of the
+invoking collection. Otherwise, returns false.
+boolean containsAll(Collection c) Returns true if the invoking collection contains
+all elements of c. Otherwise, returns false.
+boolean equals(Object obj) Returns true if the invoking collection and obj
+are equal. Otherwise, returns false.
+int hashCode( ) Returns the hash code for the invoking
+collection.
+Table 15-1. The Methods Defined by Collection
+444 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+boolean isEmpty( ) Returns true if the invoking collection is
+empty. Otherwise, returns false.
+Iterator iterator( ) Returns an iterator for the invoking collection.
+boolean remove(Object obj) Removes one instance of obj from the invoking
+collection. Returns true if the element was
+removed. Otherwise, returns false.
+boolean removeAll(Collection c) Removes all elements of c from the invoking
+collection. Returns true if the collection
+changed (i.e., elements were removed).
+Otherwise, returns false.
+boolean retainAll(Collection c) Removes all elements from the invoking
+collection except those in c. Returns true if the
+collection changed (i.e., elements were
+removed). Otherwise, returns false.
+int size( ) Returns the number of elements held in the
+invoking collection.
+Object[ ] toArray( ) Returns an array that contains all the elements
+stored in the invoking collection. The array
+elements are copies of the collection elements.
+Object[ ] toArray(Object array[ ]) Returns an array containing only those
+collection elements whose type matches that
+of array. The array elements are copies of the
+collection elements. If the size of array equals
+the number of matching elements, these are
+returned in array. If the size of array is less
+than the number of matching elements, a new
+array of the necessary size is allocated and
+returned. If the size of array is greater than the
+number of matching elements, the array
+element following the last collection element
+is set to null. An ArrayStoreException is
+thrown if any collection element has a type
+that is not a subtype of array.
+Table 15-1. The Methods Defined by Collection (continued)
+Objects are added to a collection by calling add( ). Notice that add( ) takes an
+argument of type Object. Because Object is a superclass of all classes, any type of
+object may be stored in a collection. However, primitive types may not. For example, a
+collection cannot directly store values of type int, char, double, and so forth. Of course,
+if you want to store such objects, you can also use one of the primitive type wrappers
+described in Chapter 14. You can add the entire contents of one collection to another by
+calling addAll( ).
+You can remove an object by using remove( ). To remove a group of objects, call
+removeAll( ). You can remove all elements except those of a specified group by calling
+retainAll( ). To empty a collection, call clear( ).
+You can determine whether a collection contains a specific object by calling
+contains( ). To determine whether one collection contains all the members of another, call
+containsAll( ). You can determine when a collection is empty by calling isEmpty( ). The
+number of elements currently held in a collection can be determined by calling size( ).
+The toArray( ) method returns an array that contains the elements stored in the
+invoking collection. This method is more important than it might at first seem. Often,
+processing the contents of a collection by using array-like syntax is advantageous. By
+providing a pathway between collections and arrays, you can have the best of both worlds.
+Two collections can be compared for equality by calling equals( ). The precise
+meaning of “equality” may differ from collection to collection. For example, you can
+implement equals( ) so that it compares the values of elements stored in the collection.
+Alternatively, equals( ) can compare references to those elements.
+One more very important method is iterator( ), which returns an iterator to a
+collection. As you will see, iterators are crucial to successful programming when using
+the collections framework.
+The List Interface
+The List interface extends Collection and declares the behavior of a collection that
+stores a sequence of elements. Elements can be inserted or accessed by their position
+in the list, using a zero-based index. A list may contain duplicate elements.
+In addition to the methods defined by Collection, List defines some of its own,
+which are summarized in Table 15-2. Note again that several of these methods will
+throw an UnsupportedOperationException if the collection cannot be modified, and
+a ClassCastException is generated when one object is incompatible with another,
+such as when an attempt is made to add an incompatible object to a collection.
+To the versions of add( ) and addAll( ) defined by Collection, List adds the methods
+add(int, Object) and addAll(int, Collection). These methods insert elements at the
+specified index. Also, the semantics of add(Object) and addAll(Collection) defined by
+Collection are changed by List so that they add elements to the end of the list.
+To obtain the object stored at a specific location, call get( ) with the index of the
+object. To assign a value to an element in the list, call set( ), specifying the index of the
+object to be changed. To find the index of an object, use indexOf( ) or lastIndexOf( ).
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 445
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+446 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void add(int index, Object obj) Inserts obj into the invoking list at the
+index passed in index. Any preexisting
+elements at or beyond the point of
+insertion are shifted up. Thus, no
+elements are overwritten.
+boolean addAll(int index, Collection c) Inserts all elements of c into the invoking
+list at the index passed in index. Any
+preexisting elements at or beyond the
+point of insertion are shifted up. Thus,
+no elements are overwritten. Returns
+true if the invoking list changes and
+returns false otherwise.
+Object get(int index) Returns the object stored at the specified
+index within the invoking collection.
+int indexOf(Object obj) Returns the index of the first instance of
+obj in the invoking list. If obj is not an
+element of the list, –1 is returned.
+int lastIndexOf(Object obj) Returns the index of the last instance of
+obj in the invoking list. If obj is not an
+element of the list, –1 is returned.
+ListIterator listIterator( ) Returns an iterator to the start of the
+invoking list.
+ListIterator listIterator(int index) Returns an iterator to the invoking list
+that begins at the specified index.
+Object remove(int index) Removes the element at position index from
+the invoking list and returns the deleted
+element. The resulting list is compacted.
+That is, the indexes of subsequent elements
+are decremented by one.
+Object set(int index, Object obj) Assigns obj to the location specified by
+index within the invoking list.
+List subList(int start, int end) Returns a list that includes elements
+from start to end–1 in the invoking list.
+Elements in the returned list are also
+referenced by the invoking object.
+Table 15-2. The Methods Defined by List
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 447
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+You can obtain a sublist of a list by calling subList( ), specifying the beginning and
+ending indexes of the sublist. As you can imagine, subList( ) makes list processing
+quite convenient.
+The Set Interface
+The Set interface defines a set. It extends Collection and declares the behavior of a
+collection that does not allow duplicate elements. Therefore, the add( ) method returns
+false if an attempt is made to add duplicate elements to a set. It does not define any
+additional methods of its own.
+The SortedSet Interface
+The SortedSet interface extends Set and declares the behavior of a set sorted in ascending
+order. In addition to those methods defined by Set, the SortedSet interface declares the
+methods summarized in Table 15-3. Several methods throw a NoSuchElementException
+when no items are contained in the invoking set. A ClassCastException is thrown when an
+object is incompatible with the elements in a set. A NullPointerException is thrown if an
+attempt is made to use a null object and null is not allowed in the set.
+SortedSet defines several methods that make set processing more convenient. To
+obtain the first object in the set, call first( ). To get the last element, use last( ). You can
+obtain a subset of a sorted set by calling subSet( ), specifying the first and last object in
+the set. If you need the subset that starts with the first element in the set, use
+headSet( ). If you want the subset that ends the set, use tailSet( ).
+Method Description
+Comparator comparator( ) Returns the invoking sorted set’s
+comparator. If the natural ordering is
+used for this set, null is returned.
+Object first( ) Returns the first element in the
+invoking sorted set.
+SortedSet headSet(Object end) Returns a SortedSet containing those
+elements less than end that are
+contained in the invoking sorted set.
+Elements in the returned sorted set
+are also referenced by the invoking
+sorted set.
+Object last( ) Returns the last element in the
+invoking sorted set.
+Table 15-3. The Methods Defined by SortedSet
+The Collection Classes
+Now that you are familiar with the collection interfaces, you are ready to examine the
+standard classes that implement them. Some of the classes provide full implementations
+that can be used as-is. Others are abstract, providing skeletal implementations that
+are used as starting points for creating concrete collections. None of the collection
+classes are synchronized, but as you will see later in this chapter, it is possible to obtain
+synchronized versions.
+The standard collection classes are summarized in the following table:
+Class Description
+AbstractCollection Implements most of the Collection interface.
+AbstractList Extends AbstractCollection and implements most of
+the List interface.
+AbstractSequentialList Extends AbstractList for use by a collection that uses
+sequential rather than random access of its elements.
+LinkedList Implements a linked list by extending
+AbstractSequentialList.
+ArrayList Implements a dynamic array by extending AbstractList.
+448 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+SortedSet subSet(Object start, Object end) Returns a SortedSet that includes
+those elements between start and
+end–1. Elements in the returned
+collection are also referenced by the
+invoking object.
+SortedSet tailSet(Object start) Returns a SortedSet that contains
+those elements greater than or equal
+to start that are contained in the
+sorted set. Elements in the returned
+set are also referenced by the
+invoking object.
+Table 15-3. The Methods Defined by SortedSet (continued)
+Class Description
+AbstractSet Extends AbstractCollection and implements most of
+the Set interface.
+HashSet Extends AbstractSet for use with a hash table.
+LinkedHashSet Extends HashSet to allow insertion-order iterations.
+TreeSet Implements a set stored in a tree. Extends AbstractSet.
+In addition to the collection classes, several legacy classes, such as Vector, Stack, and
+Hashtable, have been reengineered to support collections.  These are examined later in
+this chapter.
+The following sections examine the concrete collection classes and illustrate their use.
+The ArrayList Class
+The ArrayList class extends AbstractList and implements the List interface. ArrayList
+supports dynamic arrays that can grow as needed. In Java, standard arrays are of a
+fixed length. After arrays are created, they cannot grow or shrink, which means that
+you must know in advance how many elements an array will hold. But, sometimes,
+you may not know until run time precisely how large of an array you need. To handle
+this situation, the collections framework defines ArrayList. In essence, an ArrayList is
+a variable-length array of object references. That is, an ArrayList can dynamically
+increase or decrease in size. Array lists are created with an initial size. When this size is
+exceeded, the collection is automatically enlarged. When objects are removed, the array
+may be shrunk.
+Dynamic arrays are also supported by the legacy class Vector, which is described later
+in this chapter.
+ArrayList has the constructors shown here:
+ArrayList( )
+ArrayList(Collection c)
+ArrayList(int capacity)
+The first constructor builds an empty array list. The second constructor builds an array
+list that is initialized with the elements of the collection c. The third constructor builds
+an array list that has the specified initial capacity. The capacity is the size of the
+underlying array that is used to store the elements. The capacity grows automatically
+as elements are added to an array list.
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 449
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The following program shows a simple use of ArrayList. An array list is created,
+and then objects of type String are added to it. (Recall that a quoted string is translated
+into a String object.) The list is then displayed. Some of the elements are removed and
+the list is displayed again.
+// Demonstrate ArrayList.
+import java.util.*;
+class ArrayListDemo {
+public static void main(String args[]) {
+// create an array list
+ArrayList al = new ArrayList();
+System.out.println("Initial size of al: " +
+al.size());
+// add elements to the array list
+al.add("C");
+al.add("A");
+al.add("E");
+al.add("B");
+al.add("D");
+al.add("F");
+al.add(1, "A2");
+System.out.println("Size of al after additions: " +
+al.size());
+// display the array list
+System.out.println("Contents of al: " + al);
+// Remove elements from the array list
+al.remove("F");
+al.remove(2);
+System.out.println("Size of al after deletions: " +
+al.size());
+System.out.println("Contents of al: " + al);
+}
+}
+The output from this program is shown here:
+Initial size of al: 0
+Size of al after additions: 7
+450 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Contents of al: [C, A2, A, E, B, D, F]
+Size of al after deletions: 5
+Contents of al: [C, A2, E, B, D]
+Notice that a1 starts out empty and grows as elements are added to it. When elements
+are removed, its size is reduced.
+In the preceding example, the contents of a collection are displayed using
+the default conversion provided by toString( ), which was inherited from
+AbstractCollection. Although it is sufficient for short, sample programs, you seldom
+use this method to display the contents of a real-world collection. Usually, you provide
+your own output routines. But, for the next few examples, the default output created
+by toString( ) will continue to be used.
+Although the capacity of an ArrayList object increases automatically as objects are
+stored in it, you can increase the capacity of an ArrayList object manually by calling
+ensureCapacity( ). You might want to do this if you know in advance that you will be
+storing many more items in the collection that it can currently hold. By increasing its
+capacity once, at the start, you can prevent several reallocations later. Because
+reallocations are costly in terms of time, preventing unnecessary ones improves
+performance. The signature for ensureCapacity( ) is shown here:
+void ensureCapacity(int cap)
+Here, cap is the new capacity.
+Conversely, if you want to reduce the size of the array that underlies an ArrayList
+object so that it is precisely as large as the number of items that it is currently holding,
+call trimToSize( ), shown here:
+void trimToSize( )
+Obtaining an Array from an ArrayList
+When working with ArrayList, you will sometimes want to obtain an actual array that
+contains the contents of the list. As explained earlier, you can do this by calling toArray( ).
+Several reasons exist why you might want to convert a collection into an array such as:
+■ To obtain faster processing times for certain operations.
+■ To pass an array to a method that is not overloaded to accept a collection.
+■ To integrate your newer, collection-based code with legacy code that does not
+understand collections.
+Whatever the reason, converting an ArrayList to an array is a trivial matter, as the
+following program shows:
+// Convert an ArrayList into an array.
+import java.util.*;
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 451
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+class ArrayListToArray {
+public static void main(String args[]) {
+// Create an array list
+ArrayList al = new ArrayList();
+// Add elements to the array list
+al.add(new Integer(1));
+al.add(new Integer(2));
+al.add(new Integer(3));
+al.add(new Integer(4));
+System.out.println("Contents of al: " + al);
+// get array
+Object ia[] = al.toArray();
+int sum = 0;
+// sum the array
+for(int i=0; i<ia.length; i++)
+sum += ((Integer) ia[i]).intValue();
+System.out.println("Sum is: " + sum);
+}
+}
+The output from the program is shown here:
+Contents of al: [1, 2, 3, 4]
+Sum is: 10
+The program begins by creating a collection of integers. As explained, you cannot store
+primitive types in a collection, so objects of type Integer are created and stored. Next,
+toArray( ) is called and it obtains an array of Objects. The contents of this array are cast
+to Integer, and then the values are summed.
+The LinkedList Class
+The LinkedList class extends AbstractSequentialList and implements the List interface.
+It provides a linked-list data structure. It has the two constructors, shown here:
+LinkedList( )
+LinkedList(Collection c)
+452 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The first constructor builds an empty linked list. The second constructor builds a linked
+list that is initialized with the elements of the collection c.
+In addition to the methods that it inherits, the LinkedList class defines some useful
+methods of its own for manipulating and accessing lists. To add elements to the start of
+the list, use addFirst( ); to add elements to the end, use addLast( ). Their signatures are
+shown here:
+void addFirst(Object obj)
+void addLast(Object obj)
+Here, obj is the item being added.
+To obtain the first element, call getFirst( ). To retrieve the last element, call
+getLast( ). Their signatures are shown here:
+Object getFirst( )
+Object getLast( )
+To remove the first element, use removeFirst( ); to remove the last element, call
+removeLast( ). They are shown here:
+Object removeFirst( )
+Object removeLast( )
+The following program illustrates several of the methods supported by LinkedList:
+// Demonstrate LinkedList.
+import java.util.*;
+class LinkedListDemo {
+public static void main(String args[]) {
+// create a linked list
+LinkedList ll = new LinkedList();
+// add elements to the linked list
+ll.add("F");
+ll.add("B");
+ll.add("D");
+ll.add("E");
+ll.add("C");
+ll.addLast("Z");
+ll.addFirst("A");
+ll.add(1, "A2");
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 453
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+System.out.println("Original contents of ll: " + ll);
+// remove elements from the linked list
+ll.remove("F");
+ll.remove(2);
+System.out.println("Contents of ll after deletion: "
++ ll);
+// remove first and last elements
+ll.removeFirst();
+ll.removeLast();
+System.out.println("ll after deleting first and last: "
++ ll);
+// get and set a value
+Object val = ll.get(2);
+ll.set(2, (String) val + " Changed");
+System.out.println("ll after change: " + ll);
+}
+}
+The output from this program is shown here:
+Original contents of ll: [A, A2, F, B, D, E, C, Z]
+Contents of ll after deletion: [A, A2, D, E, C, Z]
+ll after deleting first and last: [A2, D, E, C]
+ll after change: [A2, D, E Changed, C]
+Because LinkedList implements the List interface, calls to add(Object) append
+items to the end of the list, as does addLast( ). To insert items at a specific location,
+use the add(int, Object) form of add( ), as illustrated by the call to add(1, “A2”) in
+the example.
+Notice how the third element in ll is changed by employing calls to get( ) and set( ).
+To obtain the current value of an element, pass get( ) the index at which the element is
+stored. To assign a new value to that index, pass set( ) the index and its new value.
+The HashSet Class
+HashSet extends AbstractSet and implements the Set interface. It creates a collection
+that uses a hash table for storage. As most readers likely know, a hash table stores
+454 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+information by using a mechanism called hashing. In hashing, the informational content
+of a key is used to determine a unique value, called its hash code. The hash code is
+then used as the index at which the data associated with the key is stored. The
+transformation of the key into its hash code is performed automatically—you never see
+the hash code itself. Also, your code can’t directly index the hash table. The advantage
+of hashing is that it allows the execution time of basic operations, such as add( ),
+contains( ), remove( ), and size( ), to remain constant even for large sets.
+The following constructors are defined:
+HashSet( )
+HashSet(Collection c)
+HashSet(int capacity)
+HashSet(int capacity, float fillRatio)
+The first form constructs a default hash set. The second form initializes the hash
+set by using the elements of c. The third form initializes the capacity of the hash set to
+capacity. The fourth form initializes both the capacity and the fill ratio (also called load
+capacity) of the hash set from its arguments. The fill ratio must be between 0.0 and 1.0,
+and it determines how full the hash set can be before it is resized upward. Specifically,
+when the number of elements is greater than the capacity of the hash set multiplied by
+its fill ratio, the hash set is expanded. For constructors that do not take a fill ratio, 0.75
+is used.
+HashSet does not define any additional methods beyond those provided by its
+superclasses and interfaces.
+Importantly, note that a hash set does not guarantee the order of its elements,
+because the process of hashing doesn’t usually lend itself to the creation of sorted sets.
+If you need sorted storage, then another collection, such as TreeSet, is a better choice.
+Here is an example that demonstrates HashSet:
+// Demonstrate HashSet.
+import java.util.*;
+class HashSetDemo {
+public static void main(String args[]) {
+// create a hash set
+HashSet hs = new HashSet();
+// add elements to the hash set
+hs.add("B");
+hs.add("A");
+hs.add("D");
+hs.add("E");
+hs.add("C");
+hs.add("F");
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 455
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+System.out.println(hs);
+}
+}
+The following is the output from this program:
+[A, F, E, D, C, B]
+As explained, the elements are not stored in sorted order, and the precise output may vary.
+The LinkedHashSet Class
+Java 2, version 1.4 adds the LinkedHashSet class. This class extends HashSet, but adds
+no members of its own. LinkedHashSet maintains a linked list of the entries in the set,
+in the order in which they were inserted. This allows insertion-order iteration over the
+set. That is, when cycling through a LinkedHashSet using an iterator, the elements will
+be returned in the order in which they were inserted. This is also the order in which
+they are contained in the string returned by toString( ) when called on a LinkedHashSet
+object. To see the effect of LinkedHashSet, try substituting LinkedHashSet For HashSet
+in the preceding program. The output will be
+[B, A, D, E, C, F]
+which is the order in which the elements were inserted.
+The TreeSet Class
+TreeSet provides an implementation of the Set interface that uses a tree for storage.
+Objects are stored in sorted, ascending order. Access and retrieval times are quite fast,
+which makes TreeSet an excellent choice when storing large amounts of sorted
+information that must be found quickly.
+The following constructors are defined:
+TreeSet( )
+TreeSet(Collection c)
+TreeSet(Comparator comp)
+TreeSet(SortedSet ss)
+The first form constructs an empty tree set that will be sorted in ascending order
+according to the natural order of its elements. The second form builds a tree set that
+contains the elements of c. The third form constructs an empty tree set that will be
+sorted according to the comparator specified by comp. (Comparators are described later
+in this chapter.) The fourth form builds a tree set that contains the elements of ss.
+456 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Here is an example that demonstrates a TreeSet:
+// Demonstrate TreeSet.
+import java.util.*;
+class TreeSetDemo {
+public static void main(String args[]) {
+// Create a tree set
+TreeSet ts = new TreeSet();
+// Add elements to the tree set
+ts.add("C");
+ts.add("A");
+ts.add("B");
+ts.add("E");
+ts.add("F");
+ts.add("D");
+System.out.println(ts);
+}
+}
+The output from this program is shown here:
+[A, B, C, D, E, F]
+As explained, because TreeSet stores its elements in a tree, they are automatically
+arranged in sorted order, as the output confirms.
+Accessing a Collection via an Iterator
+Often, you will want to cycle through the elements in a collection. For example, you
+might want to display each element. By far, the easiest way to do this is to employ an
+iterator, an object that implements either the Iterator or the ListIterator interface.
+Iterator enables you to cycle through a collection, obtaining or removing elements.
+ListIterator extends Iterator to allow bidirectional traversal of a list, and the
+modification of elements. The Iterator interface declares the methods shown in
+Table 15-4. The methods declared by ListIterator are shown in Table 15-5.
+Using an Iterator
+Before you can access a collection through an iterator, you must obtain one. Each of
+the collection classes provides an iterator( ) method that returns an iterator to the start
+of the collection. By using this iterator object, you can access each element in the
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 457
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+458 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+boolean hasNext( ) Returns true if there are more elements. Otherwise,
+returns false.
+Object next( ) Returns the next element. Throws
+NoSuchElementException if there is not a next element.
+void remove( ) Removes the current element. Throws
+IllegalStateException if an attempt is made to call
+remove( ) that is not preceded by a call to next( ).
+Table 15-4. The Methods Declared by Iterator
+Method Description
+void add(Object obj) Inserts obj into the list in front of the element that will
+be returned by the next call to next( ).
+boolean hasNext( ) Returns true if there is a next element. Otherwise,
+returns false.
+boolean hasPrevious( ) Returns true if there is a previous element. Otherwise,
+returns false.
+Object next( ) Returns the next element. A
+NoSuchElementException is thrown if there is not a
+next element.
+int nextIndex( ) Returns the index of the next element. If there is not a
+next element, returns the size of the list.
+Object previous( ) Returns the previous element. A
+NoSuchElementException is thrown if there is not a
+previous element.
+int previousIndex( ) Returns the index of the previous element. If there is
+not a previous element, returns −1.
+void remove( ) Removes the current element from the list. An
+IllegalStateException is thrown if remove( ) is called
+before next( ) or previous( ) is invoked.
+void set(Object obj) Assigns obj to the current element. This is the element
+last returned by a call to either next( ) or previous( ).
+Table 15-5. The Methods Declared by ListIterator
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 459
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+collection, one element at a time. In general, to use an iterator to cycle through the
+contents of a collection, follow these steps:
+1. Obtain an iterator to the start of the collection by calling the collection’s
+iterator( ) method.
+2. Set up a loop that makes a call to hasNext( ). Have the loop iterate as long as
+hasNext( ) returns true.
+3. Within the loop, obtain each element by calling next( ).
+For collections that implement List, you can also obtain an iterator by calling
+ListIterator. As explained, a list iterator gives you the ability to access the collection in
+either the forward or backward direction and lets you modify an element. Otherwise,
+ListIterator is used just like Iterator.
+Here is an example that implements these steps, demonstrating both Iterator and
+ListIterator. It uses an ArrayList object, but the general principles apply to any type of
+collection. Of course, ListIterator is available only to those collections that implement
+the List interface.
+// Demonstrate iterators.
+import java.util.*;
+class IteratorDemo {
+public static void main(String args[]) {
+// create an array list
+ArrayList al = new ArrayList();
+// add elements to the array list
+al.add("C");
+al.add("A");
+al.add("E");
+al.add("B");
+al.add("D");
+al.add("F");
+// use iterator to display contents of al
+System.out.print("Original contents of al: ");
+Iterator itr = al.iterator();
+while(itr.hasNext()) {
+Object element = itr.next();
+System.out.print(element + " ");
+}
+System.out.println();
+// modify objects being iterated
+ListIterator litr = al.listIterator();
+while(litr.hasNext()) {
+460 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Object element = litr.next();
+litr.set(element + "+");
+}
+System.out.print("Modified contents of al: ");
+itr = al.iterator();
+while(itr.hasNext()) {
+Object element = itr.next();
+System.out.print(element + " ");
+}
+System.out.println();
+// now, display the list backwards
+System.out.print("Modified list backwards: ");
+while(litr.hasPrevious()) {
+Object element = litr.previous();
+System.out.print(element + " ");
+}
+System.out.println();
+}
+}
+The output is shown here:
+Original contents of al: C A E B D F
+Modified contents of al: C+ A+ E+ B+ D+ F+
+Modified list backwards: F+ D+ B+ E+ A+ C+
+Pay special attention to how the list is displayed in reverse. After the list is modified,
+litr points to the end of the list. (Remember, litr.hasNext( ) returns false when the end
+of the list has been reached.) To traverse the list in reverse, the program continues to
+use litr, but this time it checks to see whether it has a previous element. As long as it
+does, that element is obtained and displayed.
+Storing User-Defined Classes in Collections
+For the sake of simplicity, the foregoing examples have stored built-in objects, such as
+String or Integer, in a collection. Of course, collections are not limited to the storage of
+built-in objects. Quite the contrary. The power of collections is that they can store any
+type of object, including objects of classes that you create. For example, consider the
+following example that uses a LinkedList to store mailing addresses:
+// A simple mailing list example.
+import java.util.*;
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 461
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+class Address {
+private String name;
+private String street;
+private String city;
+private String state;
+private String code;
+Address(String n, String s, String c,
+String st, String cd) {
+name = n;
+street = s;
+city = c;
+state = st;
+code = cd;
+}
+public String toString() {
+return name + "\n" + street + "\n" +
+city + " " + state + " " + code;
+}
+}
+class MailList {
+public static void main(String args[]) {
+LinkedList ml = new LinkedList();
+// add elements to the linked list
+ml.add(new Address("J.W. West", "11 Oak Ave",
+"Urbana", "IL", "61801"));
+ml.add(new Address("Ralph Baker", "1142 Maple Lane",
+"Mahomet", "IL", "61853"));
+ml.add(new Address("Tom Carlton", "867 Elm St",
+"Champaign", "IL", "61820"));
+Iterator itr = ml.iterator();
+while(itr.hasNext()) {
+Object element = itr.next();
+System.out.println(element + "\n");
+}
+System.out.println();
+}
+}
+The output from the program is shown here:
+J.W. West
+11 Oak Ave
+Urbana IL 61801
+Ralph Baker
+1142 Maple Lane
+Mahomet IL 61853
+Tom Carlton
+867 Elm St
+Champaign IL 61820
+Aside from storing a user-defined class in a collection, another important thing to
+notice about the preceding program is that it is quite short. When you consider that it
+sets up a linked list that can store, retrieve, and process mailing addresses in about 50
+lines of code, the power of the collections framework begins to become apparent. As
+most readers know, if all of this functionality had to be coded manually, the program
+would be several times longer. Collections offer off-the-shelf solutions to a wide variety
+of programming problems. You should use them whenever the situation presents itself.
+The RandomAccess Interface
+Java 2, version 1.4 adds the RandomAccess interface. This interface contains no members.
+However, by implementing this interface, a collection signals that it supports efficient
+random access to its elements. Although a collection might support random access, it
+might not do so efficiently. By checking for the RandomAccess interface, client code
+can determine at run time whether a collection is suitable for certain types of random
+access operations—especially as they apply to large collections. (You can use instanceof
+to determine if a class implements an interface.) RandomAccess is implemented by
+ArrayList and by the legacy Vector class.
+Working with Maps
+A map is an object that stores associations between keys and values, or key/value pairs.
+Given a key, you can find its value. Both keys and values are objects. The keys must be
+unique, but the values may be duplicated. Some maps can accept a null key and null
+values, others cannot.
+The Map Interfaces
+Because the map interfaces define the character and nature of maps, this discussion of
+maps begins with them. The following interfaces support maps:
+462 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Interface Description
+Map Maps unique keys to values.
+Map.Entry Describes an element (a key/value pair) in a map. This is an inner
+class of Map.
+SortedMap Extends Map so that the keys are maintained in ascending order.
+Each interface is examined next, in turn.
+The Map Interface
+The Map interface maps unique keys to values. A key is an object that you use to
+retrieve a value at a later date. Given a key and a value, you can store the value
+in a Map object. After the value is stored, you can retrieve it by using its key.
+The methods declared by Map are summarized in Table 15-6. Several methods
+throw a NoSuchElementException when no items exist in the invoking map. A
+ClassCastException is thrown when an object is incompatible with the elements
+in a map. A NullPointerException is thrown if an attempt is made to use a null object
+and null is not allowed in the map. An UnsupportedOperationException is thrown
+when an attempt is made to change an unmodifiable map.
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 463
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void clear( ) Removes all key/value pairs from the
+invoking map.
+boolean containsKey(Object k) Returns true if the invoking map contains k as
+a key. Otherwise, returns false.
+boolean containsValue(Object v) Returns true if the map contains v as a value.
+Otherwise, returns false.
+Set entrySet( ) Returns a Set that contains the entries in the
+map. The set contains objects of type
+Map.Entry. This method provides a set-view
+of the invoking map.
+boolean equals(Object obj) Returns true if obj is a Map and contains the
+same entries. Otherwise, returns false.
+Table 15-6. The Methods Defined by Map
+464 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Maps revolve around two basic operations: get( ) and put( ). To put a value into a
+map, use put( ), specifying the key and the value. To obtain a value, call get( ), passing
+the key as an argument. The value is returned.
+As mentioned earlier, maps are not collections because they do not implement the
+Collection interface, but you can obtain a collection-view of a map. To do this, you
+can use the entrySet( ) method. It returns a Set that contains the elements in the map.
+To obtain a collection-view of the keys, use keySet( ). To get a collection-view of the
+values, use values( ). Collection-views are the means by which maps are integrated
+into the collections framework.
+Method Description
+Object get(Object k) Returns the value associated with the key k.
+int hashCode( ) Returns the hash code for the invoking map.
+boolean isEmpty( ) Returns true if the invoking map is empty.
+Otherwise, returns false.
+Set keySet( ) Returns a Set that contains the keys in the
+invoking map. This method provides a
+set-view of the keys in the invoking map.
+Object put(Object k, Object v) Puts an entry in the invoking map,
+overwriting any previous value associated
+with the key. The key and value are k and v,
+respectively. Returns null if the key did not
+already exist. Otherwise, the previous value
+linked to the key is returned.
+void putAll(Map m) Puts all the entries from m into this map.
+Object remove(Object k) Removes the entry whose key equals k.
+int size( ) Returns the number of key/value pairs in
+the map.
+Collection values( ) Returns a collection containing the values
+in the map. This method provides a
+collection-view of the values in the map.
+Table 15-6. The Methods Defined by Map (continued)
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 465
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The SortedMap Interface
+The SortedMap interface extends Map. It ensures that the entries are maintained
+in ascending key order. The methods declared by SortedMap are summarized in
+Table 15-7. Several methods throw a NoSuchElementException when no items are in
+the invoking map. A ClassCastException is thrown when an object is incompatible
+with the elements in a map. A NullPointerException is thrown if an attempt is made
+to use a null object when null is not allowed in the map.
+Sorted maps allow very efficient manipulations of submaps (in other words, a
+subset of a map). To obtain a submap, use headMap( ), tailMap( ), or subMap( ). To
+get the first key in the set, call firstKey( ). To get the last key, use lastKey( ).
+Method Description
+Comparator comparator( ) Returns the invoking sorted
+map’s comparator. If the natural
+ordering is used for the invoking
+map, null is returned.
+Object firstKey( ) Returns the first key in the
+invoking map.
+SortedMap headMap(Object end) Returns a sorted map for those
+map entries with keys that are
+less than end.
+Object lastKey( ) Returns the last key in the
+invoking map.
+SortedMap subMap(Object start, Object end) Returns a map containing those
+entries with keys that are greater
+than or equal to start and less
+than end.
+SortedMap tailMap(Object start) Returns a map containing those
+entries with keys that are greater
+than or equal to start.
+Table 15-7. The Methods Defined by SortedMap
+The Map.Entry Interface
+The Map.Entry interface enables you to work with a map entry. Recall that the
+entrySet( ) method declared by the Map interface returns a Set containing the map
+entries. Each of these set elements is a Map.Entry object. Table 15-8 summarizes the
+methods declared by this interface.
+The Map Classes
+Several classes provide implementations of the map interfaces. The classes that can be
+used for maps are summarized here:
+Class Description
+AbstractMap Implements most of the Map interface.
+HashMap Extends AbstractMap to use a hash table.
+TreeMap Extends AbstractMap to use a tree.
+WeakHashMap Extends AbstractMap to use a hash table with weak keys.
+LinkedHashMap Extends HashMap to allow insertion-order iterations.
+IdentityHashMap Extends AbstractMap and uses reference equality when
+comparing documents.
+466 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+boolean equals(Object obj) Returns true if obj is a Map.Entry whose key and
+value are equal to that of the invoking object.
+Object getKey( ) Returns the key for this map entry.
+Object getValue( ) Returns the value for this map entry.
+int hashCode( ) Returns the hash code for this map entry.
+Object setValue(Object v) Sets the value for this map entry to v. A
+ClassCastException is thrown if v is not
+the correct type for the map. An
+IllegalArgumentException is thrown if there is
+a problem with v. A NullPointerException is
+thrown if v is null and the map does not permit
+null keys. An UnsupportedOperationException
+is thrown if the map cannot be changed.
+Table 15-8. The Methods Defined by Map.Entry
+Notice that AbstractMap is a superclass for all concrete map implementations.
+WeakHashMap implements a map that uses “weak keys,” which allows an element
+in a map to be garbage-collected when its key is unused. This class is not discussed
+further here. The others are described next.
+The HashMap Class
+The HashMap class uses a hash table to implement the Map interface. This allows the
+execution time of basic operations, such as get( ) and put( ), to remain constant even for
+large sets.
+The following constructors are defined:
+HashMap( )
+HashMap(Map m)
+HashMap(int capacity)
+HashMap(int capacity, float fillRatio)
+The first form constructs a default hash map. The second form initializes the hash map
+by using the elements of m. The third form initializes the capacity of the hash map to
+capacity. The fourth form initializes both the capacity and fill ratio of the hash map by
+using its arguments. The meaning of capacity and fill ratio is the same as for HashSet,
+described earlier.
+HashMap implements Map and extends AbstractMap. It does not add any
+methods of its own.
+You should note that a hash map does not guarantee the order of its elements.
+Therefore, the order in which elements are added to a hash map is not necessarily the
+order in which they are read by an iterator.
+The following program illustrates HashMap. It maps names to account balances.
+Notice how a set-view is obtained and used.
+import java.util.*;
+class HashMapDemo {
+public static void main(String args[]) {
+// Create a hash map
+HashMap hm = new HashMap();
+// Put elements to the map
+hm.put("John Doe", new Double(3434.34));
+hm.put("Tom Smith", new Double(123.22));
+hm.put("Jane Baker", new Double(1378.00));
+hm.put("Todd Hall", new Double(99.22));
+hm.put("Ralph Smith", new Double(-19.08));
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 467
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+// Get a set of the entries
+Set set = hm.entrySet();
+// Get an iterator
+Iterator i = set.iterator();
+// Display elements
+while(i.hasNext()) {
+Map.Entry me = (Map.Entry)i.next();
+System.out.print(me.getKey() + ": ");
+System.out.println(me.getValue());
+}
+System.out.println();
+// Deposit 1000 into John Doe's account
+double balance =  ((Double)hm.get("John Doe")).doubleValue();
+hm.put("John Doe", new Double(balance + 1000));
+System.out.println("John Doe's new balance: " +
+hm.get("John Doe"));
+}
+}
+Output from this program is shown here (the precise order may vary).
+Todd Hall: 99.22
+Ralph Smith: -19.08
+John Doe: 3434.34
+Jane Baker: 1378.0
+Tom Smith: 123.22
+John Doe’s current balance: 4434.34
+The program begins by creating a hash map and then adds the mapping of names
+to balances. Next, the contents of the map are displayed by using a set-view, obtained
+by calling entrySet( ). The keys and values are displayed by calling the getKey( ) and
+getValue( ) methods that are defined by Map.Entry. Pay close attention to how the deposit
+is made into John Doe’s account. The put( ) method automatically replaces any preexisting
+value that is associated with the specified key with the new value. Thus, after John Doe’s
+account is updated, the hash map will still contain just one “John Doe” account.
+The TreeMap Class
+The TreeMap class implements the Map interface by using a tree. A TreeMap provides
+an efficient means of storing key/value pairs in sorted order, and allows rapid
+468 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+retrieval. You should note that, unlike a hash map, a tree map guarantees that its
+elements will be sorted in ascending key order.
+The following TreeMap constructors are defined:
+TreeMap( )
+TreeMap(Comparator comp)
+TreeMap(Map m)
+TreeMap(SortedMap sm)
+The first form constructs an empty tree map that will be sorted by using the natural order
+of its keys. The second form constructs an empty tree-based map that will be sorted by
+using the Comparator comp. (Comparators are discussed later in this chapter.) The third
+form initializes a tree map with the entries from m, which will be sorted by using the
+natural order of the keys. The fourth form initializes a tree map with the entries from sm,
+which will be sorted in the same order as sm.
+TreeMap implements SortedMap and extends AbstractMap. It does not define any
+additional methods of its own.
+The following program reworks the preceding example so that it uses TreeMap:
+import java.util.*;
+class TreeMapDemo {
+public static void main(String args[]) {
+// Create a tree map
+TreeMap tm = new TreeMap();
+// Put elements to the map
+tm.put("John Doe", new Double(3434.34));
+tm.put("Tom Smith", new Double(123.22));
+tm.put("Jane Baker", new Double(1378.00));
+tm.put("Todd Hall", new Double(99.22));
+tm.put("Ralph Smith", new Double(-19.08));
+// Get a set of the entries
+Set set = tm.entrySet();
+// Get an iterator
+Iterator i = set.iterator();
+// Display elements
+while(i.hasNext()) {
+Map.Entry me = (Map.Entry)i.next();
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 469
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+System.out.print(me.getKey() + ": ");
+System.out.println(me.getValue());
+}
+System.out.println();
+// Deposit 1000 into John Doe's account
+double balance =  ((Double)tm.get("John Doe")).doubleValue();
+tm.put("John Doe", new Double(balance + 1000));
+System.out.println("John Doe's new balance: " +
+tm.get("John Doe"));
+}
+}
+The following is the output from this program:
+Jane Baker: 1378.0
+John Doe: 3434.34
+Ralph Smith: -19.08
+Todd Hall: 99.22
+Tom Smith: 123.22
+John Doe’s current balance: 4434.34
+Notice that TreeMap sorts the keys. However, in this case, they are sorted by first
+name instead of last name. You can alter this behavior by specifying a comparator
+when the map is created, as described shortly.
+The LinkedHashMap Class
+Java 2, version 1.4 adds the LinkedHashMap class. This class extends HashMap.
+LinkedHashMap maintains a linked list of the entries in the map, in the order in which
+they were inserted. This allows insertion-order iteration over the map. That is, when
+iterating a LinkedHashMap, the elements will be returned in the order in which they
+were inserted. You can also create a LinkedHashMap that returns its elements in the
+order in which they were last accessed.
+LinkedHashMap defines the following constructors.
+LinkedHashMap( )
+LinkedHashMap(Map m)
+LinkedHashMap(int capacity)
+LinkedHashMap(int capacity, float fillRatio)
+LinkedHashMap(int capacity, float fillRatio, boolean Order)
+470 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The first form constructs a default LinkedHashMap. The second form initializes
+the LinkedHashMap with the elements from m. The third form initializes the capacity.
+The fourth form initializes both capacity and fill ratio. The meaning of capacity and fill
+ratio are the same as for HashMap. The last form allows you to specify whether the
+elements will be stored in the linked list by insertion order, or by order of last access. If
+Order is true, then access order is used. If Order is false, then insertion order is used.
+LinkedHashMap adds only one method to those defined by HashMap. This
+method is removeEldestEntry( ) and it is shown here.
+protected boolean removeEldestEntry(Map.Entry e)
+This method is called by put( ) and putAll( ). The oldest entry is passed in e. By default, this
+method returns false and does nothing. However, if you override this method, then you
+can have the LinkedHashMap remove the oldest entry in the map. To do this, have your
+override return true. To keep the oldest entry, return false.
+The IdentityHashMap Class
+Java 2, version 1.4 adds the IdentityHashMap class. This class implements AbstractMap.
+It is similar to HashMap except that it uses reference equality when comparing elements.
+The Java 2 documentation explicitly states that IdentityHashMap is not for general use.
+Comparators
+Both TreeSet and TreeMap store elements in sorted order. However, it is the
+comparator that defines precisely what “sorted order” means. By default, these classes
+store their elements by using what Java refers to as “natural ordering,” which is
+usually the ordering that you would expect. (A before B, 1 before 2, and so forth.) If
+you want to order elements a different way, then specify a Comparator object when
+you construct the set or map. Doing so gives you the ability to govern precisely how
+elements are stored within sorted collections and maps.
+The Comparator interface defines two methods: compare( ) and equals( ). The
+compare( ) method, shown here, compares two elements for order:
+int compare(Object obj1, Object obj2)
+obj1 and obj2 are the objects to be compared. This method returns zero if the objects are
+equal. It returns a positive value if obj1 is greater than obj2. Otherwise, a negative value
+is returned. The method can throw a ClassCastException if the types of the objects are
+not compatible for comparison. By overriding compare( ), you can alter the way that
+objects are ordered. For example, to sort in reverse order, you can create a comparator
+that reverses the outcome of a comparison.
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 471
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+472 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The equals( ) method, shown here, tests whether an object equals the invoking
+comparator:
+boolean equals(Object obj)
+obj is the object to be tested for equality. The method returns true if obj and the
+invoking object are both Comparator objects and use the same ordering. Otherwise, it
+returns false. Overriding equals( ) is unnecessary, and most simple comparators will
+not do so.
+Using a Comparator
+The following is an example that demonstrates the power of a custom comparator. It
+implements the compare( ) method so that it operates in reverse of normal. Thus, it
+causes a tree set to be stored in reverse order.
+// Use a custom comparator.
+import java.util.*;
+// A reverse comparator for strings.
+class MyComp implements Comparator {
+public int compare(Object a, Object b) {
+String aStr, bStr;
+aStr = (String) a;
+bStr = (String) b;
+// reverse the comparison
+return bStr.compareTo(aStr);
+}
+// no need to override equals
+}
+class CompDemo {
+public static void main(String args[]) {
+// Create a tree set
+TreeSet ts = new TreeSet(new MyComp());
+// Add elements to the tree set
+ts.add("C");
+ts.add("A");
+ts.add("B");
+ts.add("E");
+ts.add("F");
+ts.add("D");
+// Get an iterator
+Iterator i = ts.iterator();
+// Display elements
+while(i.hasNext()) {
+Object element = i.next();
+System.out.print(element + " ");
+}
+System.out.println();
+}
+}
+As the following output shows, the tree is now stored in reverse order:
+F E D C B A
+Look closely at the MyComp class, which implements Comparator and overrides
+compare( ). (As explained earlier, overriding equals( ) is neither necessary nor
+common.) Inside compare( ), the String method compareTo( ) compares the two
+strings. However, bStr—not aStr—invokes compareTo( ). This causes the outcome of
+the comparison to be reversed.
+For a more practical example, the following program is an updated version of
+the TreeMap program shown earlier that stores account balances. In the previous
+version, the accounts were sorted by name, but the sorting began with the first name.
+The following program sorts the accounts by last name. To do so, it uses a comparator
+that compares the last name of each account. This results in the map being sorted by
+last name.
+// Use a comparator to sort accounts by last name.
+import java.util.*;
+// Compare last whole words in two strings.
+class TComp implements Comparator {
+public int compare(Object a, Object b) {
+int i, j, k;
+String aStr, bStr;
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 473
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+aStr = (String) a;
+bStr = (String) b;
+// find index of beginning of last name
+i = aStr.lastIndexOf(' ');
+j = bStr.lastIndexOf(' ');
+k = aStr.substring(i).compareTo(bStr.substring(j));
+if(k==0) // last names match, check entire name
+return aStr.compareTo(bStr);
+else
+return k;
+}
+// no need to override equals
+}
+class TreeMapDemo2 {
+public static void main(String args[]) {
+// Create a tree map
+TreeMap tm = new TreeMap(new TComp());
+// Put elements to the map
+tm.put("John Doe", new Double(3434.34));
+tm.put("Tom Smith", new Double(123.22));
+tm.put("Jane Baker", new Double(1378.00));
+tm.put("Todd Hall", new Double(99.22));
+tm.put("Ralph Smith", new Double(-19.08));
+// Get a set of the entries
+Set set = tm.entrySet();
+// Get an iterator
+Iterator itr = set.iterator();
+// Display elements
+while(itr.hasNext()) {
+Map.Entry me = (Map.Entry)itr.next();
+System.out.print(me.getKey() + ": ");
+System.out.println(me.getValue());
+}
+System.out.println();
+474 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+// Deposit 1000 into John Doe's account
+double balance =  ((Double)tm.get("John Doe")).doubleValue();
+tm.put("John Doe", new Double(balance + 1000));
+System.out.println("John Doe's new balance: " +
+tm.get("John Doe"));
+}
+}
+Here is the output; notice that the accounts are now sorted by last name:
+Jane Baker: 1378.0
+John Doe: 3434.34
+Todd Hall: 99.22
+Ralph Smith: -19.08
+Tom Smith: 123.22
+John Doe’s new balance: 4434.34
+The comparator class TComp compares two strings that hold first and last names.
+It does so by first comparing last names. To do this, it finds the index of the last space
+in each string and then compares the substrings of each element that begin at that
+point. In cases where last names are equivalent, the first names are then compared.
+This yields a tree map that is sorted by last name, and within last name by first name.
+You can see this because Ralph Smith comes before Tom Smith in the output.
+The Collection Algorithms
+The collections framework defines several algorithms that can be applied to collections
+and maps. These algorithms are defined as static methods within the Collections
+class. They are summarized in Table 15-9. Several of the methods can throw a
+ClassCastException, which occurs when an attempt is made to compare incompatible
+types, or an UnsupportedOperationException, which occurs when an attempt is made
+to modify an unmodifiable collection.
+Notice that several methods, such as synchronizedList( ) and synchronizedSet( ),
+are used to obtain synchronized (thread-safe) copies of the various collections. As
+explained, none of the standard collections implementations are synchronized. You
+must use the synchronization algorithms to provide synchronization. One other point:
+iterators to synchronized collections must be used within synchronized blocks.
+The set of methods that begins with unmodifiable returns views of the various
+collections that cannot be modified. These will be useful when you want to grant some
+process read—but not write—capabilities on a collection.
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 475
+476 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static int binarySearch(List list, Object value,
+Comparator c)
+Searches for value in list ordered
+according to c. Returns the
+position of value in list, or −1 if
+value is not found.
+static int binarySearch(List list, Object value) Searches for value in list. The list
+must be sorted. Returns the
+position of value in list, or −1 if
+value is not found.
+static void copy(List list1, List list2) Copies the elements of list2 to list1.
+static Enumeration enumeration(Collection c) Returns an enumeration over c.
+(See “The Enumeration
+Interface,” later in this chapter.)
+static void fill(List list, Object obj) Assigns obj to each element of list.
+static int indexOfSubList(List list,
+List subList)
+Searches list for the first
+occurrence of subList. Returns
+the index of the first match, or –1
+if no match is found. (Added by
+Java 2, v1.4)
+static int lastIndexOfSubList(List list,
+List subList)
+Searches list for the last
+occurrence of subList. Returns
+the index of the last match, or –1
+if no match is found. (Added by
+Java 2, v1.4)
+static ArrayList list(Enumeration enum) Returns an ArrayList that
+contains the elements of enum.
+(Added by Java 2, v1.4)
+static Object max(Collection c,
+Comparator comp)
+Returns the maximum element
+in c as determined by comp.
+static Object max(Collection c) Returns the maximum element
+in c as determined by natural
+ordering. The collection need
+not be sorted.
+Table 15-9. The Algorithms Defined by Collections
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 477
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static Object min(Collection c,
+Comparator comp)
+Returns the minimum element
+in c as determined by comp. The
+collection need not be sorted.
+static Object min(Collection c) Returns the minimum element
+in c as determined by natural
+ordering.
+static List nCopies(int num, Object obj) Returns num copies of obj
+contained in an immutable list.
+num must be greater than or
+equal to zero.
+static boolean replaceAll(List list,
+Object old,
+Object new)
+Replaces all occurrences of old
+with new in list. Returns true if at
+least one replacement occurred.
+Returns false, otherwise. (Added
+by Java 2, v1.4)
+static void reverse(List list) Reverses the sequence in list.
+static Comparator reverseOrder( ) Returns a reverse comparator
+(a comparator that reverses the
+outcome of a comparison
+between two elements).
+static void rotate(List list, int n) Rotates list by n places to
+the right. To rotate left, use a
+negative value for n. (Added
+by Java 2, v1.4)
+static void shuffle(List list, Random r) Shuffles (i.e., randomizes) the
+elements in list by using r as a
+source of random numbers.
+static void shuffle(List list) Shuffles (i.e., randomizes) the
+elements in list.
+static Set singleton(Object obj) Returns obj as an immutable set.
+This is an easy way to convert a
+single object into a set.
+Table 15-9. The Algorithms Defined by Collections (continued)
+478 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static List singletonList(Object obj) Returns obj as an immutable list.
+This is an easy way to convert a
+single object into a list. (Added
+by Java 2, v1.3)
+static Map singletonMap(Object k, Object v) Returns the key/value pair k/v
+as an immutable map. This is an
+easy way to convert a single
+key/value pair into a map.
+(Added by Java 2, v1.3)
+static void sort(List list, Comparator comp) Sorts the elements of list as
+determined by comp.
+static void sort(List list) Sorts the elements of list as
+determined by their natural
+ordering.
+static void swap(List list, int idx1, int idx2) Exchanges the elements in list at
+the indices specified by idx1 and
+idx2. (Added by Java 2, v1.4)
+static Collection
+synchronizedCollection(Collection c)
+Returns a thread-safe collection
+backed by c.
+static List synchronizedList(List list) Returns a thread-safe list backed
+by list.
+static Map synchronizedMap(Map m) Returns a thread-safe map
+backed by m.
+static Set synchronizedSet(Set s) Returns a thread-safe set
+backed by s.
+static SortedMap
+synchronizedSortedMap(SortedMap sm)
+Returns a thread-safe sorted set
+backed by sm.
+static SortedSet
+synchronizedSortedSet(SortedSet ss)
+Returns a thread-safe set
+backed by ss.
+static Collection
+unmodifiableCollection(Collection c)
+Returns an unmodifiable
+collection backed by c.
+static List unmodifiableList(List list) Returns an unmodifiable list
+backed by list.
+Table 15-9. The Algorithms Defined by Collections (continued)
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 479
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Collections defines three static variables: EMPTY_SET, EMPTY_LIST, and
+EMPTY_MAP. All are immutable. EMPTY_MAP was added by Java 2, version 1.3.
+The following program demonstrates some of the algorithms. It creates and
+initializes a linked list. The reverseOrder( ) method returns a Comparator that reverses
+the comparison of Integer objects. The list elements are sorted according to this
+comparator and then are displayed. Next, the list is randomized by calling shuffle( ),
+and then its minimum and maximum values are displayed.
+// Demonstrate various algorithms.
+import java.util.*;
+class AlgorithmsDemo {
+public static void main(String args[]) {
+// Create and initialize linked list
+LinkedList ll = new LinkedList();
+ll.add(new Integer(-8));
+ll.add(new Integer(20));
+ll.add(new Integer(-20));
+ll.add(new Integer(8));
+// Create a reverse order comparator
+Comparator r = Collections.reverseOrder();
+// Sort list by using the comparator
+Collections.sort(ll, r);
+Method Description
+static Map unmodifiableMap(Map m) Returns an unmodifiable map
+backed by m.
+static Set unmodifiableSet(Set s) Returns an unmodifiable set
+backed by s.
+static SortedMap
+unmodifiableSortedMap(SortedMap sm)
+Returns an unmodifiable sorted
+map backed by sm.
+static SortedSet
+unmodifiableSortedSet(SortedSet ss)
+Returns an unmodifiable sorted
+set backed by ss.
+Table 15-9. The Algorithms Defined by Collections (continued)
+// Get iterator
+Iterator li = ll.iterator();
+System.out.print("List sorted in reverse: ");
+while(li.hasNext())
+System.out.print(li.next() + " ");
+System.out.println();
+Collections.shuffle(ll);
+// display randomized list
+li = ll.iterator();
+System.out.print("List shuffled: ");
+while(li.hasNext())
+System.out.print(li.next() + " ");
+System.out.println();
+System.out.println("Minimum: " + Collections.min(ll));
+System.out.println("Maximum: " + Collections.max(ll));
+}
+}
+Output from this program is shown here:
+List sorted in reverse: 20 8 -8 -20
+List shuffled: 20 -20 8 -8
+Minimum: -20
+Maximum: 20
+Notice that min( ) and max( ) operate on the list after it has been shuffled. Neither
+requires a sorted list for its operation.
+Arrays
+The Arrays class provides various methods that are useful when working with arrays.
+Although these methods technically aren’t part of the collections framework, they help
+bridge the gap between collections and arrays. Arrays was added by Java 2. Each
+method defined by Arrays is examined in this section.
+The asList( ) method returns a List that is backed by a specified array. In other words,
+both the list and the array refer to the same location. It has the following signature:
+static List asList(Object[ ] array)
+Here, array is the array that contains the data.
+480 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 481
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The binarySearch( ) method uses a binary search to find a specified value. This
+method must be applied to sorted arrays. It has the following forms:
+static int binarySearch(byte[ ] array, byte value)
+static int binarySearch(char[ ] array, char value)
+static int binarySearch(double[ ] array, double value)
+static int binarySearch(float[ ] array, float value)
+static int binarySearch(int[ ] array, int value)
+static int binarySearch(long[ ] array, long value)
+static int binarySearch(short[ ] array, short value)
+static int binarySearch(Object[ ] array, Object value)
+static int binarySearch(Object[ ] array, Object value, Comparator c)
+Here, array is the array to be searched and value is the value to be located. The last two
+forms throw a ClassCastException if array contains elements that cannot be compared
+(for example, Double and StringBuffer) or if value is not compatible with the types in
+array. In the last form, the Comparator c is used to determine the order of the elements
+in array. In all cases, if value exists in array, the index of the element is returned.
+Otherwise, a negative value is returned.
+The equals( ) method returns true if two arrays are equivalent. Otherwise, it
+returns false. The equals( ) method has the following forms:
+static boolean equals(boolean array1[ ], boolean array2[ ])
+static boolean equals(byte array1[ ], byte array2[ ])
+static boolean equals(char array1[ ], char array2[ ])
+static boolean equals(double array1[ ], double array2[ ])
+static boolean equals(float array1[ ], float array2[ ])
+static boolean equals(int array1[ ], int array2[ ])
+static boolean equals(long array1[ ], long array2[ ])
+static boolean equals(short array1[ ], short array2[ ])
+static boolean equals(Object array1[ ], Object array2[ ])
+Here, array1 and array2 are the two arrays that are compared for equality.
+The fill( ) method assigns a value to all elements in an array. In other words, it fills
+an array with a specified value. The fill( ) method has two versions. The first version,
+which has the following forms, fills an entire array:
+static void fill(boolean array[ ], boolean value)
+static void fill(byte array[ ], byte value)
+static void fill(char array[ ], char value)
+static void fill(double array[ ], double value)
+static void fill(float array[ ], float value)
+static void fill(int array[ ], int value)
+static void fill(long array[ ], long value)
+static void fill(short array[ ], short value)
+static void fill(Object array[ ], Object value)
+Here, value is assigned to all elements in array.
+The second version of the fill( ) method assigns a value to a subset of an array. Its
+forms are shown here:
+static void fill(boolean array[ ], int start, int end, boolean value)
+static void fill(byte array[ ], int start, int end, byte value)
+static void fill(char array[ ], int start, int end, char value)
+static void fill(double array[ ], int start, int end, double value)
+static void fill(float array[ ], int start, int end, float value)
+static void fill(int array[ ], int start, int end, int value)
+static void fill(long array[ ], int start, int end, long value)
+static void fill(short array[ ], int start, int end, short value)
+static void fill(Object array[ ], int start, int end, Object value)
+Here, value is assigned to the elements in array from position start to position end–1.
+These methods may all throw an IllegalArgumentException if start is greater than end,
+or an ArrayIndexOutOfBoundsException if start or end is out of bounds.
+The sort( ) method sorts an array so that it is arranged in ascending order. The
+sort( ) method has two versions. The first version, shown here, sorts the entire array:
+static void sort(byte array[ ])
+static void sort(char array[ ])
+static void sort(double array[ ])
+static void sort(float array[ ])
+static void sort(int array[ ])
+static void sort(long array[ ])
+static void sort(short array[ ])
+static void sort(Object array[ ])
+static void sort(Object array[ ], Comparator c)
+Here, array is the array to be sorted. In the last form, c is a Comparator that is used to
+order the elements of array. The forms that sort arrays of Object can also throw a
+ClassCastException if elements of the array being sorted are not comparable.
+The second version of sort( ) enables you to specify a range within an array that
+you want to sort. Its forms are shown here:
+static void sort(byte array[ ], int start, int end)
+static void sort(char array[ ], int start, int end)
+static void sort(double array[ ], int start, int end)
+static void sort(float array[ ], int start, int end)
+static void sort(int array[ ], int start, int end)
+static void sort(long array[ ], int start, int end)
+static void sort(short array[ ], int start, int end)
+static void sort(Object array[ ], int start, int end)
+static void sort(Object array[ ], int start, int end, Comparator c)
+Here, the range beginning at start and running through end–1 within array will be
+sorted. In the last form, c is a Comparator that is used to order the elements of array.
+482 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+All of these methods can throw an IllegalArgumentException if start is greater than
+end, or an ArrayIndexOutOfBoundsException if start or end is out of bounds. The last
+two forms can also throw a ClassCastException if elements of the array being sorted
+are not comparable.
+The following program illustrates how to use some of the methods of the Arrays class:
+// Demonstrate Arrays
+import java.util.*;
+class ArraysDemo {
+public static void main(String args[]) {
+// allocate and initialize array
+int array[] = new int[10];
+for(int i = 0; i < 10; i++)
+array[i] = -3 * i;
+// display, sort, display
+System.out.print("Original contents: ");
+display(array);
+Arrays.sort(array);
+System.out.print("Sorted: ");
+display(array);
+// fill and display
+Arrays.fill(array, 2, 6, -1);
+System.out.print("After fill(): ");
+display(array);
+// sort and display
+Arrays.sort(array);
+System.out.print("After sorting again: ");
+display(array);
+// binary search for -9
+System.out.print("The value -9 is at location ");
+int index =
+Arrays.binarySearch(array, -9);
+System.out.println(index);
+}
+static void display(int array[]) {
+for(int i = 0; i < array.length; i++)
+System.out.print(array[i] + " ");
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 483
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+484 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+System.out.println("");
+}
+}
+The following is the output from this program:
+Original contents: 0 -3 -6 -9 -12 -15 -18 -21 -24 -27
+Sorted: -27 -24 -21 -18 -15 -12 -9 -6 -3 0
+After fill(): -27 -24 -1 -1 -1 -1 -9 -6 -3 0
+After sorting again: -27 -24 -9 -6 -3 -1 -1 -1 -1 0
+The value -9 is at location 2
+The Legacy Classes and Interfaces
+As explained at the start of this chapter, the original version of java.util did not include
+the collections framework. Instead, it defined several classes and an interface that
+provided an ad hoc method of storing objects. With the addition of collections by Java
+2, several of the original classes were reengineered to support the collection interfaces.
+Thus, they are fully compatible with the framework. While no classes have actually
+been deprecated, one has been rendered obsolete. Of course, where a collection
+duplicates the functionality of a legacy class, you will usually want to use the collection
+for new code. In general, the legacy classes are supported because there is still code
+that uses them.
+One other point: None of the collection classes are synchronized, but all the legacy
+classes are synchronized. This distinction may be important in some situations. Of
+course, you can easily synchronize collections, too, by using one of the algorithms
+provided by Collections.
+The legacy classes defined by java.util are shown here:
+Dictionary Hashtable Properties Stack Vector
+There is one legacy interface called Enumeration. The following sections examine
+Enumeration and each of the legacy classes, in turn.
+The Enumeration Interface
+The Enumeration interface defines the methods by which you can enumerate (obtain
+one at a time) the elements in a collection of objects. This legacy interface has been
+superceded by Iterator. Although not deprecated, Enumeration is considered obsolete
+for new code. However, it is used by several methods defined by the legacy classes
+(such as Vector and Properties), is used by several other API classes, and is currently
+in widespread use in application code.
+Enumeration specifies the following two methods:
+boolean hasMoreElements( )
+Object nextElement( )
+When implemented, hasMoreElements( ) must return true while there are still
+more elements to extract, and false when all the elements have been enumerated.
+nextElement( ) returns the next object in the enumeration as a generic Object reference.
+That is, each call to nextElement( ) obtains the next object in the enumeration. The
+calling routine must cast that object into the object type held in the enumeration.
+Vector
+Vector implements a dynamic array. It is similar to ArrayList, but with two differences:
+Vector is synchronized, and it contains many legacy methods that are not part of
+the collections framework. With the release of Java 2, Vector was reengineered to
+extend AbstractList and implement the List interface, so it now is fully compatible
+with collections.
+Here are the Vector constructors:
+Vector( )
+Vector(int size)
+Vector(int size, int incr)
+Vector(Collection c)
+The first form creates a default vector, which has an initial size of 10. The second form
+creates a vector whose initial capacity is specified by size. The third form creates a
+vector whose initial capacity is specified by size and whose increment is specified by
+incr. The increment specifies the number of elements to allocate each time that a vector
+is resized upward. The fourth form creates a vector that contains the elements of
+collection c. This constructor was added by Java 2.
+All vectors start with an initial capacity. After this initial capacity is reached, the
+next time that you attempt to store an object in the vector, the vector automatically
+allocates space for that object plus extra room for additional objects. By allocating more
+than just the required memory, the vector reduces the number of allocations that must
+take place. This reduction is important, because allocations are costly in terms of time.
+The amount of extra space allocated during each reallocation is determined by the
+increment that you specify when you create the vector. If you don’t specify an
+increment, the vector’s size is doubled by each allocation cycle.
+Vector defines these protected data members:
+int capacityIncrement;
+int elementCount;
+Object elementData[ ];
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 485
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The increment value is stored in capacityIncrement. The number of elements currently
+in the vector is stored in elementCount. The array that holds the vector is stored in
+elementData.
+In addition to the collections methods defined by List, Vector defines several legacy
+methods, which are shown in Table 15-10.
+486 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void addElement(Object element) The object specified by element is
+added to the vector.
+int capacity( ) Returns the capacity of the vector.
+Object clone( ) Returns a duplicate of the
+invoking vector.
+boolean contains(Object element) Returns true if element is
+contained by the vector, and
+returns false if it is not.
+void copyInto(Object array[ ]) The elements contained in the
+invoking vector are copied into
+the array specified by array.
+Object elementAt(int index) Returns the element at the
+location specified by index.
+Enumeration elements( ) Returns an enumeration of the
+elements in the vector.
+void ensureCapacity(int size) Sets the minimum capacity of the
+vector to size.
+Object firstElement( ) Returns the first element in
+the vector.
+int indexOf(Object element) Returns the index of the first
+occurrence of element. If the object
+is not in the vector, –1 is returned.
+int indexOf(Object element, int start) Returns the index of the first
+occurrence of element at or after
+start. If the object is not in that
+portion of the vector, –1 is
+returned.
+Table 15-10. The Methods Defined by Vector
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 487
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void insertElementAt(Object element,
+int index)
+Adds element to the vector at the
+location specified by index.
+boolean isEmpty( ) Returns true if the vector is empty
+and returns false if it contains one
+or more elements.
+Object lastElement( ) Returns the last element in the
+vector.
+int lastIndexOf(Object element) Returns the index of the last
+occurrence of element. If the object
+is not in the vector, –1 is returned.
+int lastIndexOf(Object element,
+int start)
+Returns the index of the last
+occurrence of element before start.
+If the object is not in that portion
+of the vector, –1 is returned.
+void removeAllElements( ) Empties the vector. After this
+method executes, the size of the
+vector is zero.
+boolean removeElement(Object element) Removes element from the vector.
+If more than one instance of the
+specified object exists in the
+vector, then it is the first one that
+is removed. Returns true if
+successful and false if the object is
+not found.
+void removeElementAt(int index) Removes the element at the
+location specified by index.
+void setElementAt(Object element,
+int index)
+The location specified by index is
+assigned element.
+void setSize(int size) Sets the number of elements in the
+vector to size. If the new size is
+less than the old size, elements are
+lost. If the new size is larger than
+the old size, null elements are
+added.
+Table 15-10. The Methods Defined by Vector (continued)
+488 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Because Vector implements List, you can use a vector just like you use an ArrayList
+instance. You can also manipulate one using its legacy methods. For example, after you
+instantiate a Vector, you can add an element to it by calling addElement( ). To obtain
+the element at a specific location, call elementAt( ). To obtain the first element in the
+vector, call firstElement( ). To retrieve the last element, call lastElement( ). You can
+obtain the index of an element by using indexOf( ) and lastIndexOf( ). To remove an
+element, call removeElement( ) or removeElementAt( ).
+The following program uses a vector to store various types of numeric objects. It
+demonstrates several of the legacy methods defined by Vector. It also demonstrates the
+Enumeration interface.
+// Demonstrate various Vector operations.
+import java.util.*;
+class VectorDemo {
+public static void main(String args[]) {
+// initial size is 3, increment is 2
+Vector v = new Vector(3, 2);
+System.out.println("Initial size: " + v.size());
+System.out.println("Initial capacity: " +
+v.capacity());
+Method Description
+int size( ) Returns the number of elements
+currently in the vector.
+String toString( ) Returns the string equivalent of
+the vector.
+void trimToSize( ) Sets the vector’s capacity equal to
+the number of elements that it
+currently holds.
+Table 15-10. The Methods Defined by Vector (continued)
+v.addElement(new Integer(1));
+v.addElement(new Integer(2));
+v.addElement(new Integer(3));
+v.addElement(new Integer(4));
+System.out.println("Capacity after four additions: " +
+v.capacity());
+v.addElement(new Double(5.45));
+System.out.println("Current capacity: " +
+v.capacity());
+v.addElement(new Double(6.08));
+v.addElement(new Integer(7));
+System.out.println("Current capacity: " +
+v.capacity());
+v.addElement(new Float(9.4));
+v.addElement(new Integer(10));
+System.out.println("Current capacity: " +
+v.capacity());
+v.addElement(new Integer(11));
+v.addElement(new Integer(12));
+System.out.println("First element: " +
+(Integer)v.firstElement());
+System.out.println("Last element: " +
+(Integer)v.lastElement());
+if(v.contains(new Integer(3)))
+System.out.println("Vector contains 3.");
+// enumerate the elements in the vector.
+Enumeration vEnum = v.elements();
+System.out.println("\nElements in vector:");
+while(vEnum.hasMoreElements())
+System.out.print(vEnum.nextElement() + " ");
+System.out.println();
+}
+}
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 489
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The output from this program is shown here:
+Initial size: 0
+Initial capacity: 3
+Capacity after four additions: 5
+Current capacity: 5
+Current capacity: 7
+Current capacity: 9
+First element: 1
+Last element: 12
+Vector contains 3.
+Elements in vector:
+1 2 3 4 5.45 6.08 7 9.4 10 11 12
+With the release of Java 2, Vector added support for iterators. Instead of relying on
+an enumeration to cycle through the objects (as the preceding program does), you now
+can use an iterator. For example, the following iterator-based code can be substituted
+into the program:
+// use an iterator to display contents
+Iterator vItr = v.iterator();
+System.out.println("\nElements in vector:");
+while(vItr.hasNext())
+System.out.print(vItr.next() + " ");
+System.out.println();
+Because enumerations are not recommended for new code, you will usually use an
+iterator to enumerate the contents of a vector. Of course, much legacy code exists that
+employs enumerations. Fortunately, enumerations and iterators work in nearly the
+same manner.
+Stack
+Stack is a subclass of Vector that implements a standard last-in, first-out stack. Stack
+only defines the default constructor, which creates an empty stack. Stack includes all
+the methods defined by Vector, and adds several of its own, shown in Table 15-11.
+To put an object on the top of the stack, call push( ). To remove and return the top
+element, call pop( ). An EmptyStackException is thrown if you call pop( ) when the
+invoking stack is empty. You can use peek( ) to return, but not remove, the top object.
+The empty( ) method returns true if nothing is on the stack. The search( ) method
+determines whether an object exists on the stack, and returns the number of pops that
+490 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+are required to bring it to the top of the stack. Here is an example that creates a stack,
+pushes several Integer objects onto it, and then pops them off again:
+// Demonstrate the Stack class.
+import java.util.*;
+class StackDemo {
+static void showpush(Stack st, int a) {
+st.push(new Integer(a));
+System.out.println("push(" + a + ")");
+System.out.println("stack: " + st);
+}
+static void showpop(Stack st) {
+System.out.print("pop -> ");
+Integer a = (Integer) st.pop();
+System.out.println(a);
+System.out.println("stack: " + st);
+}
+public static void main(String args[]) {
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 491
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+boolean empty( ) Returns true if the stack is empty, and returns false
+if the stack contains elements.
+Object peek( ) Returns the element on the top of the stack, but
+does not remove it.
+Object pop( ) Returns the element on the top of the stack,
+removing it in the process.
+Object push(Object element) Pushes element onto the stack. element is also
+returned.
+int search(Object element) Searches for element in the stack. If found, its offset
+from the top of the stack is returned. Otherwise, –1
+is returned.
+Table 15-11. The Methods Defined by Stack
+Stack st = new Stack();
+System.out.println("stack: " + st);
+showpush(st, 42);
+showpush(st, 66);
+showpush(st, 99);
+showpop(st);
+showpop(st);
+showpop(st);
+try {
+showpop(st);
+} catch (EmptyStackException e) {
+System.out.println("empty stack");
+}
+}
+}
+The following is the output produced by the program; notice how the exception
+handler for EmptyStackException is caught so that you can gracefully handle a
+stack underflow:
+stack: [ ]
+push(42)
+stack: [42]
+push(66)
+stack: [42, 66]
+push(99)
+stack: [42, 66, 99]
+pop -> 99
+stack: [42, 66]
+pop -> 66
+stack: [42]
+pop -> 42
+stack: [ ]
+pop -> empty stack
+Dictionary
+Dictionary is an abstract class that represents a key/value storage repository and
+operates much like Map. Given a key and value, you can store the value in a Dictionary
+492 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+object. Once the value is stored, you can retrieve it by using its key. Thus, like a map,
+a dictionary can be thought of as a list of key/value pairs. Although not actually
+deprecated by Java 2, Dictionary is classified as obsolete, because it is superceded by
+Map. However, Dictionary is still in use and thus is fully discussed here.
+The abstract methods defined by Dictionary are listed in Table 15-12.
+To add a key and a value, use the put( ) method. Use get( ) to retrieve the value of a
+given key. The keys and values can each be returned as an Enumeration by the keys( )
+and elements( ) methods, respectively. The size( ) method returns the number of key/
+value pairs stored in a dictionary, and isEmpty( ) returns true when the dictionary is
+empty. You can use the remove( ) method to delete a key/value pair.
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 493
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Purpose
+Enumeration elements( ) Returns an enumeration of the values
+contained in the dictionary.
+Object get(Object key) Returns the object that contains the value
+associated with key. If key is not in the
+dictionary, a null object is returned.
+boolean isEmpty( ) Returns true if the dictionary is empty, and
+returns false if it contains at least one key.
+Enumeration keys( ) Returns an enumeration of the keys
+contained in the dictionary.
+Object put(Object key, Object value) Inserts a key and its value into the
+dictionary. Returns null if key is not already
+in the dictionary; returns the previous
+value associated with key if key is already
+in the dictionary.
+Object remove(Object key) Removes key and its value. Returns the
+value associated with key. If key is not in
+the dictionary, a null is returned.
+int size( ) Returns the number of entries in the
+dictionary.
+Table 15-12. The Abstract Methods Defined by Dictionary
+The Dictionary class is obsolete. You should implement the Map interface to obtain
+key/value storage functionality.
+Hashtable
+Hashtable was part of the original java.util and is a concrete implementation of a
+Dictionary. However, Java 2 reengineered Hashtable so that it also implements the
+Map interface. Thus, Hashtable is now integrated into the collections framework. It is
+similar to HashMap, but is synchronized.
+Like HashMap, Hashtable stores key/value pairs in a hash table. When using a
+Hashtable, you specify an object that is used as a key, and the value that you want
+linked to that key. The key is then hashed, and the resulting hash code is used as the
+index at which the value is stored within the table.
+A hash table can only store objects that override the hashCode( ) and equals( )
+methods that are defined by Object. The hashCode( ) method must compute and
+return the hash code for the object. Of course, equals( ) compares two objects.
+Fortunately, many of Java’s built-in classes already implement the hashCode( )
+method. For example, the most common type of Hashtable uses a String object as
+the key. String implements both hashCode( ) and equals( ).
+The Hashtable constructors are shown here:
+Hashtable( )
+Hashtable(int size)
+Hashtable(int size, float fillRatio)
+Hashtable(Map m)
+The first version is the default constructor. The second version creates a hash table that
+has an initial size specified by size. The third version creates a hash table that has an
+initial size specified by size and a fill ratio specified by fillRatio. This ratio must be
+between 0.0 and 1.0, and it determines how full the hash table can be before it is resized
+upward. Specifically, when the number of elements is greater than the capacity of the
+hash table multiplied by its fill ratio, the hash table is expanded. If you do not specify
+a fill ratio, then 0.75 is used. Finally, the fourth version creates a hash table that is
+initialized with the elements in m. The capacity of the hash table is set to twice the
+number of elements in m. The default load factor of 0.75 is used. The fourth constructor
+was added by Java 2.
+In addition to the methods defined by the Map interface, which Hashtable now
+implements, Hashtable defines the legacy methods listed in Table 15-13.
+494 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 495
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void clear( ) Resets and empties the hash table.
+Object clone( ) Returns a duplicate of the invoking object.
+boolean contains(Object value) Returns true if some value equal to value
+exists within the hash table. Returns false
+if the value isn’t found.
+boolean containsKey(Object key) Returns true if some key equal to key
+exists within the hash table. Returns false
+if the key isn’t found.
+boolean containsValue(Object value) Returns true if some value equal to value
+exists within the hash table. Returns false
+if the value isn’t found. (A non-Map
+method added by Java 2, for consistency.)
+Enumeration elements( ) Returns an enumeration of the values
+contained in the hash table.
+Object get(Object key) Returns the object that contains the value
+associated with key. If key is not in the
+hash table, a null object is returned.
+boolean isEmpty( ) Returns true if the hash table is empty;
+returns false if it contains at least one key.
+Enumeration keys( ) Returns an enumeration of the keys
+contained in the hash table.
+Object put(Object key, Object value) Inserts a key and a value into the hash
+table. Returns null if key isn’t already in
+the hash table; returns the previous value
+associated with key if key is already in the
+hash table.
+void rehash( ) Increases the size of the hash table and
+rehashes all of its keys.
+Table 15-13. The Legacy Methods Defined by Hashtable
+496 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The following example reworks the bank account program, shown earlier, so that it
+uses a Hashtable to store the names of bank depositors and their current balances:
+// Demonstrate a Hashtable
+import java.util.*;
+class HTDemo {
+public static void main(String args[]) {
+Hashtable balance = new Hashtable();
+Enumeration names;
+String str;
+double bal;
+balance.put("John Doe", new Double(3434.34));
+balance.put("Tom Smith", new Double(123.22));
+balance.put("Jane Baker", new Double(1378.00));
+balance.put("Todd Hall", new Double(99.22));
+balance.put("Ralph Smith", new Double(-19.08));
+// Show all balances in hash table.
+names = balance.keys();
+while(names.hasMoreElements()) {
+str = (String) names.nextElement();
+System.out.println(str + ": " +
+balance.get(str));
+}
+System.out.println();
+Method Description
+Object remove(Object key) Removes key and its value. Returns the
+value associated with key. If key is not in
+the hash table, a null object is returned.
+int size( ) Returns the number of entries in the
+hash table.
+String toString( ) Returns the string equivalent of a
+hash table.
+Table 15-13. The Legacy Methods Defined by Hashtable (continued)
+// Deposit 1,000 into John Doe's account
+bal = ((Double)balance.get("John Doe")).doubleValue();
+balance.put("John Doe", new Double(bal+1000));
+System.out.println("John Doe's new balance: " +
+balance.get("John Doe"));
+}
+}
+The output from this program is shown here:
+Todd Hall: 99.22
+Ralph Smith: -19.08
+John Doe: 3434.34
+Jane Baker: 1378.0
+Tom Smith: 123.22
+John Doe’s new balance: 4434.34
+One important point: like the map classes, Hashtable does not directly support
+iterators. Thus, the preceding program uses an enumeration to display the contents
+of balance. However, you can obtain set-views of the hash table, which permits the
+use of iterators. To do so, you simply use one of the collection-view methods defined
+by Map, such as entrySet( ) or keySet( ). For example, you can obtain a set-view of the
+keys and iterate through them. Here is a reworked version of the program that shows
+this technique:
+// Use iterators with a Hashtable.
+import java.util.*;
+class HTDemo2 {
+public static void main(String args[]) {
+Hashtable balance = new Hashtable();
+String str;
+double bal;
+balance.put("John Doe", new Double(3434.34));
+balance.put("Tom Smith", new Double(123.22));
+balance.put("Jane Baker", new Double(1378.00));
+balance.put("Todd Hall", new Double(99.22));
+balance.put("Ralph Smith", new Double(-19.08));
+// show all balances in hashtable
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 497
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Set set = balance.keySet(); // get set-view of keys
+// get iterator
+Iterator itr = set.iterator();
+while(itr.hasNext()) {
+str = (String) itr.next();
+System.out.println(str + ": " +
+balance.get(str));
+}
+System.out.println();
+// Deposit 1,000 into John Doe's account
+bal = ((Double)balance.get("John Doe")).doubleValue();
+balance.put("John Doe", new Double(bal+1000));
+System.out.println("John Doe's new balance: " +
+balance.get("John Doe"));
+}
+}
+Properties
+Properties is a subclass of Hashtable. It is used to maintain lists of values in which the
+key is a String and the value is also a String. The Properties class is used by many other
+Java classes. For example, it is the type of object returned by System.getProperties( )
+when obtaining environmental values.
+Properties defines the following instance variable:
+Properties defaults;
+This variable holds a default property list associated with a Properties object.
+Properties defines these constructors:
+Properties( )
+Properties(Properties propDefault)
+The first version creates a Properties object that has no default values. The second
+creates an object that uses propDefault for its default values. In both cases, the property
+list is empty.
+In addition to the methods that Properties inherits from Hashtable, Properties
+defines the methods listed in Table 15-14. Properties also contains one deprecated
+method: save( ). This was replaced by store( ) because save( ) did not handle errors
+correctly.
+498 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+One useful capability of the Properties class is that you can specify a default
+property that will be returned if no value is associated with a certain key. For example,
+a default value can be specified along with the key in the getProperty( ) method—such
+as getProperty(“name”, “default value”). If the “name” value is not found, then
+“default value” is returned. When you construct a Properties object, you can pass
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 499
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+String getProperty(String key) Returns the value associated with
+key. A null object is returned if key
+is neither in the list nor in the
+default property list.
+String getProperty(String key,
+String defaultProperty)
+Returns the value associated with
+key. defaultProperty is returned if key
+is neither in the list nor in the
+default property list.
+void list(PrintStream streamOut) Sends the property list to the
+output stream linked to streamOut.
+void list(PrintWriter streamOut) Sends the property list to the
+output stream linked to streamOut.
+void load(InputStream streamIn)
+throws IOException
+Inputs a property list from the
+input stream linked to streamIn.
+Enumeration propertyNames( ) Returns an enumeration of the
+keys. This includes those keys
+found in the default property
+list, too.
+Object setProperty(String key, String value) Associates value with key. Returns
+the previous value associated with
+key, or returns null if no such
+association exists. (Added by Java 2,
+for consistency.)
+void store(OutputStream streamOut,
+String description)
+After writing the string specified
+by description, the property list is
+written to the output stream linked
+to streamOut. (Added by Java 2.)
+Table 15-14. The Legacy Methods Defined by Properties
+another instance of Properties to be used as the default properties for the new instance.
+In this case, if you call getProperty(“foo”) on a given Properties object, and “foo” does
+not exist, Java looks for “foo” in the default Properties object. This allows for arbitrary
+nesting of levels of default properties.
+The following example demonstrates Properties. It creates a property list in which
+the keys are the names of states and the values are the names of their capitals. Notice
+that the attempt to find the capital for Florida includes a default value.
+// Demonstrate a Property list.
+import java.util.*;
+class PropDemo {
+public static void main(String args[]) {
+Properties capitals = new Properties();
+Set states;
+String str;
+capitals.put("Illinois", "Springfield");
+capitals.put("Missouri", "Jefferson City");
+capitals.put("Washington", "Olympia");
+capitals.put("California", "Sacramento");
+capitals.put("Indiana", "Indianapolis");
+// Show all states and capitals in hashtable.
+states = capitals.keySet(); // get set-view of keys
+Iterator itr = states.iterator();
+while(itr.hasNext()) {
+str = (String) itr.next();
+System.out.println("The capital of " +
+str + " is " +
+capitals.getProperty(str)
++ ".");
+}
+System.out.println();
+// look for state not in list -- specify default
+str = capitals.getProperty("Florida", "Not Found");
+System.out.println("The capital of Florida is "
++ str + ".");
+}
+}
+500 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 501
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The output from this program is shown here:
+The capital of Missouri is Jefferson City.
+The capital of Illinois is Springfield.
+The capital of Indiana is Indianapolis.
+The capital of California is Sacramento.
+The capital of Washington is Olympia.
+The capital of Florida is Not Found.
+Since Florida is not in the list, the default value is used.
+Although it is perfectly valid to use a default value when you call getProperty( ), as
+the preceding example shows, there is a better way of handling default values for most
+applications of property lists. For greater flexibility, specify a default property list
+when constructing a Properties object. The default list will be searched if the desired
+key is not found in the main list. For example, the following is a slightly reworked
+version of the preceding program, with a default list of states specified. Now, when
+Florida is sought, it will be found in the default list:
+// Use a default property list.
+import java.util.*;
+class PropDemoDef {
+public static void main(String args[]) {
+Properties defList = new Properties();
+defList.put("Florida", "Tallahassee");
+defList.put("Wisconsin", "Madison");
+Properties capitals = new Properties(defList);
+Set states;
+String str;
+capitals.put("Illinois", "Springfield");
+capitals.put("Missouri", "Jefferson City");
+capitals.put("Washington", "Olympia");
+capitals.put("California", "Sacramento");
+capitals.put("Indiana", "Indianapolis");
+// Show all states and capitals in hashtable.
+states = capitals.keySet(); // get set-view of keys
+Iterator itr = states.iterator();
+while(itr.hasNext()) {
+str = (String) itr.next();
+System.out.println("The capital of " +
+str + " is " +
+capitals.getProperty(str)
++ ".");
+}
+System.out.println();
+// Florida will now be found in the default list.
+str = capitals.getProperty("Florida");
+System.out.println("The capital of Florida is "
++ str + ".");
+}
+}
+Using store( ) and load( )
+One of the most useful aspects of Properties is that the information contained in a
+Properties object can be easily stored to or loaded from disk with the store( ) and
+load( ) methods. At any time, you can write a Properties object to a stream or read
+it back. This makes property lists especially convenient for implementing simple
+databases. For example, the following program uses a property list to create a simple
+computerized telephone book that stores names and phone numbers. To find a
+person’s number, you enter his or her name. The program uses the store( ) and load( )
+methods to store and retrieve the list. When the program executes, it first tries to load
+the list from a file called phonebook.dat. If this file exists, the list is loaded. You can
+then add to the list. If you do, the new list is saved when you terminate the program.
+Notice how little code is required to implement a small, but functional, computerized
+phone book.
+/* A simple telephone number database that uses
+a property list. */
+import java.io.*;
+import java.util.*;
+class Phonebook {
+public static void main(String args[])
+throws IOException
+{
+Properties ht = new Properties();
+BufferedReader br =
+502 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+new BufferedReader(new InputStreamReader(System.in));
+String name, number;
+FileInputStream fin = null;
+boolean changed = false;
+// Try to open phonebook.dat file.
+try {
+fin = new FileInputStream("phonebook.dat");
+} catch(FileNotFoundException e) {
+// ignore missing file
+}
+/* If phonebook file already exists,
+load existing telephone numbers. */
+try {
+if(fin != null) {
+ht.load(fin);
+fin.close();
+}
+} catch(IOException e) {
+System.out.println("Error reading file.");
+}
+// Let user enter new names and numbers.
+do {
+System.out.println("Enter new name" +
+" ('quit' to stop): ");
+name = br.readLine();
+if(name.equals("quit")) continue;
+System.out.println("Enter number: ");
+number = br.readLine();
+ht.put(name, number);
+changed = true;
+} while(!name.equals("quit"));
+// If phone book data has changed, save it.
+if(changed) {
+FileOutputStream fout = new FileOutputStream("phonebook.dat");
+ht.store(fout, "Telephone Book");
+C h a p t e r 1 5 : j a v a . u t i l P a r t 1 : T h e C o l l e c t i o n s F r a m e w o r k 503
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+fout.close();
+}
+// Look up numbers given a name.
+do {
+System.out.println("Enter name to find" +
+" ('quit' to quit): ");
+name = br.readLine();
+if(name.equals("quit")) continue;
+number = (String) ht.get(name);
+System.out.println(number);
+} while(!name.equals("quit"));
+}
+}
+Collections Summary
+The collections framework gives you, the programmer, a powerful set of well-engineered
+solutions to some of programming’s most common tasks. Consider using a collection the
+next time that you need to store and retrieve information. Remember, collections need
+not be reserved for only the “large jobs,” such as corporate databases, mailing lists, or
+inventory systems. They are also effective when applied to smaller jobs. For example, a
+TreeMap would make an excellent collection to hold the directory structure of a set of
+files. A TreeSet could be quite useful for storing project-management information.
+Frankly, the types of problems that will benefit from a collections-based solution are
+limited only by your imagination.
+504 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 16
+java.util Part 2: More
+Utility Classes
+505

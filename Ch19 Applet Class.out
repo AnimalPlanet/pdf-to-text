@@ -1,0 +1,968 @@
+Chapter 19
+The Applet Class
+627
+This chapter examines the Applet class, which provides the necessary support forapplets. In Chapter 12, you were introduced to the general form of an applet andthe steps necessary to compile and run one. In this chapter, we will look at
+applets in detail.
+The Applet class is contained in the java.applet package. Applet contains several
+methods that give you detailed control over the execution of your applet. In addition,
+java.applet also defines three interfaces: AppletContext, AudioClip, and AppletStub.
+Let’s begin by reviewing the basic elements of an applet and the steps necessary to
+create and test one.
+Applet Basics
+All applets are subclasses of Applet. Thus, all applets must import java.applet. Applets
+must also import java.awt. Recall that AWT stands for the Abstract Window Toolkit.
+Since all applets run in a window, it is necessary to include support for that window.
+Applets are not executed by the console-based Java run-time interpreter. Rather, they
+are executed by either a Web browser or an applet viewer. The figures shown in this
+chapter were created with the standard applet viewer, called appletviewer, provided
+by the SDK. But you can use any applet viewer or browser you like.
+Execution of an applet does not begin at main( ). Actually, few applets even have
+main( ) methods. Instead, execution of an applet is started and controlled with an
+entirely different mechanism, which will be explained shortly. Output to your applet’s
+window is not performed by System.out.println( ). Rather, it is handled with various
+AWT methods, such as drawString( ), which outputs a string to a specified X,Y
+location. Input is also handled differently than in an application.
+Once an applet has been compiled, it is included in an HTML file using the
+APPLET tag. The applet will be executed by a Java-enabled web browser when it
+encounters the APPLET tag within the HTML file. To view and test an applet more
+conveniently, simply include a comment at the head of your Java source code file that
+contains the APPLET tag. This way, your code is documented with the necessary
+HTML statements needed by your applet, and you can test the compiled applet by
+starting the applet viewer with your Java source code file specified as the target. Here
+is an example of such a comment:
+/*
+<applet code="MyApplet" width=200 height=60>
+</applet>
+*/
+This comment contains an APPLET tag that will run an applet called MyApplet in a
+window that is 200 pixels wide and 60 pixels high. Since the inclusion of an APPLET
+628 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+command makes testing applets easier, all of the applets shown in this book will
+contain the appropriate APPLET tag embedded in a comment.
+The Applet Class
+The Applet class defines the methods shown in Table 19-1. Applet provides all
+necessary support for applet execution, such as starting and stopping. It also provides
+methods that load and display images, and methods that load and play audio clips.
+Applet extends the AWT class Panel. In turn, Panel extends Container, which extends
+Component. These classes provide support for Java’s window-based, graphical
+interface. Thus, Applet provides all of the necessary support for window-based
+activities. (The AWT is described in detail in following chapters.)
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 629
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+YMethod Description
+void destroy( ) Called by the browser just before
+an applet is terminated. Your
+applet will override this method if it
+needs to perform any cleanup prior to
+its destruction.
+AccessibleContext
+getAccessibleContext( )
+Returns the accessibilty context for the
+invoking object.
+AppletContext getAppletContext( ) Returns the context associated with
+the applet.
+String getAppletInfo( ) Returns a string that describes
+the applet.
+AudioClip getAudioClip(URL url) Returns an AudioClip object that
+encapsulates the audio clip found at the
+location specified by url.
+AudioClip getAudioClip(URL url,
+String clipName)
+Returns an AudioClip object that
+encapsulates the audio clip found at the
+location specified by url and having the
+name specified by clipName.
+URL getCodeBase( ) Returns the URL associated with the
+invoking applet.
+URL getDocumentBase( ) Returns the URL of the HTML
+document that invokes the applet.
+Table 19-1. The Methods Defined by Applet
+630 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+Image getImage(URL url) Returns an Image object that
+encapsulates the image found at the
+location specified by url.
+Image getImage(URL url,
+String imageName)
+Returns an Image object that
+encapsulates the image found at the
+location specified by url and having the
+name specified by imageName.
+Locale getLocale( ) Returns a Locale object that is used
+by various locale-sensitive classes
+and methods.
+String getParameter(String paramName) Returns the parameter associated with
+paramName. null is returned if the
+specified parameter is not found.
+String[ ] [ ] getParameterInfo( ) Returns a String table that describes
+the parameters recognized by the
+applet. Each entry in the table must
+consist of three strings that contain the
+name of the parameter, a description of
+its type and/or range, and an
+explanation of its purpose.
+void init( ) Called when an applet begins
+execution. It is the first method called
+for any applet.
+boolean isActive( ) Returns true if the applet has been
+started. It returns false if the applet has
+been stopped.
+static final AudioClip
+newAudioClip(URL url)
+Returns an AudioClip object that
+encapsulates the audio clip found at the
+location specified by url. This method is
+similar to getAudioClip( ) except that it
+is static and can be executed without
+the need for an Applet object. (Added
+by Java 2)
+Table 19-1. The Methods Defined by Applet (continued)
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 631
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void play(URL url) If an audio clip is found at the location
+specified by url, the clip is played.
+void play(URL url, String clipName) If an audio clip is found at the location
+specified by url with the name specified
+by clipName, the clip is played.
+void resize(Dimension dim) Resizes the applet according to the
+dimensions specified by dim.
+Dimension is a class stored inside
+java.awt. It contains two integer fields:
+width and height.
+void resize(int width, int height) Resizes the applet according to
+the dimensions specified by width
+and height.
+final void setStub(AppletStub stubObj) Makes stubObj the stub for the applet.
+This method is used by the run-time
+system and is not usually called by
+your applet. A stub is a small piece of
+code that provides the linkage between
+your applet and the browser.
+void showStatus(String str) Displays str in the status window of the
+browser or applet viewer. If the
+browser does not support a status
+window, then no action takes place.
+void start( ) Called by the browser when an applet
+should start (or resume) execution. It is
+automatically called after init( ) when
+an applet first begins.
+void stop( ) Called by the browser to suspend
+execution of the applet. Once stopped,
+an applet is restarted when the browser
+calls start( ).
+Table 19-1. The Methods Defined by Applet (continued)
+Applet Architecture
+An applet is a window-based program. As such, its architecture is different from the
+so-called normal, console-based programs shown in the first part of this book. If you
+are familiar with Windows programming, you will be right at home writing applets.
+If not, then there are a few key concepts you must understand.
+First, applets are event driven. Although we won’t examine event handling until
+the following chapter, it is important to understand in a general way how the
+event-driven architecture impacts the design of an applet. An applet resembles a set
+of interrupt service routines. Here is how the process works. An applet waits until an
+event occurs. The AWT notifies the applet about an event by calling an event handler
+that has been provided by the applet. Once this happens, the applet must take
+appropriate action and then quickly return control to the AWT. This is a crucial point.
+For the most part, your applet should not enter a “mode” of operation in which it
+maintains control for an extended period. Instead, it must perform specific actions
+in response to events and then return control to the AWT run-time system. In those
+situations in which your applet needs to perform a repetitive task on its own (for
+example, displaying a scrolling message across its window), you must start an
+additional thread of execution. (You will see an example later in this chapter.)
+Second, the user initiates interaction with an applet—not the other way around. As
+you know, in a nonwindowed program, when the program needs input, it will prompt
+the user and then call some input method, such as readLine( ). This is not the way it
+works in an applet. Instead, the user interacts with the applet as he or she wants, when
+he or she wants. These interactions are sent to the applet as events to which the applet
+must respond. For example, when the user clicks a mouse inside the applet’s window,
+a mouse-clicked event is generated. If the user presses a key while the applet’s window
+has input focus, a keypress event is generated. As you will see in later chapters, applets
+can contain various controls, such as push buttons and check boxes. When the user
+interacts with one of these controls, an event is generated.
+While the architecture of an applet is not as easy to understand as that of a
+console-based program, Java’s AWT makes it as simple as possible. If you have
+written programs for Windows, you know how intimidating that environment can
+be. Fortunately, Java’s AWT provides a much cleaner approach that is more
+quickly mastered.
+An Applet Skeleton
+All but the most trivial applets override a set of methods that provides the basic
+mechanism by which the browser or applet viewer interfaces to the applet and controls
+its execution. Four of these methods—init( ), start( ), stop( ), and destroy( )—are
+defined by Applet. Another, paint( ), is defined by the AWT Component class. Default
+implementations for all of these methods are provided. Applets do not need to
+override those methods they do not use. However, only very simple applets will not
+632 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+need to define all of them. These five methods can be assembled into the skeleton
+shown here:
+// An Applet skeleton.
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="AppletSkel" width=300 height=100>
+</applet>
+*/
+public class AppletSkel extends Applet {
+// Called first.
+public void init() {
+// initialization
+}
+/* Called second, after init().  Also called whenever
+the applet is restarted. */
+public void start() {
+// start or resume execution
+}
+// Called when the applet is stopped.
+public void stop() {
+// suspends execution
+}
+/* Called when applet is terminated.  This is the last
+method executed. */
+public void destroy() {
+// perform shutdown activities
+}
+// Called when an applet's window must be restored.
+public void paint(Graphics g) {
+// redisplay contents of window
+}
+}
+Although this skeleton does not do anything, it can be compiled and run. When run, it
+generates the following window when viewed with an applet viewer:
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 633
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+634 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Applet Initialization and Termination
+It is important to understand the order in which the various methods shown in the
+skeleton are called. When an applet begins, the AWT calls the following methods, in
+this sequence:
+1. init( )
+2. start( )
+3. paint( )
+When an applet is terminated, the following sequence of method calls takes place:
+1. stop( )
+2. destroy( )
+Let’s look more closely at these methods.
+init( )
+The init( ) method is the first method to be called. This is where you should initialize
+variables. This method is called only once during the run time of your applet.
+start( )
+The start( ) method is called after init( ). It is also called to restart an applet after it has
+been stopped. Whereas init( ) is called once—the first time an applet is loaded—start( )
+is called each time an applet’s HTML document is displayed onscreen. So, if a user
+leaves a web page and comes back, the applet resumes execution at start( ).
+paint( )
+The paint( ) method is called each time your applet’s output must be redrawn. This
+situation can occur for several reasons. For example, the window in which the applet is
+running may be overwritten by another window and then uncovered. Or the applet
+window may be minimized and then restored. paint( ) is also called when the applet
+begins execution. Whatever the cause, whenever the applet must redraw its output,
+paint( ) is called. The paint( ) method has one parameter of type Graphics. This
+parameter will contain the graphics context, which describes the graphics environment
+in which the applet is running. This context is used whenever output to the applet
+is required.
+stop( )
+The stop( ) method is called when a web browser leaves the HTML document containing
+the applet—when it goes to another page, for example. When stop( ) is called, the
+applet is probably running. You should use stop( ) to suspend threads that don’t need
+to run when the applet is not visible. You can restart them when start( ) is called if the
+user returns to the page.
+destroy( )
+The destroy( ) method is called when the environment determines that your applet
+needs to be removed completely from memory. At this point, you should free
+up any resources the applet may be using. The stop( ) method is always called
+before destroy( ).
+Overriding update( )
+In some situations, your applet may need to override another method defined by the
+AWT, called update( ). This method is called when your applet has requested that a
+portion of its window be redrawn. The default version of update( ) first fills an applet
+with the default background color and then calls paint( ). If you fill the background
+using a different color in paint( ), the user will experience a flash of the default
+background each time update( ) is called—that is, whenever the window is repainted.
+One way to avoid this problem is to override the update( ) method so that it performs
+all necessary display activities. Then have paint( ) simply call update( ). Thus, for some
+applications, the applet skeleton will override paint( ) and update( ), as shown here:
+public void update(Graphics g) {
+// redisplay your window, here.
+}
+public void paint(Graphics g) {
+update(g);
+}
+For the examples in this book, we will override update( ) only when needed.
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 635
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Simple Applet Display Methods
+As we’ve mentioned, applets are displayed in a window and they use the AWT to
+perform input and output. Although we will examine the methods, procedures, and
+techniques necessary to fully handle the AWT windowed environment in subsequent
+chapters, a few are described here, because we will use them to write sample applets.
+As we described in Chapter 12, to output a string to an applet, use drawString( ),
+which is a member of the Graphics class. Typically, it is called from within either
+update( ) or paint( ). It has the following general form:
+void drawString(String message, int x, int y)
+Here, message is the string to be output beginning at x,y. In a Java window, the
+upper-left corner is location 0,0. The drawString( ) method will not recognize newline
+characters. If you want to start a line of text on another line, you must do so manually,
+specifying the precise X,Y location where you want the line to begin. (As you will see in
+later chapters, there are techniques that make this process easy.)
+To set the background color of an applet’s window, use setBackground( ). To set the
+foreground color (the color in which text is shown, for example), use setForeground( ).
+These methods are defined by Component, and they have the following general forms:
+void setBackground(Color newColor)
+void setForeground(Color newColor)
+Here, newColor specifies the new color. The class Color defines the constants shown
+here that can be used to specify colors:
+Color.black Color.magenta
+Color.blue Color.orange
+Color.cyan Color.pink
+Color.darkGray Color.red
+Color.gray Color.white
+Color.green Color.yellow
+Color.lightGray
+For example, this sets the background color to green and the text color to red:
+setBackground(Color.green);
+setForeground(Color.red);
+636 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 637
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+A good place to set the foreground and background colors is in the init( ) method.
+Of course, you can change these colors as often as necessary during the execution of
+your applet. The default foreground color is black. The default background color is
+light gray.
+You can obtain the current settings for the background and foreground colors by
+calling getBackground( ) and getForeground( ), respectively. They are also defined
+by Component and are shown here:
+Color getBackground( )
+Color getForeground( )
+Here is a very simple applet that sets the background color to cyan, the foreground
+color to red, and displays a message that illustrates the order in which the init( ),
+start( ), and paint( ) methods are called when an applet starts up:
+/* A simple applet that sets the foreground and
+background colors and outputs a string. */
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="Sample" width=300 height=50>
+</applet>
+*/
+public class Sample extends Applet{
+String msg;
+// set the foreground and background colors.
+public void init() {
+setBackground(Color.cyan);
+setForeground(Color.red);
+msg = "Inside init( ) --";
+}
+// Initialize the string to be displayed.
+public void start() {
+msg += " Inside start( ) --";
+}
+// Display msg in applet window.
+public void paint(Graphics g) {
+msg += " Inside paint( ).";
+g.drawString(msg, 10, 30);
+}
+}
+This applet generates the window shown here:
+The methods stop( ) and destroy( ) are not overridden, because they are not needed
+by this simple applet.
+Requesting Repainting
+As a general rule, an applet writes to its window only when its update( ) or paint( )
+method is called by the AWT. This raises an interesting question: How can the applet
+itself cause its window to be updated when its information changes? For example, if an
+applet is displaying a moving banner, what mechanism does the applet use to update
+the window each time this banner scrolls? Remember, one of the fundamental
+architectural constraints imposed on an applet is that it must quickly return control to
+the AWT run-time system. It cannot create a loop inside paint( ) that repeatedly scrolls
+the banner, for example. This would prevent control from passing back to the AWT.
+Given this constraint, it may seem that output to your applet’s window will be difficult
+at best. Fortunately, this is not the case. Whenever your applet needs to update the
+information displayed in its window, it simply calls repaint( ).
+The repaint( ) method is defined by the AWT. It causes the AWT run-time
+system to execute a call to your applet’s update( ) method, which, in its default
+implementation, calls paint( ). Thus, for another part of your applet to output to its
+window, simply store the output and then call repaint( ). The AWT will then execute
+a call to paint( ), which can display the stored information. For example, if part of your
+applet needs to output a string, it can store this string in a String variable and then call
+repaint( ). Inside paint( ), you will output the string using drawString( ).
+The repaint( ) method has four forms. Let’s look at each one, in turn. The simplest
+version of repaint( ) is shown here:
+void repaint( )
+This version causes the entire window to be repainted. The following version
+specifies a region that will be repainted:
+void repaint(int left, int top, int width, int height)
+638 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 639
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Here, the coordinates of the upper-left corner of the region are specified by left and
+top, and the width and height of the region are passed in width and height. These
+dimensions are specified in pixels. You save time by specifying a region to repaint.
+Window updates are costly in terms of time. If you need to update only a small portion
+of the window, it is more efficient to repaint only that region.
+Calling repaint( ) is essentially a request that your applet be repainted sometime
+soon. However, if your system is slow or busy, update( ) might not be called
+immediately. Multiple requests for repainting that occur within a short time can be
+collapsed by the AWT in a manner such that update( ) is only called sporadically. This
+can be a problem in many situations, including animation, in which a consistent update
+time is necessary. One solution to this problem is to use the following forms of repaint( ):
+void repaint(long maxDelay)
+void repaint(long maxDelay, int x, int y, int width, int height)
+Here, maxDelay specifies the maximum number of milliseconds that can elapse before
+update( ) is called. Beware, though. If the time elapses before update( ) can be called, it
+isn’t called. There’s no return value or exception thrown, so you must be careful.
+It is possible for a method other than paint( ) or update( ) to output to an applet’s
+window. To do so, it must obtain a graphics context by calling getGraphics( ) (defined
+by Component) and then use this context to output to the window. However, for most
+applications, it is better and easier to route window output through paint( ) and to call
+repaint( ) when the contents of the window change.
+A Simple Banner Applet
+To demonstrate repaint( ), a simple banner applet is developed. This applet scrolls
+a message, from right to left, across the applet’s window. Since the scrolling of the
+message is a repetitive task, it is performed by a separate thread, created by the applet
+when it is initialized. The banner applet is shown here:
+/* A simple banner applet.
+This applet creates a thread that scrolls
+the message contained in msg right to left
+across the applet's window.
+*/
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="SimpleBanner" width=300 height=50>
+</applet>
+*/
+public class SimpleBanner extends Applet implements Runnable {
+String msg = " A Simple Moving Banner.";
+Thread t = null;
+int state;
+boolean stopFlag;
+// Set colors and initialize thread.
+public void init() {
+setBackground(Color.cyan);
+setForeground(Color.red);
+}
+// Start thread
+public void start() {
+t = new Thread(this);
+stopFlag = false;
+t.start();
+}
+// Entry point for the thread that runs the banner.
+public void run() {
+char ch;
+// Display banner
+for( ; ; ) {
+try {
+repaint();
+Thread.sleep(250);
+ch = msg.charAt(0);
+msg = msg.substring(1, msg.length());
+msg += ch;
+if(stopFlag)
+break;
+} catch(InterruptedException e) {}
+}
+}
+// Pause the banner.
+public void stop() {
+640 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+stopFlag = true;
+t = null;
+}
+// Display the banner.
+public void paint(Graphics g) {
+g.drawString(msg, 50, 30);
+}
+}
+Following is sample output:
+Let’s take a close look at how this applet operates. First, notice that SimpleBanner
+extends Applet, as expected, but it also implements Runnable. This is necessary, since
+the applet will be creating a second thread of execution that will be used to scroll the
+banner. Inside init( ), the foreground and background colors of the applet are set.
+After initialization, the AWT run-time system calls start( ) to start the applet running.
+Inside start( ), a new thread of execution is created and assigned to the Thread variable
+t. Then, the boolean variable stopFlag, which controls the execution of the applet, is set
+to false. Next, the thread is started by a call to t.start( ). Remember that t.start( ) calls a
+method defined by Thread, which causes run( ) to begin executing. It does not cause
+a call to the version of start( ) defined by Applet. These are two separate methods.
+Inside run( ), the characters in the string contained in msg are repeatedly rotated left.
+Between each rotation, a call to repaint( ) is made. This eventually causes the paint( )
+method to be called and the current contents of msg is displayed. Between each
+iteration, run( ) sleeps for a quarter of a second. The net effect of run( ) is that the
+contents of msg is scrolled right to left in a constantly moving display. The stopFlag
+variable is checked on each iteration. When it is true, the run( ) method terminates.
+If a browser is displaying the applet when a new page is viewed, the stop( ) method is
+called, which sets stopFlag to true, causing run( ) to terminate. This is the mechanism used
+to stop the thread when its page is no longer in view. When the applet is brought back into
+view, start( ) is once again called, which starts a new thread to execute the banner.
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 641
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+642 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Using the Status Window
+In addition to displaying information in its window, an applet can also output a
+message to the status window of the browser or applet viewer on which it is running.
+To do so, call showStatus( ) with the string that you want displayed. The status window
+is a good place to give the user feedback about what is occurring in the applet, suggest
+options, or possibly report some types of errors. The status window also makes an
+excellent debugging aid, because it gives you an easy way to output information about
+your applet.
+The following applet demonstrates showStatus( ):
+// Using the Status Window.
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="StatusWindow" width=300 height=50>
+</applet>
+*/
+public class StatusWindow extends Applet{
+public void init() {
+setBackground(Color.cyan);
+}
+// Display msg in applet window.
+public void paint(Graphics g) {
+g.drawString("This is in the applet window.", 10, 20);
+showStatus("This is shown in the status window.");
+}
+}
+Sample output from this program is shown here:
+The HTML APPLET Tag
+The APPLET tag is used to start an applet from both an HTML document and from an
+applet viewer. (The newer OBJECT tag also works, but this book will use APPLET.)
+An applet viewer will execute each APPLET tag that it finds in a separate window,
+while web browsers like Netscape Navigator, Internet Explorer, and HotJava will allow
+many applets on a single page. So far, we have been using only a simplified form of the
+APPLET tag. Now it is time to take a closer look at it.
+The syntax for the standard APPLET tag is shown here. Bracketed items
+are optional.
+< APPLET
+[CODEBASE = codebaseURL]
+CODE = appletFile
+[ALT = alternateText]
+[NAME = appletInstanceName]
+WIDTH = pixels HEIGHT = pixels
+[ALIGN = alignment]
+[VSPACE = pixels] [HSPACE = pixels]
+>
+[< PARAM NAME = AttributeName VALUE = AttributeValue>]
+[< PARAM NAME = AttributeName2 VALUE = AttributeValue>]
+. . .
+[HTML Displayed in the absence of Java]
+</APPLET>
+Let’s take a look at each part now.
+CODEBASE CODEBASE is an optional attribute that specifies the base URL of the
+applet code, which is the directory that will be searched for the applet’s executable
+class file (specified by the CODE tag). The HTML document’s URL directory is used as
+the CODEBASE if this attribute is not specified. The CODEBASE does not have to be
+on the host from which the HTML document was read.
+CODE CODE is a required attribute that gives the name of the file containing your
+applet’s compiled .class file. This file is relative to the code base URL of the applet,
+which is the directory that the HTML file was in or the directory indicated by
+CODEBASE if set.
+ALT The ALT tag is an optional attribute used to specify a short text message that
+should be displayed if the browser understands the APPLET tag but can’t currently
+run Java applets. This is distinct from the alternate HTML you provide for browsers
+that don’t support applets.
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 643
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+644 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+NAME NAME is an optional attribute used to specify a name for the applet instance.
+Applets must be named in order for other applets on the same page to find them by
+name and communicate with them. To obtain an applet by name, use getApplet( ),
+which is defined by the AppletContext interface.
+WIDTH AND HEIGHT WIDTH and HEIGHT are required attributes that give the
+size (in pixels) of the applet display area.
+ALIGN ALIGN is an optional attribute that specifies the alignment of the applet.
+This attribute is treated the same as the HTML IMG tag with these possible values:
+LEFT, RIGHT, TOP, BOTTOM, MIDDLE, BASELINE, TEXTTOP, ABSMIDDLE,
+and ABSBOTTOM.
+VSPACE AND HSPACE These attributes are optional. VSPACE specifies the space,
+in pixels, above and below the applet. HSPACE specifies the space, in pixels, on each
+side of the applet. They’re treated the same as the IMG tag’s VSPACE and HSPACE
+attributes.
+PARAM NAME AND VALUE The PARAM tag allows you to specify applet-
+specific arguments in an HTML page. Applets access their attributes with the
+getParameter( ) method.
+HANDLING OLDER BROWSERS Some very old web browsers can’t execute applets
+and don’t recognize the APPLET tag. Although these browsers are now nearly extinct
+(having been replaced by Java-compatible ones), you may need to deal with them
+occasionally. The best way to design your HTML page to deal with such browsers is to
+include HTML text and markup within your <applet></applet> tags. If the applet tags
+are not recognized by your browser, you will see the alternate markup. If Java is
+available, it will consume all of the markup between the <applet></applet> tags and
+disregard the alternate markup.
+Here’s the HTML to start an applet called SampleApplet in Java and to display a
+message in older browsers:
+<applet code="SampleApplet" width=200 height=40>
+If you were driving a Java powered browser,
+you'd see &quote;A Sample Applet&quote; here.<p>
+</applet>
+Passing Parameters to Applets
+As just discussed, the APPLET tag in HTML allows you to pass parameters to your
+applet. To retrieve a parameter, use the getParameter( ) method. It returns the value of
+the specified parameter in the form of a String object. Thus, for numeric and boolean
+values, you will need to convert their string representations into their internal formats.
+Here is an example that demonstrates passing parameters:
+// Use Parameters
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="ParamDemo" width=300 height=80>
+<param name=fontName value=Courier>
+<param name=fontSize value=14>
+<param name=leading value=2>
+<param name=accountEnabled value=true>
+</applet>
+*/
+public class ParamDemo extends Applet{
+String fontName;
+int fontSize;
+float leading;
+boolean active;
+// Initialize the string to be displayed.
+public void start() {
+String param;
+fontName = getParameter("fontName");
+if(fontName == null)
+fontName = "Not Found";
+param = getParameter("fontSize");
+try {
+if(param != null) // if not found
+fontSize = Integer.parseInt(param);
+else
+fontSize = 0;
+} catch(NumberFormatException e) {
+fontSize = -1;
+}
+param = getParameter("leading");
+try {
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 645
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+if(param != null) // if not found
+leading = Float.valueOf(param).floatValue();
+else
+leading = 0;
+} catch(NumberFormatException e) {
+leading = -1;
+}
+param = getParameter("accountEnabled");
+if(param != null)
+active = Boolean.valueOf(param).booleanValue();
+}
+// Display parameters.
+public void paint(Graphics g) {
+g.drawString("Font name: " + fontName, 0, 10);
+g.drawString("Font size: " + fontSize, 0, 26);
+g.drawString("Leading: " + leading, 0, 42);
+g.drawString("Account Active: " + active, 0, 58);
+}
+}
+Sample output from this program is shown here:
+As the program shows, you should test the return values from getParameter( ). If a
+parameter isn’t available, getParameter( ) will return null. Also, conversions to numeric
+types must be attempted in a try statement that catches NumberFormatException.
+Uncaught exceptions should never occur within an applet.
+646 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Improving the Banner Applet
+It is possible to use a parameter to enhance the banner applet shown earlier. In the
+previous version, the message being scrolled was hard-coded into the applet. However,
+passing the message as a parameter allows the banner applet to display a different
+message each time it is executed. This improved version is shown here. Notice that the
+APPLET tag at the top of the file now specifies a parameter called message that is linked
+to a quoted string.
+// A parameterized banner
+import java.awt.*;
+import java.applet.*;
+/*
+<applet code="ParamBanner" width=300 height=50>
+<param name=message value="Java makes the Web move!">
+</applet>
+*/
+public class ParamBanner extends Applet implements Runnable {
+String msg;
+Thread t = null;
+int state;
+boolean stopFlag;
+// Set colors and initialize thread.
+public void init() {
+setBackground(Color.cyan);
+setForeground(Color.red);
+}
+// Start thread
+public void start() {
+msg = getParameter("message");
+if(msg == null) msg = "Message not found.";
+msg = " " + msg;
+t = new Thread(this);
+stopFlag = false;
+t.start();
+}
+// Entry point for the thread that runs the banner.
+public void run() {
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 647
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+char ch;
+// Display banner
+for( ; ; ) {
+try {
+repaint();
+Thread.sleep(250);
+ch = msg.charAt(0);
+msg = msg.substring(1, msg.length());
+msg += ch;
+if(stopFlag)
+break;
+} catch(InterruptedException e) {}
+}
+}
+// Pause the banner.
+public void stop() {
+stopFlag = true;
+t = null;
+}
+// Display the banner.
+public void paint(Graphics g) {
+g.drawString(msg, 50, 30);
+}
+}
+getDocumentBase( ) and getCodeBase( )
+Often, you will create applets that will need to explicitly load media and text. Java will
+allow the applet to load data from the directory holding the HTML file that started the
+applet (the document base) and the directory from which the applet’s class file was
+loaded (the code base). These directories are returned as URL objects (described in
+Chapter 18) by getDocumentBase( ) and getCodeBase( ). They can be concatenated
+with a string that names the file you want to load. To actually load another file, you
+will use the showDocument( ) method defined by the AppletContext interface,
+discussed in the next section.
+The following applet illustrates these methods:
+// Display code and document bases.
+648 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 649
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+import java.awt.*;
+import java.applet.*;
+import java.net.*;
+/*
+<applet code="Bases" width=300 height=50>
+</applet>
+*/
+public class Bases extends Applet{
+// Display code and document bases.
+public void paint(Graphics g) {
+String msg;
+URL url = getCodeBase(); // get code base
+msg = "Code base: " + url.toString();
+g.drawString(msg, 10, 20);
+url = getDocumentBase(); // get document base
+msg = "Document base: " + url.toString();
+g.drawString(msg, 10, 40);
+}
+}
+Sample output from this program is shown here:
+AppletContext and showDocument( )
+One application of Java is to use active images and animation to provide a graphical
+means of navigating the Web that is more interesting than the underlined blue
+words used by hypertext. To allow your applet to transfer control to another URL,
+you must use the showDocument( ) method defined by the AppletContext interface.
+AppletContext is an interface that lets you get information from the applet’s execution
+environment. The methods defined by AppletContext are shown in Table 19-2. The
+context of the currently executing applet is obtained by a call to the getAppletContext( )
+method defined by Applet.
+Within an applet, once you have obtained the applet’s context, you can bring
+another document into view by calling showDocument( ). This method has no
+return value and throws no exception if it fails, so use it carefully. There are two
+showDocument( ) methods. The method showDocument(URL) displays the document
+650 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+Applet getApplet(String appletName) Returns the applet specified by appletName if it is
+within the current applet context. Otherwise, null
+is returned.
+Enumeration getApplets( ) Returns an enumeration that contains all of the
+applets within the current applet context.
+AudioClip getAudioClip(URL url) Returns an AudioClip object that encapsulates the
+audio clip found at the location specified by url.
+Image getImage(URL url) Returns an Image object that encapsulates the image
+found at the location specified by url.
+InputStream getStream(String key) Returns the stream linked to key. Keys are linked to
+streams by using the setStream( ) method. A null
+reference is returned if no stream is linked to key.
+(Added by Java 2, version 1.4)
+Iterator getStreamKeys( ) Returns an iterator for the keys associated with the
+invoking object. The keys are linked to streams. See
+getStream( ) and setStream( ). (Added by Java 2,
+version 1.4)
+void setStream(String key,
+InputStream strm)
+Links the stream specified by strm to the key passed
+in key. The key is deleted from the invoking object if
+strm is null. (Added by Java 2, version 1.4)
+void showDocument(URL url) Brings the document at the URL specified by url
+into view. This method may not be supported by
+applet viewers.
+void showDocument(URL url,
+String where)
+Brings the document at the URL specified by url
+into view. This method may not be supported by
+applet viewers. The placement of the document
+is specified by where as described in the text.
+void showStatus(String str) Displays str in the status window.
+Table 19-2. The Abstract Methods Defined by the AppletContext Interface
+at the specified URL. The method showDocument(URL, where) displays the specified
+document at the specified location within the browser window. Valid arguments for
+where are “_self” (show in current frame), “_parent” (show in parent frame), “_top”
+(show in topmost frame), and “_blank” (show in new browser window). You can also
+specify a name, which causes the document to be shown in a new browser window by
+that name.
+The following applet demonstrates AppletContext and showDocument( ).
+Upon execution, it obtains the current applet context and uses that context to
+transfer control to a file called Test.html. This file must be in the same directory
+as the applet. Test.html can contain any valid hypertext that you like.
+/* Using an applet context, getCodeBase(),
+and showDocument() to display an HTML file.
+*/
+import java.awt.*;
+import java.applet.*;
+import java.net.*;
+/*
+<applet code="ACDemo" width=300 height=50>
+</applet>
+*/
+public class ACDemo extends Applet{
+public void start() {
+AppletContext ac = getAppletContext();
+URL url = getCodeBase(); // get url of this applet
+try {
+ac.showDocument(new URL(url+"Test.html"));
+} catch(MalformedURLException e) {
+showStatus("URL not found");
+}
+}
+}
+The AudioClip Interface
+The AudioClip interface defines these methods: play( ) (play a clip from the
+beginning), stop( ) (stop playing the clip), and loop( ) (play the loop continuously).
+After you have loaded an audio clip using getAudioClip( ), you can use these methods
+to play it.
+C h a p t e r 1 9 : T h e A p p l e t C l a s s 651
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+The AppletStub Interface
+The AppletStub interface provides the means by which an applet and the browser (or
+applet viewer) communicate. Your code will not typically implement this interface.
+Outputting to the Console
+Although output to an applet’s window must be accomplished through AWT
+methods, such as drawString( ), it is still possible to use console output in your
+applet—especially for debugging purposes. In an applet, when you call a method
+such as System.out.println( ), the output is not sent to your applet’s window. Instead,
+it appears either in the console session in which you launched the applet viewer or in
+the Java console that is available in some browsers. Use of console output for purposes
+other than debugging is discouraged, since it violates the design principles of the
+graphical interface most users will expect.
+652 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 20
+Event Handling
+653

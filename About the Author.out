@@ -1,0 +1,61 @@
+About the Author
+Herbert Schildt is the world’s leading
+programming author. He is an authority on the
+C, C++, Java, and C# languages, and is a master
+Windows programmer. His programming books
+have sold more that 3 million copies worldwide
+and have been translated into all major foreign
+languages. He is the author of numerous
+bestsellers, including Java 2: The Complete
+Reference, Java 2: A Beginner's Guide, Java 2
+Programmers Reference, C++: The Complete
+Reference, C: The Complete Reference, and C#:
+The Complete Reference. Schildt holds a master's
+degree in computer science from the University
+of Illinois. He can be reached at his consulting
+office at (217) 586-4683.
+Java™ 2:
+The Complete Reference,
+Fifth Edition
+Herbert Schildt
+McGraw-Hill/Osborne
+New York   Chicago   San Francisco
+Lisbon   London   Madrid   Mexico City
+Milan   New Delhi   San Juan
+Seoul   Singapore   Sydney   Toronto
+Copyright © 2002 by The McGraw-HIll Companies, Inc. All rights reserved. Manufactured in the United States of
+America. Except as permitted under the United States Copyright Act of 1976, no part of this publication may be
+reproduced or distributed in any form or by any means, or stored in a database or retrieval system, without the prior
+written permission of the publisher. 
+0-07-222858-X 
+The material in this eBook also appears in the print version of this title: 0-07-222420-7 
+All trademarks are trademarks of their respective owners. Rather than put a trademark symbol after every occur-
+rence of a trademarked name, we use names in an editorial fashion only, and to the benefit of the trademark
+owner, with no intention of infringement of the trademark. Where such designations appear in this book, they
+have been printed with initial caps. 
+McGraw-Hill eBooks are available at special quantity discounts to use as premiums and sales promotions, or for
+use in corporate training programs. For more information, please contact George Hoare, Special Sales, at
+george_hoare@mcgraw-hill.com or (212) 904-4069. 
+TERMS OF USE
+This is a copyrighted work and The McGraw-Hill Companies, Inc. (“McGraw-Hill”) and its licensors reserve all
+rights in and to the work. Use of this work is subject to these terms. Except as permitted under the Copyright Act
+of 1976 and the right to store and retrieve one copy of the work, you may not decompile, disassemble, reverse
+engineer, reproduce, modify, create derivative works based upon, transmit, distribute, disseminate, sell, publish
+or sublicense the work or any part of it without McGraw-Hill’s prior consent. You may use the work for your
+own noncommercial and personal use; any other use of the work is strictly prohibited. Your right to use the work
+may be terminated if you fail to comply with these terms. 
+THE WORK IS PROVIDED “AS IS”. McGRAW-HILL AND ITS LICENSORS MAKE NO GUARANTEES
+OR WARRANTIES AS TO THE ACCURACY, ADEQUACY OR COMPLETENESS OF OR RESULTS TO BE
+OBTAINED FROM USING THE WORK, INCLUDING ANY INFORMATION THAT CAN BE ACCESSED
+THROUGH THE WORK VIA HYPERLINK OR OTHERWISE, AND EXPRESSLY DISCLAIM ANY WAR-
+RANTY, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF
+MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. McGraw-Hill and its licensors do not
+warrant or guarantee that the functions contained in the work will meet your requirements or that its operation
+will be uninterrupted or error free. Neither McGraw-Hill nor its licensors shall be liable to you or anyone else for
+any inaccuracy, error or omission, regardless of cause, in the work or for any damages resulting therefrom.
+McGraw-Hill has no responsibility for the content of any information accessed through the work. Under no cir-
+cumstances shall McGraw-Hill and/or its licensors be liable for any indirect, incidental, special, punitive, conse-
+quential or similar damages that result from the use of or inability to use the work, even if any of them has been
+advised of the possibility of such damages. This limitation of liability shall apply to any claim or cause whatso-
+ever whether such claim or cause arises in contract, tort or otherwise.
+DOI: 10.1036/007222858X

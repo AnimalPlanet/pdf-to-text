@@ -1,0 +1,2413 @@
+Chapter 14
+Exploring java.lang
+379
+380 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+This chapter discusses those classes and interfaces defined by java.lang. As youknow, java.lang is automatically imported into all programs. It contains classesand interfaces that are fundamental to virtually all of Java programming. It is
+Java’s most widely used package.
+java.lang includes the following classes:
+Boolean Long StackTraceElement (Java 2,1.4)
+Byte Math StrictMath (Java 2,1.3)
+Character Number String
+Class Object StringBuffer
+ClassLoader Package (Java 2) System
+Compiler Process Thread
+Double Runtime ThreadGroup
+Float RuntimePermission (Java 2) ThreadLocal (Java 2)
+InheritableThreadLocal (Java 2) SecurityManager Throwable
+Integer Short Void
+In addition, there are two classes defined by Character: Character.Subset and
+Character.UnicodeBlock. These were added by Java 2.
+java.lang also defines the following interfaces:
+■ Cloneable
+■ Comparable
+■ Runnable
+■ CharSequence
+The Comparable interface was added by Java 2. CharSequence was added by Java 2,
+version 1.4.
+Several of the classes contained in java.lang contain deprecated methods, most
+dating back to Java 1.0. These deprecated methods are still provided by Java 2, to
+support an ever-shrinking pool of legacy code, and are not recommended for new code.
+Most of the deprecations took place prior to Java 2 and these deprecated methods are not
+discussed here. Deprecations that occurred because of Java 2, however, are mentioned.
+Java 2 also added several new classes and methods to the java.lang package. The
+new additions are so indicated.
+Simple Type Wrappers
+As we mentioned in Part I of this book, Java uses simple types, such as int and char, for
+performance reasons. These data types are not part of the object hierarchy. They are
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 381
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+passed by value to methods and cannot be directly passed by reference. Also, there is
+no way for two methods to refer to the same instance of an int. At times, you will need
+to create an object representation for one of these simple types. For example, there are
+enumeration classes discussed in Chapter 15 that deal only with objects; to store a
+simple type in one of these classes, you need to wrap the simple type in a class. To
+address this need, Java provides classes that correspond to each of the simple types. In
+essence, these classes encapsulate, or wrap, the simple types within a class. Thus, they
+are commonly referred to as type wrappers.
+Number
+The abstract class Number defines a superclass that is implemented by the classes that
+wrap the numeric types byte, short, int, long, float, and double. Number has abstract
+methods that return the value of the object in each of the different number formats.
+That is, doubleValue( ) returns the value as a double, floatValue( ) returns the value
+as a float, and so on. These methods are shown here:
+byte byteValue( )
+double doubleValue( )
+float floatValue( )
+int intValue( )
+long longValue( )
+short shortValue( )
+The values returned by these methods can be rounded.
+Number has six concrete subclasses that hold explicit values of each numeric type:
+Double, Float, Byte, Short, Integer, and Long.
+Double and Float
+Double and Float are wrappers for floating-point values of type double and float,
+respectively. The constructors for Float are shown here:
+Float(double num)
+Float(float num)
+Float(String str) throws NumberFormatException
+As you can see, Float objects can be constructed with values of type float or double.
+They can also be constructed from the string representation of a floating-point number.
+The constructors for Double are shown here:
+Double(double num)
+Double(String str) throws NumberFormatException
+Double objects can be constructed with a double value or a string containing a
+floating-point value.
+The methods defined by Float are shown in Table 14-1. The methods defined by
+Double are shown in Table 14-2. Both Float and Double define the following constants:
+MAX_VALUE Maximum positive value
+MIN_VALUE Minimum positive value
+NaN Not a number
+POSITIVE_INFINITY Positive infinity
+NEGATIVE_INFINITY Negative infinity
+TYPE The Class object for float or double
+382 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+byte byteValue( ) Returns the value of the invoking object as
+a byte.
+static int compare(float num1,
+float num2)
+Compares the values of num1 and num2.
+Returns 0 if the values are equal. Returns a
+negative value if num1 is less than num2.
+Returns a positive value if num1 is greater
+than num2. (Added by Java 2, version 1.4)
+int compareTo(Float f) Compares the numerical value of the
+invoking object with that of f. Returns 0 if
+the values are equal. Returns a negative
+value if the invoking object has a lower
+value. Returns a positive value if the
+invoking object has a greater value.
+(Added by Java 2)
+int compareTo(Object obj) Operates identically to compareTo(Float)
+if obj is of class Float. Otherwise, throws a
+ClassCastException. (Added by Java 2)
+double doubleValue( ) Returns the value of the invoking object as
+a double.
+boolean equals(Object FloatObj) Returns true if the invoking Float object is
+equivalent to FloatObj. Otherwise, it
+returns false.
+Table 14-1. The Methods Defined by Float
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 383
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static int floatToIntBits(float num) Returns the IEEE-compatible,
+single-precision bit pattern that
+corresponds to the num.
+float floatValue( ) Returns the value of the invoking object as
+a float.
+int hashCode( ) Returns the hash code for the invoking object.
+static float intBitsToFloat(int num) Returns float equivalent of the
+IEEE-compatible, single-precision bit
+pattern specified by num.
+int intValue( ) Returns the value of the invoking object as
+an int.
+boolean isInfinite( ) Returns true if the invoking object contains
+an infinite value. Otherwise, it returns false.
+static boolean isInfinite(float num) Returns true if num specifies an infinite
+value. Otherwise, it returns false.
+boolean isNaN( ) Returns true if the invoking object
+contains a value that is not a number.
+Otherwise, it returns false.
+static boolean isNaN(float num) Returns true if num specifies a value that is
+not a number. Otherwise, it returns false.
+long longValue( ) Returns the value of the invoking object as
+a long.
+static float parseFloat(String str)
+throws NumberFormatException
+Returns the float equivalent of the number
+contained in the string specified by str
+using radix 10. (Added by Java 2)
+short shortValue( ) Returns the value of the invoking object as
+a short.
+String toString( ) Returns the string equivalent of the
+invoking object.
+static String toString(float num) Returns the string equivalent of the value
+specified by num.
+static Float valueOf(String str)
+throws NumberFormatException
+Returns the Float object that contains the
+value specified by the string in str.
+Table 14-1. The Methods Defined by Float (continued)
+384 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+byte byteValue( ) Returns the value of the invoking
+object as a byte.
+static int compare(double num1,
+double num2)
+Compares the values of num1 and
+num2. Returns 0 if the values are
+equal. Returns a negative value if
+num1 is less than num2. Returns a
+positive value if num1 is greater than
+num2. (Added by Java 2, version 1.4)
+int compareTo(Double d) Compares the numerical value of
+the invoking object with that of d.
+Returns 0 if the values are equal.
+Returns a negative value if the
+invoking object has a lower value.
+Returns a positive value if the
+invoking object has a greater value.
+(Added by Java 2)
+int compareTo(Object obj) Operates identically to
+compareTo(Double) if obj is of
+class Double. Otherwise, throws
+a ClassCastException. (Added
+by Java 2)
+static long doubleToLongBits(double num) Returns the IEEE-compatible,
+double-precision bit pattern that
+corresponds to the num.
+double doubleValue( ) Returns the value of the invoking
+object as a double.
+boolean equals(Object DoubleObj) Returns true if the invoking
+Double object is equivalent
+to DoubleObj. Otherwise, it
+returns false.
+float floatValue( ) Returns the value of the invoking
+object as a float.
+int hashcode( ) Returns the hash code for the
+invoking object.
+Table 14-2. The Methods Defined by Double
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 385
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+int intValue( ) Returns the value of the invoking
+object as an int.
+boolean isInfinite( ) Returns true if the invoking object
+contains an infinite value.
+Otherwise, it returns false.
+static boolean isInfinite(double num) Returns true if num specifies an
+infinite value. Otherwise, it
+returns false.
+boolean isNaN( ) Returns true if the invoking object
+contains a value that is not a
+number. Otherwise, it returns false.
+static boolean isNaN(double num) Returns true if num specifies a
+value that is not a number.
+Otherwise, it returns false.
+static double longBitsToDouble(long num) Returns double equivalent of the
+IEEE-compatible, double-precision
+bit pattern specified by num.
+long longValue( ) Returns the value of the invoking
+object as a long.
+static double parseDouble(String str)
+throws NumberFormatException
+Returns the double equivalent of
+the number contained in the string
+specified by str using radix 10.
+(Added by Java 2)
+short shortValue( ) Returns the value of the invoking
+object as a short.
+String toString( ) Returns the string equivalent of the
+invoking object.
+static String toString(double num) Returns the string equivalent of the
+value specified by num.
+static Double valueOf(String str)
+throws NumberFormatException
+Returns a Double object that
+contains the value specified by the
+string in str.
+Table 14-2. The Methods Defined by Double (continued)
+The following example creates two Double objects—one by using a double value
+and the other by passing a string that can be parsed as a double:
+class DoubleDemo {
+public static void main(String args[]) {
+Double d1 = new Double(3.14159);
+Double d2 = new Double("314159E-5");
+System.out.println(d1 + " = " + d2 + " -> " + d1.equals(d2));
+}
+}
+As you can see from the following output, both constructors created identical Double
+instances, as shown by the equals( ) method returning true:
+3.14159 = 3.14159 –> true
+Understanding isInfinite( ) and isNaN( )
+Float and Double provide the methods isInfinite( ) and isNaN( ), which help when
+manipulating two special double and float values. These methods test for two unique
+values defined by the IEEE floating-point specification: infinity and NaN (not a
+number). isInfinite( ) returns true if the value being tested is infinitely large or small
+in magnitude. isNaN( ) returns true if the value being tested is not a number.
+The following example creates two Double objects; one is infinite, and the other is
+not a number:
+// Demonstrate isInfinite() and isNaN()
+class InfNaN {
+public static void main(String args[]) {
+Double d1 = new Double(1/0.);
+Double d2 = new Double(0/0.);
+System.out.println(d1 + ": " + d1.isInfinite() + ", " + d1.isNaN());
+System.out.println(d2 + ": " + d2.isInfinite() + ", " + d2.isNaN());
+}
+}
+This program generates the following output:
+Infinity: true, false
+NaN: false, true
+386 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Byte, Short, Integer, and Long
+The Byte, Short, Integer, and Long classes are wrappers for byte, short, int, and long
+integer types, respectively. Their constructors are shown here:
+Byte(byte num)
+Byte(String str) throws NumberFormatException
+Short(short num)
+Short(String str) throws NumberFormatException
+Integer(int num)
+Integer(String str) throws NumberFormatException
+Long(long num)
+Long(String str) throws NumberFormatException
+As you can see, these objects can be constructed from numeric values or from strings
+that contain valid whole number values.
+The methods defined by these classes are shown in Tables 14-3 through 14-6. As
+you can see, they define methods for parsing integers from strings and converting
+strings back into integers. Variants of these methods allow you to specify the radix,
+or numeric base, for conversion. Common radixes are 2 for binary, 8 for octal, 10 for
+decimal, and 16 for hexadecimal.
+The following constants are defined:
+MIN_VALUE Minimum value
+MAX_VALUE Maximum value
+TYPE The Class object for byte, short, int, or long
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 387
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+byte byteValue( ) Returns the value of the invoking
+object as a byte.
+int compareTo(Byte b) Compares the numerical value of
+the invoking object with that of b.
+Returns 0 if the values are equal.
+Returns a negative value if the
+invoking object has a lower value.
+Returns a positive value if the
+invoking object has a greater value.
+(Added by Java 2)
+Table 14-3. The Methods Defined by Byte
+388 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+int compareTo(Object obj) Operates identically to
+compareTo(Byte) if obj is of class
+Byte. Otherwise, throws a
+ClassCastException. (Added
+by Java 2)
+static Byte decode(String str)
+throws NumberFormatException
+Returns a Byte object that contains
+the value specified by the string
+in str.
+double doubleValue( ) Returns the value of the invoking
+object as a double.
+boolean equals(Object ByteObj) Returns true if the invoking Byte
+object is equivalent to ByteObj.
+Otherwise, it returns false.
+float floatValue( ) Returns the value of the invoking
+object as a float.
+int hashCode( ) Returns the hash code for the
+invoking object.
+int intValue( ) Returns the value of the invoking
+object as an int.
+long longValue( ) Returns the value of the invoking
+object as a long.
+static byte parseByte(String str)
+throws NumberFormatException
+Returns the byte equivalent of the
+number contained in the string
+specified by str using radix 10.
+static byte parseByte(String str, int radix)
+throws NumberFormatException
+Returns the byte equivalent of
+the number contained in the
+string specified by str using the
+specified radix.
+short shortValue( ) Returns the value of the invoking
+object as a short.
+String toString( ) Returns a string that contains
+the decimal equivalent of the
+invoking object.
+Table 14-3. The Methods Defined by Byte (continued)
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 389
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static String toString(byte num) Returns a string that contains the
+decimal equivalent of num.
+static Byte valueOf(String str)
+throws NumberFormatException
+Returns a Byte object that contains
+the value specified by the string
+in str.
+static Byte valueOf(String str, int radix)
+throws NumberFormatException
+Returns a Byte object that contains
+the value specified by the string in
+str using the specified radix.
+Table 14-3. The Methods Defined by Byte (continued)
+Method Description
+byte byteValue( ) Returns the value of the invoking
+object as a byte.
+int compareTo(Short s) Compares the numerical value of
+the invoking object with that of s.
+Returns 0 if the values are equal.
+Returns a negative value if the
+invoking object has a lower value.
+Returns a positive value if the
+invoking object has a greater value.
+(Added by Java 2)
+int compareTo(Object obj) Operates identically to
+compareTo(Short) if obj is of
+class Short. Otherwise, throws
+a ClassCastException. (Added
+by Java 2)
+static Short decode(String str)
+throws NumberFormatException
+Returns a Short object that
+contains the value specified by
+the string in str.
+Table 14-4. The Methods Defined by Short
+390 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+double doubleValue( ) Returns the value of the invoking
+object as a double.
+boolean equals(Object ShortObj) Returns true if the invoking
+Integer object is equivalent
+to ShortObj. Otherwise, it
+returns false.
+float floatValue( ) Returns the value of the invoking
+object as a float.
+int hashCode( ) Returns the hash code for the
+invoking object.
+int intValue( ) Returns the value of the invoking
+object as an int.
+long longValue( ) Returns the value of the invoking
+object as a long.
+static short parseShort(String str)
+throws NumberFormatException
+Returns the short equivalent of the
+number contained in the string
+specified by str using radix 10.
+static short parseShort(String str, int radix)
+throws NumberFormatException
+Returns the short equivalent
+of the number contained in the
+string specified by str using
+the specified radix.
+short shortValue( ) Returns the value of the invoking
+object as a short.
+String toString( ) Returns a string that contains
+the decimal equivalent of the
+invoking object.
+static String toString(short num) Returns a string that contains the
+decimal equivalent of num.
+static Short valueOf(String str)
+throws NumberFormatException
+Returns a Short object that contains
+the value specified by the string in
+str using radix 10.
+static Short valueOf(String str, int radix)
+throws NumberFormatException
+Returns a Short object that contains
+the value specified by the string in
+str using the specified radix.
+Table 14-4. The Methods Defined by Short (continued)
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 391
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+byte byteValue( ) Returns the value of the invoking
+object as a byte.
+int compareTo(Integer i) Compares the numerical value of
+the invoking object with that of i.
+Returns 0 if the values are equal.
+Returns a negative value if the
+invoking object has a lower
+value. Returns a positive value if
+the invoking object has a greater
+value. (Added by Java 2)
+int compareTo(Object obj) Operates identically to
+compareTo(Integer) if obj is of
+class Integer. Otherwise, throws
+a ClassCastException. (Added
+by Java 2)
+static Integer decode(String str)
+throws NumberFormatException
+Returns an Integer object that
+contains the value specified by
+the string in str.
+double doubleValue( ) Returns the value of the invoking
+object as a double.
+boolean equals(Object IntegerObj) Returns true if the invoking
+Integer object is equivalent
+to IntegerObj. Otherwise, it
+returns false.
+float floatValue( ) Returns the value of the invoking
+object as a float.
+static Integer getInteger(String propertyName) Returns the value associated
+with the environmental property
+specified by propertyName. A
+null is returned on failure.
+static Integer getInteger(String propertyName,
+int default)
+Returns the value associated
+with the environmental property
+specified by propertyName.
+The value of default is returned
+on failure.
+Table 14-5. The Methods Defined by Integer
+392 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static Integer getInteger(String propertyName,
+Integer default)
+Returns the value associated
+with the environmental property
+specified by propertyName.
+The value of default is returned
+on failure.
+int hashCode( ) Returns the hash code for the
+invoking object.
+int intValue( ) Returns the value of the invoking
+object as an int.
+long longValue( ) Returns the value of the invoking
+object as a long.
+static int parseInt(String str)
+throws NumberFormatException
+Returns the integer equivalent
+of the number contained in
+the string specified by str using
+radix 10.
+static int parseInt(String str, int radix)
+throws NumberFormatException
+Returns the integer equivalent of
+the number contained in the
+string specified by str using the
+specified radix.
+short shortValue( ) Returns the value of the invoking
+object as a short.
+static String toBinaryString(int num) Returns a string that contains the
+binary equivalent of num.
+static String toHexString(int num) Returns a string that contains the
+hexadecimal equivalent of num.
+static String toOctalString(int num) Returns a string that contains the
+octal equivalent of num.
+String toString( ) Returns a string that contains the
+decimal equivalent of the
+invoking object.
+static String toString(int num) Returns a string that contains the
+decimal equivalent of num.
+Table 14-5. The Methods Defined by Integer (continued)
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 393
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static String toString(int num, int radix) Returns a string that contains the
+decimal equivalent of num using
+the specified radix.
+static Integer valueOf(String str)
+throws NumberFormatException
+Returns an Integer object that
+contains the value specified by
+the string in str.
+static Integer valueOf(String str, int radix)
+throws NumberFormatException
+Returns an Integer object that
+contains the value specified by
+the string in str using the
+specified radix.
+Table 14-5. The Methods Defined by Integer (continued)
+Method Description
+byte byteValue( ) Returns the value of the invoking
+object as a byte.
+int compareTo(Long l) Compares the numerical value of
+the invoking object with that of l.
+Returns 0 if the values are equal.
+Returns a negative value if the
+invoking object has a lower
+value. Returns a positive value if
+the invoking object has a greater
+value. (Added by Java 2)
+int compareTo(Object obj) Operates identically to
+compareTo(Long) if obj is of
+class Long. Otherwise, throws a
+ClassCastException. (Added by
+Java 2)
+Table 14-6. The Methods Defined by Long
+394 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static Long decode(String str)
+throws NumberFormatException
+Returns a Long object that
+contains the value specified by
+the string in str.
+double doubleValue( ) Returns the value of the invoking
+object as a double.
+boolean equals(Object LongObj) Returns true if the invoking long
+object is equivalent to LongObj.
+Otherwise, it returns false.
+float floatValue( ) Returns the value of the invoking
+object as a float.
+static Long getLong(String propertyName) Returns the value associated
+with the environmental property
+specified by propertyName. A
+null is returned on failure.
+static Long getLong(String propertyName,
+long default)
+Returns the value associated
+with the environmental property
+specified by propertyName.
+The value of default is returned
+on failure.
+static Long getLong(String propertyName,
+Long default)
+Returns the value associated
+with the environmental property
+specified by propertyName.
+The value of default is returned
+on failure.
+int hashCode( ) Returns the hash code for the
+invoking object.
+int intValue( ) Returns the value of the invoking
+object as an int.
+long longValue( ) Returns the value of the invoking
+object as a long.
+Table 14-6. The Methods Defined by Long (continued)
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 395
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static long parseLong(String str)
+throws NumberFormatException
+Returns the long equivalent of
+the number contained in the
+string specified by str in radix 10.
+static long parseLong(String str, int radix)
+throws NumberFormatException
+Returns the long equivalent of
+the number contained in the
+string specified by str using the
+specified radix.
+short shortValue( ) Returns the value of the invoking
+object as a short.
+static String toBinaryString(long num) Returns a string that contains the
+binary equivalent of num.
+static String toHexString(long num) Returns a string that contains the
+hexadecimal equivalent of num.
+static String toOctalString(long num) Returns a string that contains the
+octal equivalent of num.
+String toString( ) Returns a string that contains the
+decimal equivalent of the
+invoking object.
+static String toString(long num) Returns a string that contains the
+decimal equivalent of num.
+static String toString(long num, int radix) Returns a string that contains the
+decimal equivalent of num using
+the specified radix.
+static Long valueOf(String str)
+throws NumberFormatException
+Returns a Long object that
+contains the value specified by
+the string in str.
+static Long valueOf(String str, int radix)
+throws NumberFormatException
+Returns a Long object that
+contains the value specified by
+the string in str using the
+specified radix.
+Table 14-6. The Methods Defined by Long (continued)
+396 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Converting Numbers to and from Strings
+One of the most common programming chores is converting the string representation
+of a number into its internal, binary format. Fortunately, Java provides an easy way to
+accomplish this. The Byte, Short, Integer, and Long classes provide the parseByte( ),
+parseShort( ), parseInt( ), and parseLong( ) methods, respectively. These methods
+return the byte, short, int, or long equivalent of the numeric string with which they are
+called. (Similar methods also exist for the Float and Double classes.)
+The following program demonstrates parseInt( ). It sums a list of integers entered
+by the user. It reads the integers using readLine( ) and uses parseInt( ) to convert these
+strings into their int equivalents.
+/* This program sums a list of numbers entered
+by the user.  It converts the string representation
+of each number into an int using parseInt().
+*/
+import java.io.*;
+class ParseDemo {
+public static void main(String args[])
+throws IOException
+{
+// create a BufferedReader using System.in
+BufferedReader br = new
+BufferedReader(new InputStreamReader(System.in));
+String str;
+int i;
+int sum=0;
+System.out.println("Enter numbers, 0 to quit.");
+do {
+str = br.readLine();
+try {
+i = Integer.parseInt(str);
+} catch(NumberFormatException e) {
+System.out.println("Invalid format");
+i = 0;
+}
+sum += i;
+System.out.println("Current sum is: " + sum);
+} while(i != 0);
+}
+}
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 397
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+To convert a whole number into a decimal string, use the versions of toString( )
+defined in the Byte, Short, Integer, or Long classes. The Integer and Long classes also
+provide the methods toBinaryString( ), toHexString( ), and toOctalString( ), which
+convert a value into a binary, hexadecimal, or octal string, respectively.
+The following program demonstrates binary, hexadecimal, and octal conversion:
+/* Convert an integer into binary, hexadecimal,
+and octal.
+*/
+class StringConversions {
+public static void main(String args[]) {
+int num = 19648;
+System.out.println(num + " in binary: " +
+Integer.toBinaryString(num));
+System.out.println(num + " in octal: " +
+Integer.toOctalString(num));
+System.out.println(num + " in hexadecimal: " +
+Integer.toHexString(num));
+}
+}
+The output of this program is shown here:
+19648 in binary: 100110011000000
+19648 in octal: 46300
+19648 in hexadecimal: 4cc0
+Character
+Character is a simple wrapper around a char. The constructor for Character is
+Character(char ch)
+Here, ch specifies the character that will be wrapped by the Character object
+being created.
+To obtain the char value contained in a Character object, call charValue( ),
+shown here:
+char charValue( )
+It returns the character.
+398 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The Character class defines several constants, including the following:
+MAX_RADIX The largest radix
+MIN_RADIX The smallest radix
+MAX_VALUE The largest character value
+MIN_VALUE The smallest character value
+TYPE The Class object for char
+Character includes several static methods that categorize characters and alter their
+case. They are shown in Table 14-7. The following example demonstrates several of
+these methods.
+// Demonstrate several Is... methods.
+class IsDemo {
+public static void main(String args[]) {
+char a[] = {'a', 'b', '5', '?', 'A', ' '};
+for(int i=0; i<a.length; i++) {
+if(Character.isDigit(a[i]))
+System.out.println(a[i] + " is a digit.");
+if(Character.isLetter(a[i]))
+System.out.println(a[i] + " is a letter.");
+if(Character.isWhitespace(a[i]))
+System.out.println(a[i] + " is whitespace.");
+if(Character.isUpperCase(a[i]))
+System.out.println(a[i] + " is uppercase.");
+if(Character.isLowerCase(a[i]))
+System.out.println(a[i] + " is lowercase.");
+}
+}
+}
+The output from this program is shown here:
+a is a letter.
+a is lowercase.
+b is a letter.
+b is lowercase.
+5 is a digit.
+A is a letter.
+A is uppercase.
+is whitespace.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 399
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static boolean isDefined(char ch) Returns true if ch is defined by
+Unicode. Otherwise, it returns false.
+static boolean isDigit(char ch) Returns true if ch is a digit.
+Otherwise, it returns false.
+static boolean isIdentifierIgnorable(char ch) Returns true if ch should be
+ignored in an identifier.
+Otherwise, it returns false.
+static boolean isISOControl(char ch) Returns true if ch is an ISO control
+character. Otherwise, it returns
+false.
+static boolean isJavaIdentifierPart(char ch) Returns true if ch is allowed as
+part of a Java identifier (other than
+the first character). Otherwise, it
+returns false.
+static boolean isJavaIdentifierStart(char ch) Returns true if ch is allowed
+as the first character of a
+Java identifier. Otherwise,
+it returns false.
+static boolean isLetter(char ch) Returns true if ch is a letter.
+Otherwise, it returns false.
+static boolean isLetterOrDigit(char ch) Returns true if ch is a letter or a
+digit. Otherwise, it returns false.
+static boolean isLowerCase(char ch) Returns true if ch is a
+lowercase letter. Otherwise,
+it returns false.
+static boolean isMirrored(char ch) Returns true if ch is a mirrored
+Unicode character. A mirrored
+character is one that is reversed for
+text that is displayed right-to-left.
+(Added by Java 2, version 1.4)
+static boolean isSpaceChar(char ch) Returns true if ch is a Unicode
+space character. Otherwise, it
+returns false.
+Table 14-7. Various Character Methods
+400 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Character defines the forDigit( ) and digit( ) methods, shown here:
+static char forDigit(int num, int radix)
+static int digit(char digit, int radix)
+forDigit( ) returns the digit character associated with the value of num. The radix of the
+conversion is specified by radix. digit( ) returns the integer value associated with the
+specified character (which is presumably a digit) according to the specified radix.
+Another method defined by Character is compareTo( ), which has the following
+two forms:
+int compareTo(Character c)
+int compareTo(Object obj)
+The first form returns 0 if the invoking object and c have the same value. It returns a
+negative value if the invoking object has a lower value. Otherwise, it returns a positive
+value. The second form works just like the first if obj is a reference to a Character.
+Otherwise, a ClassCastException is thrown. These methods were added by Java 2.
+Method Description
+static boolean isTitleCase(char ch) Returns true if ch is a Unicode
+titlecase character. Otherwise,
+it returns false.
+static boolean isUnicodeIdentifierPart(char ch) Returns true if ch is allowed as
+part of a Unicode identifier (other
+than the first character).
+Otherwise, it returns false.
+static boolean isUnicodeIdentifierStart(char ch) Returns true if ch is allowed
+as the first character of a Unicode
+identifier. Otherwise,
+it returns false.
+static boolean isUpperCase(char ch) Returns true if ch is an uppercase
+letter. Otherwise, it returns false.
+static boolean isWhitespace(char ch) Returns true if ch is whitespace.
+Otherwise, it returns false.
+static char toLowerCase(char ch) Returns lowercase equivalent of ch.
+static char toTitleCase(char ch) Returns titlecase equivalent of ch.
+static char toUpperCase(char ch) Returns uppercase equivalent of ch.
+Table 14-7. Various Character Methods (continued)
+Java 2, version 1.4 adds a method called getDirectionality( ) which can be used to
+determine the direction of a character. Several new constants have been added which
+describe directionality. Most programs will not need to use character directionality.
+Character also defines the equals( ) and hashCode( ) methods.
+Two other character-related classes are Character.Subset, used to describe a subset
+of Unicode, and Character.UnicodeBlock, which contains Unicode character blocks.
+Boolean
+Boolean is a very thin wrapper around boolean values, which is useful mostly when
+you want to pass a boolean variable by reference. It contains the constants TRUE and
+FALSE, which define true and false Boolean objects. Boolean also defines the TYPE
+field, which is the Class object for boolean. Boolean defines these constructors:
+Boolean(boolean boolValue)
+Boolean(String boolString)
+In the first version, boolValue must be either true or false. In the second version, if
+boolString contains the string “true” (in uppercase or lowercase), then the new Boolean
+object will be true. Otherwise, it will be false.
+Boolean defines the methods shown in Table 14-8.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 401
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+boolean booleanValue( ) Returns boolean equivalent.
+boolean equals(Object boolObj) Returns true if the invoking object is equivalent
+to boolObj. Otherwise, it returns false.
+static boolean
+getBoolean(String propertyName)
+Returns true if the system property specified
+by propertyName is true. Otherwise, it returns
+false.
+int hashCode( ) Returns the hash code for the invoking object.
+String toString( ) Returns the string equivalent of the invoking
+object.
+static String toString(boolean boolVal) Returns the string equivalent of boolVal.
+(Added by Java 2, version 1.4)
+static Boolean valueOf(boolean boolVal) Returns the Boolean equivalent of boolVal.
+(Added by Java 2, version 1.4)
+static Boolean valueOf(String boolString) Returns true if boolString contains the string
+“true” (in uppercase or lowercase).
+Otherwise, it returns false.
+Table 14-8. The Methods Defined by Boolean
+Void
+The Void class has one field, TYPE, which holds a reference to the Class object for type
+void. You do not create instances of this class.
+Process
+The abstract Process class encapsulates a process—that is, an executing program. It is
+used primarily as a superclass for the type of objects created by exec( ) in the Runtime
+class described in the next section. Process contains the abstract methods shown in
+Table 14-9.
+402 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void destroy( ) Terminates the process.
+int exitValue( ) Returns an exit code obtained
+from a subprocess.
+InputStream getErrorStream( ) Returns an input stream that
+reads input from the process’ err
+output stream.
+InputStream getInputStream( ) Returns an input stream that
+reads input from the process’ out
+output stream.
+OutputStream getOutputStream( ) Returns an output stream that
+writes output to the process’ in
+input stream.
+int waitFor( )
+throws InterruptedException
+Returns the exit code returned by
+the process. This method does not
+return until the process on which
+it is called terminates.
+Table 14-9. The Abstract Methods Defined by Process
+Runtime
+The Runtime class encapsulates the run-time environment. You cannot instantiate a
+Runtime object. However, you can get a reference to the current Runtime object by
+calling the static method Runtime.getRuntime( ). Once you obtain a reference to the
+current Runtime object, you can call several methods that control the state and
+behavior of the Java Virtual Machine. Applets and other untrusted code typically
+cannot call any of the Runtime methods without raising a SecurityException.
+The methods defined by Runtime are shown in Table 14-10. Java 2 deprecates
+the method runFinalizersOnExit( ). This method was added by Java 1.1 but was
+deemed unstable.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 403
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+YMethod Description
+void addShutdownHook(Thread thrd) Registers thrd as a thread to be run when
+the Java virtual machine terminates.
+(Added by Java 2, version 1.3)
+Process exec(String progName)
+throws IOException
+Executes the program specified by
+progName as a separate process. An object
+of type Process is returned that describes
+the new process.
+Process exec(String progName,
+String environment[ ])
+throws IOException
+Executes the program specified by
+progName as a separate process with the
+environment specified by environment. An
+object of type Process is returned that
+describes the new process.
+Process exec(String comLineArray[ ])
+throws IOException
+Executes the command line specified by
+the strings in comLineArray as a separate
+process. An object of type Process is
+returned that describes the new process.
+Process exec(String comLineArray[ ],
+String environment[ ])
+throws IOException
+Executes the command line specified by
+the strings in comLineArray as a separate
+process with the environment specified by
+environment. An object of type Process is
+returned that describes the new process.
+Table 14-10. The Commonly Used Methods Defined by Runtime
+404 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void exit(int exitCode) Halts execution and returns the value of
+exitCode to the parent process. By
+convention, 0 indicates normal
+termination. All other values indicate
+some form of error.
+long freeMemory( ) Returns the approximate number of bytes
+of free memory available to the Java
+run-time system.
+void gc( ) Initiates garbage collection.
+static Runtime getRuntime( ) Returns the current Runtime object.
+void halt(int code) Immediately terminates the Java virtual
+machine. No termination threads or
+finalizers are run. The value of code is
+returned to the invoking process.
+(Added by Java 2, version 1.3)
+void load(String libraryFileName) Loads the dynamic library whose file is
+specified by libraryFileName, which must
+specify its complete path.
+void loadLibrary(String libraryName) Loads the dynamic library whose name is
+associated with libraryName.
+boolean removeShutdownHook(Thread thrd) Removes thrd from the list of threads
+to run when the Java virtual machine
+terminates. It returns true if
+successfulthat is, if the thread was
+removed. (Added by Java 2, verison 1.3)
+void runFinalization( ) Initiates calls to the finalize( ) methods of
+unused but not yet recycled objects.
+long totalMemory( ) Returns the total number of bytes of
+memory available to the program.
+void traceInstructions(boolean traceOn) Turns on or off instruction tracing,
+depending upon the value of traceOn. If
+traceOn is true, the trace is displayed. If it
+is false, tracing is turned off.
+void traceMethodCalls(boolean traceOn) Turns on or off method call tracing,
+depending upon the value of traceOn. If
+traceOn is true, the trace is displayed. If it
+is false, tracing is turned off.
+Table 14-10. The Commonly Used Methods Defined by Runtime (continued)
+Let’s look at two of the most common uses of the Runtime class: memory
+management and executing additional processes.
+Memory Management
+Although Java provides automatic garbage collection, sometimes you will want to
+know how large the object heap is and how much of it is left. You can use this
+information, for example, to check your code for efficiency or to approximate how
+many more objects of a certain type can be instantiated. To obtain these values, use the
+totalMemory( ) and freeMemory( ) methods.
+As we mentioned in Part I, Java’s garbage collector runs periodically to recycle
+unused objects. However, sometimes you will want to collect discarded objects prior to
+the collector’s next appointed rounds. You can run the garbage collector on demand by
+calling the gc( ) method. A good thing to try is to call gc( ) and then call freeMemory( )
+to get a baseline memory usage. Next, execute your code and call freeMemory( ) again
+to see how much memory it is allocating. The following program illustrates this idea:
+// Demonstrate totalMemory(), freeMemory() and gc().
+class MemoryDemo {
+public static void main(String args[]) {
+Runtime r = Runtime.getRuntime();
+long mem1, mem2;
+Integer someints[] = new Integer[1000];
+System.out.println("Total memory is: " +
+r.totalMemory());
+mem1 = r.freeMemory();
+System.out.println("Initial free memory: " + mem1);
+r.gc();
+mem1 = r.freeMemory();
+System.out.println("Free memory after garbage collection: "
++ mem1);
+for(int i=0; i<1000; i++)
+someints[i] = new Integer(i); // allocate integers
+mem2 = r.freeMemory();
+System.out.println("Free memory after allocation: "
++ mem2);
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 405
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+406 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+System.out.println("Memory used by allocation: "
++ (mem1-mem2));
+// discard Integers
+for(int i=0; i<1000; i++) someints[i] = null;
+r.gc(); // request garbage collection
+mem2 = r.freeMemory();
+System.out.println("Free memory after collecting" +
+" discarded Integers: " + mem2);
+}
+}
+Sample output from this program is shown here (of course, your actual results
+may vary):
+Total memory is: 1048568
+Initial free memory: 751392
+Free memory after garbage collection: 841424
+Free memory after allocation: 824000
+Memory used by allocation: 17424
+Free memory after collecting discarded Integers: 842640
+Executing Other Programs
+In safe environments, you can use Java to execute other heavyweight processes (that is,
+programs) on your multitasking operating system. Several forms of the exec( ) method
+allow you to name the program you want to run as well as its input parameters. The
+exec( ) method returns a Process object, which can then be used to control how your
+Java program interacts with this new running process. Because Java can run on a
+variety of platforms and under a variety of operating systems, exec( ) is inherently
+environment-dependent.
+The following example uses exec( ) to launch notepad, Windows’ simple text
+editor. Obviously, this example must be run under the Windows operating system.
+// Demonstrate exec().
+class ExecDemo {
+public static void main(String args[]) {
+Runtime r = Runtime.getRuntime();
+Process p = null;
+try {
+p = r.exec("notepad");
+} catch (Exception e) {
+System.out.println("Error executing notepad.");
+}
+}
+}
+There are several alternate forms of exec( ), but the one shown in the example is the
+most common. The Process object returned by exec( ) can be manipulated by Process’
+methods after the new program starts running. You can kill the subprocess with the
+destroy( ) method. The waitFor( ) method causes your program to wait until the
+subprocess finishes. The exitValue( ) method returns the value returned by the
+subprocess when it is finished. This is typically 0 if no problems occur. Here is the
+preceding exec( ) example modified to wait for the running process to exit:
+// Wait until notepad is terminated.
+class ExecDemoFini {
+public static void main(String args[]) {
+Runtime r = Runtime.getRuntime();
+Process p = null;
+try {
+p = r.exec("notepad");
+p.waitFor();
+} catch (Exception e) {
+System.out.println("Error executing notepad.");
+}
+System.out.println("Notepad returned " + p.exitValue());
+}
+}
+While a subprocess is running, you can write to and read from its standard input and
+output. The getOutputStream( ) and getInputStream( ) methods return the handles to
+standard in and out of the subprocess. (I/O is examined in detail in Chapter 17.)
+System
+The System class holds a collection of static methods and variables. The standard input,
+output, and error output of the Java run time are stored in the in, out, and err variables.
+The methods defined by System are shown in Table 14-11. Many of the methods throw a
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 407
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+SecurityException if the operation is not permitted by the security manager. One other
+point: Java 2 deprecated the method runFinalizersOnExit( ). This method was added by
+Java 1.1, but was determined to be unstable.
+Let’s look at some common uses of System.
+408 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static void arraycopy(Object source,
+int sourceStart,
+Object target,
+int targetStart,
+int size)
+Copies an array. The array to
+be copied is passed in source,
+and the index at which point
+the copy will begin within
+source is passed in sourceStart.
+The array that will receive the
+copy is passed in target, and
+the index at which point the
+copy will begin within target
+is passed in targetStart.
+size is the number of elements
+that are copied.
+static long currentTimeMillis( ) Returns the current time in
+terms of milliseconds since
+midnight, January 1, 1970.
+static void exit(int exitCode) Halts execution and returns
+the value of exitCode to the
+parent process (usually the
+operating system). By
+convention, 0 indicates normal
+termination. All other values
+indicate some form of error.
+static void gc( ) Initiates garbage collection.
+static Properties getProperties( ) Returns the properties
+associated with the Java
+run-time system. (The
+Properties class is described
+in Chapter 15.)
+Table 14-11. The Methods Defined by System
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 409
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static String getProperty(String which) Returns the property
+associated with which. A null
+object is returned if the desired
+property is not found.
+static String getProperty(String which,
+String default)
+Returns the property
+associated with which. If the
+desired property is not found,
+default is returned.
+static SecurityManager getSecurityManager( ) Returns the current security
+manager or a null object if no
+security manager is installed.
+static int identityHashCode(Object obj) Returns the identity hash code
+for obj.
+static void load(String libraryFileName) Loads the dynamic library
+whose file is specified by
+libraryFileName, which must
+specify its complete path.
+static void loadLibrary(String libraryName) Loads the dynamic library
+whose name is associated with
+libraryName.
+static String mapLibraryName(String lib) Returns a platform-specific
+name for the library named lib.
+(Added by Java 2)
+static void runFinalization( ) Initiates calls to the finalize( )
+methods of unused but not yet
+recycled objects.
+static void setErr(PrintStream eStream) Sets the standard err stream
+to eStream.
+static void setIn(InputStream iStream) Sets the standard in stream
+to iStream.
+static void setOut(PrintStream oStream) Sets the standard out stream
+to oStream.
+Table 14-11. The Methods Defined by System (continued)
+410 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Using currentTimeMillis( ) to Time Program Execution
+One use of the System class that you might find particularly interesting is to use
+the currentTimeMillis( ) method to time how long various parts of your program
+take to execute. The currentTimeMillis( ) method returns the current time in terms of
+milliseconds since midnight, January 1, 1970. To time a section of your program, store
+this value just before beginning the section in question. Immediately upon completion,
+call currentTimeMillis( ) again. The elapsed time will be the ending time minus the
+starting time. The following program demonstrates this:
+// Timing program execution.
+class Elapsed {
+public static void main(String args[]) {
+long start, end;
+System.out.println("Timing a for loop from 0 to 1,000,000");
+// time a for loop from 0 to 1,000,000
+start = System.currentTimeMillis(); // get starting time
+for(int i=0; i < 1000000; i++) ;
+end = System.currentTimeMillis(); // get ending time
+System.out.println("Elapsed time: " + (end-start));
+}
+}
+Method Description
+static void
+setProperties(Properties sysProperties)
+Sets the current system
+properties as specified
+by sysProperties.
+static String setProperty(String which, String v) Assigns the value v to the
+property named which.
+(Added by Java 2)
+static void setSecurityManager(
+SecurityManager secMan)
+Sets the security manager to
+that specified by secMan.
+Table 14-11. The Methods Defined by System (continued)
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 411
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Here is a sample run (remember that your results probably will differ):
+Timing a for loop from 0 to 1,000,000
+Elapsed time: 10
+Using arraycopy( )
+The arraycopy( ) method can be used to copy quickly an array of any type from one
+place to another. This is much faster than the equivalent loop written out longhand in
+Java. Here is an example of two arrays being copied by the arraycopy( ) method. First,
+a is copied to b. Next, all of a’s elements are shifted down by one. Then, b is shifted up
+by one.
+// Using arraycopy().
+class ACDemo {
+static byte a[] = { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 };
+static byte b[] = { 77, 77, 77, 77, 77, 77, 77, 77, 77, 77 };
+public static void main(String args[]) {
+System.out.println("a = " + new String(a));
+System.out.println("b = " + new String(b));
+System.arraycopy(a, 0, b, 0, a.length);
+System.out.println("a = " + new String(a));
+System.out.println("b = " + new String(b));
+System.arraycopy(a, 0, a, 1, a.length - 1);
+System.arraycopy(b, 1, b, 0, b.length - 1);
+System.out.println("a = " + new String(a));
+System.out.println("b = " + new String(b));
+}
+}
+As you can see from the following output, you can copy using the same source and
+destination in either direction:
+a = ABCDEFGHIJ
+b = MMMMMMMMMM
+a = ABCDEFGHIJ
+b = ABCDEFGHIJ
+a = AABCDEFGHI
+b = BCDEFGHIJJ
+412 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Environment Properties
+The following properties are available in Java 2, version 1.4:
+file.separator java.specification.version java.vm.version
+java.class.path java.vendor line.separator
+java.class.version java.vendor.url os.arch
+java.compiler java.version os.name
+java.ext.dirs java.vm.name os.version
+java.home java.vm.specification.name path.separator
+java.io.tmpdir java.vm.specification.vendor user.dir
+java.library.path java.vm.specification.version user.home
+java.specification.name java.vm.vendor user.name
+java.specification.vendor
+You can obtain the values of various environment variables by calling the
+System.getProperty( ) method. For example, the following program displays the path
+to the current user directory:
+class ShowUserDir {
+public static void main(String args[]) {
+System.out.println(System.getProperty("user.dir"));
+}
+}
+Object
+As we mentioned in Part I, Object is a superclass of all other classes. Object defines the
+methods shown in Table 14-12, which are available to every object.
+Using clone( ) and the Cloneable Interface
+Most of the methods defined by Object are discussed elsewhere in this book. However,
+one deserves special attention: clone( ). The clone( ) method generates a duplicate copy
+of the object on which it is called. Only classes that implement the Cloneable interface
+can be cloned.
+The Cloneable interface defines no members. It is used to indicate that a class
+allows a bitwise copy of an object (that is, a clone) to be made. If you try to call clone( )
+on a class that does not implement Cloneable, a CloneNotSupportedException is
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 413
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+thrown. When a clone is made, the constructor for the object being cloned is not called.
+A clone is simply an exact copy of the original.
+Cloning is a potentially dangerous action, because it can cause unintended side
+effects. For example, if the object being cloned contains a reference variable called
+obRef, then when the clone is made, obRef in the clone will refer to the same object as
+does obRef in the original. If the clone makes a change to the contents of the object
+Method Description
+Object clone( )
+throws
+CloneNotSupportedException
+Creates a new object that is the same as the
+invoking object.
+boolean equals(Object object) Returns true if the invoking object is
+equivalent to object.
+void finalize( )
+throws Throwable
+Default finalize( ) method. This is usually
+overridden by subclasses.
+final Class getClass( ) Obtains a Class object that describes the
+invoking object.
+int hashCode( ) Returns the hash code associated with the
+invoking object.
+final void notify( ) Resumes execution of a thread waiting on
+the invoking object.
+final void notifyAll( ) Resumes execution of all threads waiting
+on the invoking object.
+String toString( ) Returns a string that describes the object.
+final void wait( )
+throws InterruptedException
+Waits on another thread of execution.
+final void wait(long milliseconds)
+throws InterruptedException
+Waits up to the specified number of
+milliseconds on another thread of execution.
+final void wait(long milliseconds,
+int nanoseconds)
+throws InterruptedException
+Waits up to the specified number of
+milliseconds plus nanoseconds on another
+thread of execution.
+Table 14-12. The Methods Defined by Object
+414 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+referred to by obRef, then it will be changed for the original object, too. Here is another
+example. If an object opens an I/O stream and is then cloned, two objects will be
+capable of operating on the same stream. Further, if one of these objects closes the
+stream, the other object might still attempt to write to it, causing an error.
+Because cloning can cause problems, clone( ) is declared as protected inside Object.
+This means that it must either be called from within a method defined by the class that
+implements Cloneable, or it must be explicitly overridden by that class so that it is
+public. Let’s look at an example of each approach.
+The following program implements Cloneable and defines the method
+cloneTest( ), which calls clone( ) in Object:
+// Demonstrate the clone() method.
+class TestClone implements Cloneable {
+int a;
+double b;
+// This method calls Object's clone().
+TestClone cloneTest() {
+try {
+// call clone in Object.
+return (TestClone) super.clone();
+} catch(CloneNotSupportedException e) {
+System.out.println("Cloning not allowed.");
+return this;
+}
+}
+}
+class CloneDemo {
+public static void main(String args[]) {
+TestClone x1 = new TestClone();
+TestClone x2;
+x1.a = 10;
+x1.b = 20.98;
+x2 = x1.cloneTest(); // clone x1
+System.out.println("x1: " + x1.a + " " + x1.b);
+System.out.println("x2: " + x2.a + " " + x2.b);
+}
+}
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 415
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Here, the method cloneTest( ) calls clone( ) in Object and returns the result. Notice
+that the object returned by clone( ) must be cast into its appropriate type (TestClone).
+The following example overrides clone( ) so that it can be called from code outside
+of its class. To do this, its access specifier must be public, as shown here:
+// Override the clone() method.
+class TestClone implements Cloneable {
+int a;
+double b;
+// clone() is now overridden and is public.
+public Object clone() {
+try {
+// call clone in Object.
+return super.clone();
+} catch(CloneNotSupportedException e) {
+System.out.println("Cloning not allowed.");
+return this;
+}
+}
+}
+class CloneDemo2 {
+public static void main(String args[]) {
+TestClone x1 = new TestClone();
+TestClone x2;
+x1.a = 10;
+x1.b = 20.98;
+// here, clone() is called directly.
+x2 = (TestClone) x1.clone();
+System.out.println("x1: " + x1.a + " " + x1.b);
+System.out.println("x2: " + x2.a + " " + x2.b);
+}
+}
+The side effects caused by cloning are sometimes difficult to see at first. It is easy to
+think that a class is safe for cloning when it actually is not. In general, you should not
+implement Cloneable for any class without good reason.
+Class
+Class encapsulates the run-time state of an object or interface. Objects of type Class are
+created automatically, when classes are loaded. You cannot explicitly declare a Class
+object. Generally, you obtain a Class object by calling the getClass( ) method defined
+by Object. Some of the most commonly used methods defined by Class are shown in
+Table 14-13.
+416 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static Class forName(String name)
+throws ClassNotFoundException
+Returns a Class object given its
+complete name.
+static Class forName(String name,
+boolean how,
+ClassLoader ldr)
+throws ClassNotFoundException
+Returns a Class object given its
+complete name. The object is
+loaded using the loader specified
+by ldr. If how is true, the object is
+initialized; otherwise it is not.
+(Added by Java 2)
+Class[ ] getClasses( ) Returns a Class object for each of
+the public classes and interfaces that
+are members of the invoking object.
+ClassLoader getClassLoader( ) Returns the ClassLoader object that
+loaded the class or interface used to
+instantiate the invoking object.
+Constructor[ ] getConstructors( )
+throws SecurityException
+Returns a Constructor object for all
+the public constructors of this class.
+Constructor[ ] getDeclaredConstructors( )
+throws SecurityException
+Returns a Constructor object for all
+the constructors that are declared by
+this class.
+Field[ ] getDeclaredFields( )
+throws SecurityException
+Returns a Field object for all the
+fields that are declared by this class.
+Method[ ] getDeclaredMethods( )
+throws SecurityException
+Returns a Method object for all the
+methods that are declared by this
+class or interface.
+Table 14-13. Some Methods Defined by Class
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 417
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+Field[ ] getFields( )
+throws SecurityException
+Returns a Field object for all the
+public fields of this class.
+Class[ ] getInterfaces( ) When invoked on an object, this
+method returns an array of the
+interfaces implemented by the class
+type of the object. When invoked on
+an interface, this method returns
+an array of interfaces extended by
+the interface.
+Method[ ] getMethods( )
+throws SecurityException
+Returns a Method object for all the
+public methods of this class.
+String getName( ) Returns the complete name
+of the class or interface of the
+invoking object.
+ProtectionDomain getProtectionDomain( ) Returns the protection domain
+associated with the invoking object.
+(Added by Java 2)
+Class getSuperclass( ) Returns the superclass of the
+invoking object. The return value
+is null if the invoking object is of
+type Object.
+boolean isInterface( ) Returns true if the invoking object
+is an interface. Otherwise, it
+returns false.
+Object newInstance( )
+throws IllegalAccessException,
+InstantiationException
+Creates a new instance (i.e., a new
+object) that is of the same type as
+the invoking object. This is
+equivalent to using new with the
+class’ default constructor. The new
+object is returned.
+String toString( ) Returns the string representation of
+the invoking object or interface.
+Table 14-13. Some Methods Defined by Class (continued)
+418 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The methods defined by Class are often useful in situations where run-time type
+information about an object is required. As Table 14-13 shows, methods are provided
+that allow you to determine additional information about a particular class, such as its
+public constructors, fields, and methods. This is important for the Java Beans
+functionality, which is discussed later in this book.
+The following program demonstrates getClass( ) (inherited from Object) and
+getSuperclass( ) (from Class):
+// Demonstrate Run-Time Type Information.
+class X {
+int a;
+float b;
+}
+class Y extends X {
+double c;
+}
+class RTTI {
+public static void main(String args[]) {
+X x = new X();
+Y y = new Y();
+Class clObj;
+clObj = x.getClass(); // get Class reference
+System.out.println("x is object of type: " +
+clObj.getName());
+clObj = y.getClass(); // get Class reference
+System.out.println("y is object of type: " +
+clObj.getName());
+clObj = clObj.getSuperclass();
+System.out.println("y's superclass is " +
+clObj.getName());
+}
+}
+The output from this program is shown here:
+x is object of type: X
+y is object of type: Y
+y’s superclass is X
+ClassLoader
+The abstract class ClassLoader defines how classes are loaded. Your application can
+create subclasses that extend ClassLoader, implementing its methods. Doing so allows
+you to load classes in some way other than the way they are normally loaded by the
+Java run-time system. Some of the methods defined by ClassLoader are shown in
+Table 14-14.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 419
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+final Class defineClass(String str, byte b[ ],
+int index,
+int numBytes)
+throws ClassFormatError
+Returns a Class object. The
+name of the class is in str
+and the object is contained
+in the array of bytes
+specified by b. The object
+begins within this array at
+the index specified by index
+and is numBytes long. The
+data in b must represent a
+valid object.
+final Class findSystemClass(String name)
+throws ClassNotFoundException
+Returns a Class object given
+its name.
+Class loadClass(String name,
+boolean callResolveClass)
+throws ClassNotFoundException
+An implementation of this
+abstract method must load a
+class given its name and call
+resolveClass( ) if
+callResolveClass is true.
+final void resolveClass(Class obj) The class referred to by
+obj is resolved (i.e., its name
+is entered into the class
+name space).
+Table 14-14. Some of the Methods Defined by ClassLoader
+420 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Math
+The Math class contains all the floating-point functions that are used for geometry and
+trigonometry, as well as several general-purpose methods. Math defines two double
+constants: E (approximately 2.72) and PI (approximately 3.14).
+Transcendental Functions
+The following three methods accept a double parameter for an angle in radians and
+return the result of their respective transcendental function:
+Method Description
+static double sin(double arg) Returns the sine of the angle specified
+by arg in radians.
+static double cos(double arg) Returns the cosine of the angle specified
+by arg in radians.
+static double tan(double arg) Returns the tangent of the angle
+specified by arg in radians.
+The next methods take as a parameter the result of a transcendental function and
+return, in radians, the angle that would produce that result. They are the inverse of
+their non-arc companions.
+Method Description
+static double asin(double arg) Returns the angle whose sine is specified
+by arg.
+static double acos(double arg) Returns the angle whose cosine is
+specified by arg.
+static double atan(double arg) Returns the angle whose tangent is
+specified by arg.
+static double atan2(double x, double y) Returns the angle whose tangent is x/y.
+Exponential Functions
+Math defines the following exponential methods:
+Method Description
+static double exp(double arg) Returns e to the arg.
+static double log(double arg) Returns the natural logarithm of arg.
+Method Description
+static double pow(double y, double x) Returns y raised to the x; for example,
+pow(2.0, 3.0) returns 8.0.
+static double sqrt(double arg) Returns the square root of arg.
+Rounding Functions
+The Math class defines several methods that provide various types of rounding
+operations. They are shown in Table 14-15.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 421
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+static int abs(int arg) Returns the absolute value of arg.
+static long abs(long arg) Returns the absolute value of arg.
+static float abs(float arg) Returns the absolute value of arg.
+static double abs(double arg) Returns the absolute value of arg.
+static double ceil(double arg) Returns the smallest whole number greater
+than or equal to arg.
+static double floor(double arg) Returns the largest whole number less than
+or equal to arg.
+static int max(int x, int y) Returns the maximum of x and y.
+static long max(long x, long y) Returns the maximum of x and y.
+static float max(float x, float y) Returns the maximum of x and y.
+static double max(double x, double y) Returns the maximum of x and y.
+static int min(int x, int y) Returns the minimum of x and y
+static long min(long x, long y) Returns the minimum of x and y.
+static float min(float x, float y) Returns the minimum of x and y.
+static double min(double x, double y) Returns the minimum of x and y.
+static double rint(double arg) Returns the integer nearest in value to arg.
+static int round(float arg) Returns arg rounded up to the nearest int.
+static long round(double arg) Returns arg rounded up to the nearest long.
+Table 14-15. The Rounding Methods Defined by Math
+Miscellaneous Math Methods
+In addition to the methods just shown, Math defines the following methods:
+static double IEEEremainder(double dividend, double divisor)
+static double random( )
+static double toRadians(double angle)
+static double toDegrees(double angle)
+IEEEremainder( ) returns the remainder of dividend/divisor. random( ) returns a
+pseudorandom number. This value will be between 0 and 1. Most of the time, you will
+use the Random class when you need to generate random numbers. The toRadians( )
+method converts degrees to radians. toDegrees( ) converts radians to degrees. The last
+two methods were added by Java 2.
+Here is a program that demonstrates toRadians( ) and toDegrees( ):
+// Demonstrate toDegrees() and toRadians().
+class Angles {
+public static void main(String args[]) {
+double theta = 120.0;
+System.out.println(theta + " degrees is " +
+Math.toRadians(theta) + " radians.");
+theta = 1.312;
+System.out.println(theta + " radians is " +
+Math.toDegrees(theta) + " degrees.");
+}
+}
+The output is shown here.
+120.0 degrees is 2.0943951023931953 radians.
+1.312 radians is 75.17206272116401 degrees.
+StrictMath
+Java 2, version 1.3 added the StrictMath class. This class defines a complete set
+of mathematical methods that parallel those in Math.  The difference is that the
+StrictMath version is guaranteed to generate precisely identical results across all Java
+implementations whereas the methods in Math are given more latitude in order to
+improve performance.
+422 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 423
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Compiler
+The Compiler class supports the creation of Java environments in which Java bytecode
+is compiled into executable code rather than interpreted. It is not for normal
+programming use.
+Thread, ThreadGroup, and Runnable
+The Runnable interface and the Thread and ThreadGroup classes support
+multithreaded programming. Each is examined next.
+An overview of the techniques used to manage threads, implement the Runnable
+interface, and create multithreaded programs is presented in Chapter 11.
+The Runnable Interface
+The Runnable interface must be implemented by any class that will initiate a separate
+thread of execution. Runnable only defines one abstract method, called run( ), which is
+the entry point to the thread. It is defined like this:
+abstract void run( )
+Threads that you create must implement this method.
+Thread
+Thread creates a new thread of execution. It defines the following commonly
+used constructors:
+Thread( )
+Thread(Runnable threadOb)
+Thread(Runnable threadOb, StringthreadName)
+Thread(String threadName)
+Thread(ThreadGroup groupOb, Runnable threadOb)
+Thread(ThreadGroup groupOb, Runnable threadOb, String threadName)
+Thread(ThreadGroup groupOb, String threadName)
+threadOb is an instance of a class that implements the Runnable interface and defines
+where execution of the thread will begin. The name of the thread is specified by
+threadName. When a name is not specified, one is created by the Java Virtual Machine.
+groupOb specifies the thread group to which the new thread will belong. When no thread
+group is specified, the new thread belongs to the same group as the parent thread.
+The following constants are defined by Thread:
+MAX_PRIORITY
+MIN_PRIORITY
+NORM_PRIORITY
+As expected, these constants specify the maximum, minimum, and default
+thread priorities.
+The methods defined by Thread are shown in Table 14-16. In versions of Java
+prior to 2, Thread also included the methods stop( ), suspend( ), and resume( ).
+However, as explained in Chapter 11, these have been deprecated by Java 2 because
+they were inherently unstable. Also deprecated by Java 2 is countStackFrames( ),
+because it calls suspend( ).
+424 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static int activeCount( ) Returns the number of threads in the
+group to which the thread belongs.
+void checkAccess( ) Causes the security manager to verify
+that the current thread can access
+and/or change the thread on which
+checkAccess( ) is called.
+static Thread currentThread( ) Returns a Thread object that
+encapsulates the thread that calls
+this method.
+void destroy( ) Terminates the thread.
+static void dumpStack( ) Displays the call stack for the thread.
+static int enumerate(Thread threads[ ]) Puts copies of all Thread objects in the
+current thread’s group into threads. The
+number of threads is returned.
+ClassLoader getContextClassLoader( ) Returns the class loader that is used to
+load classes and resources for this
+thread. (Added by Java 2)
+final String getName( ) Returns the thread’s name.
+final int getPriority( ) Returns the thread’s priority setting.
+final ThreadGroup getThreadGroup( ) Returns the ThreadGroup object of
+which the invoking thread is a member.
+static boolean holdsLock(Object ob) Returns true if the invoking thread
+owns the lock on ob. Returns false
+otherwise. (Added by Java 2, version 1.4)
+Table 14-16. The Methods Defined by Thread
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 425
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void interrupt( ) Interrupts the thread.
+static boolean interrupted( ) Returns true if the currently executing
+thread has been scheduled for
+interruption. Otherwise, it returns false.
+final boolean isAlive( ) Returns true if the thread is still active.
+Otherwise, it returns false.
+final boolean isDaemon( ) Returns true if the thread is a daemon
+thread (one that is part of the Java
+run-time system). Otherwise, it returns
+false.
+boolean isInterrupted( ) Returns true if the thread is interrupted.
+Otherwise, it returns false.
+final void join( )
+throws InterruptedException
+Waits until the thread terminates.
+final void join(long milliseconds)
+throws InterruptedException
+Waits up to the specified number of
+milliseconds for the thread on which it
+is called to terminate.
+final void join(long milliseconds,
+int nanoseconds)
+throws InterruptedException
+Waits up to the specified number of
+milliseconds plus nanoseconds for the
+thread on which it is called to terminate.
+void run( ) Begins execution of a thread.
+void setContextClassLoader(ClassLoader cl) Sets the class loader that will be used
+by the invoking thread to cl. (Added
+by Java 2)
+final void setDaemon(boolean state) Flags the thread as a
+daemon thread.
+final void setName(String threadName) Sets the name of the thread to that
+specified by threadName.
+final void setPriority(int priority) Sets the priority of the thread to that
+specified by priority.
+Table 14-16. The Methods Defined by Thread (continued)
+426 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+ThreadGroup
+ThreadGroup creates a group of threads. It defines these two constructors:
+ThreadGroup(String groupName)
+ThreadGroup(ThreadGroup parentOb, String groupName)
+For both forms, groupName specifies the name of the thread group. The first version
+creates a new group that has the current thread as its parent. In the second form, the
+parent is specified by parentOb.
+The methods defined by ThreadGroup are shown in Table 14-17. In versions of Java
+prior to 2, ThreadGroup also included the methods stop( ), suspend( ), and resume( ).
+These have been deprecated by Java 2 because they were inherently unstable.
+Thread groups offer a convenient way to manage groups of threads as a unit. This
+is particularly valuable in situations in which you want to suspend and resume a
+number of related threads. For example, imagine a program in which one set of threads
+is used for printing a document, another set is used to display the document on the
+screen, and another set saves the document to a disk file. If printing is aborted, you
+will want an easy way to stop all threads related to printing. Thread groups offer this
+Method Description
+static void sleep(long milliseconds)
+throws InterruptedException
+Suspends execution of the
+thread for the specified
+number of milliseconds.
+static void sleep(long milliseconds,
+int nanoseconds)
+throws InterruptedException
+Suspends execution of the thread for
+the specified number of milliseconds
+plus nanoseconds.
+void start( ) Starts execution of the thread.
+String toString( ) Returns the string equivalent of
+a thread.
+static void yield( ) The calling thread yields the CPU to
+another thread.
+Table 14-16. The Methods Defined by Thread (continued)
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 427
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+int activeCount( ) Returns the number of threads in
+the group plus any groups for
+which this thread is a parent.
+int activeGroupCount( ) Returns the number of groups
+for which the invoking thread
+is a parent.
+final void checkAccess( ) Causes the security manager to
+verify that the invoking thread
+may access and/or change the
+group on which checkAccess( )
+is called.
+final void destroy( ) Destroys the thread group
+(and any child groups) on which
+it is called.
+int enumerate(Thread group[ ]) The threads that comprise the
+invoking thread group are put into
+the group array.
+int enumerate(Thread group[ ], boolean all) The threads that comprise the
+invoking thread group are put into
+the group array. If all is true, then
+threads in all subgroups of the
+thread are also put into group.
+int enumerate(ThreadGroup group[ ]) The subgroups of the invoking
+thread group are put into the
+group array.
+int enumerate(ThreadGroup group[ ],
+boolean all)
+The subgroups of the invoking
+thread group are put into the group
+array. If all is true, then all
+subgroups of the subgroups (and
+so on) are also put into group.
+final int getMaxPriority( ) Returns the maximum priority
+setting for the group.
+Table 14-17. The Methods Defined by ThreadGroup
+428 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+final String getName( ) Returns the name of the group.
+final ThreadGroup getParent( ) Returns null if the invoking
+ThreadGroup object has no parent.
+Otherwise, it returns the parent of
+the invoking object.
+final void interrupt( ) Invokes the interrupt( ) method of
+all threads in the group. (Added
+by Java 2)
+final boolean isDaemon( ) Returns true if the group is a
+daemon group. Otherwise, it
+returns false.
+boolean isDestroyed( ) Returns true if the group has
+been destroyed. Otherwise, it
+returns false.
+void list( ) Displays information about
+the group.
+final boolean parentOf(ThreadGroup group) Returns true if the invoking thread
+is the parent of group (or group,
+itself). Otherwise, it returns false.
+final void setDaemon(boolean isDaemon) If isDaemon is true, then the
+invoking group is flagged as a
+daemon group.
+final void setMaxPriority(int priority) Sets the maximum priority of the
+invoking group to priority.
+String toString( ) Returns the string equivalent of
+the group.
+void uncaughtException(Thread thread,
+Throwable e)
+This method is called when an
+exception goes uncaught.
+Table 14-17. The Methods Defined by ThreadGroup (continued)
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+convenience. The following program, which creates two thread groups of two threads
+each, illustrates this usage:
+// Demonstrate thread groups.
+class NewThread extends Thread {
+boolean suspendFlag;
+NewThread(String threadname, ThreadGroup tgOb) {
+super(tgOb, threadname);
+System.out.println("New thread: " + this);
+suspendFlag = false;
+start(); // Start the thread
+}
+// This is the entry point for thread.
+public void run() {
+try {
+for(int i = 5; i > 0; i--) {
+System.out.println(getName() + ": " + i);
+Thread.sleep(1000);
+synchronized(this) {
+while(suspendFlag) {
+wait();
+}
+}
+}
+} catch (Exception e) {
+System.out.println("Exception in " + getName());
+}
+System.out.println(getName() + " exiting.");
+}
+void mysuspend() {
+suspendFlag = true;
+}
+synchronized void myresume() {
+suspendFlag = false;
+notify();
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 429
+}}
+class ThreadGroupDemo {
+public static void main(String args[]) {
+ThreadGroup groupA = new ThreadGroup("Group A");
+ThreadGroup groupB = new ThreadGroup("Group B");
+NewThread ob1 = new NewThread("One", groupA);
+NewThread ob2 = new NewThread("Two", groupA);
+NewThread ob3 = new NewThread("Three", groupB);
+NewThread ob4 = new NewThread("Four", groupB);
+System.out.println("\nHere is output from list():");
+groupA.list();
+groupB.list();
+System.out.println();
+System.out.println("Suspending Group A");
+Thread tga[] = new Thread[groupA.activeCount()];
+groupA.enumerate(tga); // get threads in group
+for(int i = 0; i < tga.length; i++) {
+((NewThread)tga[i]).mysuspend(); // suspend each thread
+}
+try {
+Thread.sleep(4000);
+} catch (InterruptedException e) {
+System.out.println("Main thread interrupted.");
+}
+System.out.println("Resuming Group A");
+for(int i = 0; i < tga.length; i++) {
+((NewThread)tga[i]).myresume(); // resume threads in group
+}
+// wait for threads to finish
+try {
+System.out.println("Waiting for threads to finish.");
+ob1.join();
+ob2.join();
+ob3.join();
+430 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+ob4.join();
+} catch (Exception e) {
+System.out.println("Exception in Main thread");
+}
+System.out.println("Main thread exiting.");
+}
+}
+Sample output from this program is shown here:
+New thread: Thread[One,5,Group A]
+New thread: Thread[Two,5,Group A]
+New thread: Thread[Three,5,Group B]
+New thread: Thread[Four,5,Group B]
+Here is output from list():
+java.lang.ThreadGroup[name=Group A,maxpri=10]
+Thread[One,5,Group A]
+Thread[Two,5,Group A]
+java.lang.ThreadGroup[name=Group B,maxpri=10]
+Thread[Three,5,Group B]
+Thread[Four,5,Group B]
+Suspending Group A
+Three: 5
+Four: 5
+Three: 4
+Four: 4
+Three: 3
+Four: 3
+Three: 2
+Four: 2
+Resuming Group A
+Waiting for threads to finish.
+One: 5
+Two: 5
+Three: 1
+Four: 1
+One: 4
+Two: 4
+Three exiting.
+Four exiting.
+One: 3
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 431
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+432 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Two: 3
+One: 2
+Two: 2
+One: 1
+Two: 1
+One exiting.
+Two exiting.
+Main thread exiting.
+Inside the program, notice that thread group A is suspended for four seconds. As
+the output confirms, this causes threads One and Two to pause, but threads Three and
+Four continue running. After the four seconds, threads One and Two are resumed.
+Notice how thread group A is suspended and resumed. First, the threads in group A
+are obtained by calling enumerate( ) on group A. Then, each thread is suspended
+by iterating through the resulting array. To resume the threads in A, the list is
+again traversed and each thread is resumed. One last point: this example uses the
+recommended Java 2 approach to suspending and resuming threads. It does not rely
+upon the deprecated methods suspend( ) and resume( ).
+ThreadLocal and InheritableThreadLocal
+Java 2 added two thread-related classes to java.lang:
+■ ThreadLocal Used to create thread local variables. Each thread will have its
+own copy of a thread local variable.
+■ InheritableThreadLocal Creates thread local variables that may be inherited.
+Package
+Java 2 added a class called Package that encapsulates version data associated with a
+package. Package version information is becoming more important because of the
+proliferation of packages and because a Java program may need to know what version
+of a package is available. The methods defined by Package are shown in Table 14-18.
+The following program demonstrates Package, displaying the packages about which
+the program currently is aware.
+// Demonstrate Package
+class PkgTest {
+public static void main(String args[]) {
+Package pkgs[];
+pkgs = Package.getPackages();
+for(int i=0; i < pkgs.length; i++)
+System.out.println(
+pkgs[i].getName() + " " +
+pkgs[i].getImplementationTitle() + " " +
+pkgs[i].getImplementationVendor() + " " +
+pkgs[i].getImplementationVersion()
+);
+}
+}
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 433
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+YMethod Description
+String getImplementationTitle( ) Returns the title of the
+invoking package.
+String getImplementationVendor( ) Returns the name of
+the implementor of the
+invoking package.
+String getImplementationVersion( ) Returns the version number of
+the invoking package.
+String getName( ) Returns the name of the
+invoking package.
+static Package getPackage(String pkgName) Returns a Package object with
+the name specified by pkgName.
+static Package[ ] getPackages( ) Returns all packages about
+which the invoking program is
+currently aware.
+String getSpecificationTitle( ) Returns the title of the invoking
+package’s specification.
+String getSpecificationVendor( ) Returns the name of the owner
+of the specification for the
+invoking package.
+Table 14-18. The Methods Defined by Package
+RuntimePermission
+RuntimePermission was added to java.lang by Java 2. It relates to Java’s security
+mechanism and is not examined further here.
+Throwable
+The Throwable class supports Java’s exception-handling system, and is the class from
+which all exception classes are derived. It is discussed in Chapter 10.
+SecurityManager
+SecurityManager is an abstract class that your subclasses can implement to create a
+security manager. Generally, you don’t need to implement your own security manager.
+If you do, you need to consult the documentation that comes with your Java
+development system.
+434 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+String getSpecificationVersion( ) Returns the invoking
+package’s specification
+version number.
+int hashCode( ) Returns the hash code for the
+invoking package.
+boolean isCompatibleWith(String verNum)
+throws NumberFormatException
+Returns true if verNum is less
+than or equal to the invoking
+package’s version number.
+boolean isSealed( ) Returns true if the invoking
+package is sealed. Returns
+false otherwise.
+boolean isSealed(URL url) Returns true if the invoking
+package is sealed relative to
+url. Returns false otherwise.
+String toString( ) Returns the string equivalent
+of the invoking package.
+Table 14-18. The Methods Defined by Package (continued)
+StackTraceElement
+Java 2, version 1.4 adds the StackTraceElement class. This class describes a single
+stack frame, which is an individual element of a stack trace when an exception occurs.
+Each stack frame represents an execution point, which includes such things as the
+name of the method, the name of the file, and the source-code line number. An array
+of StackTraceElements is returned by the getStackTrace( ) method of the Throwable
+class. The methods supported by StackTraceElement are shown in Table 14-19. These
+methods give you programmatical access to a stack trace.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 435
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+boolean equals(Object ob) Returns true if the invoking
+StackTraceElement is the same as the one
+passed in ob. Otherwise, it returns false.
+String getClassName( ) Returns the class name of the execution point
+described by the invoking StackTraceElement.
+String getFileName( ) Returns the file name of the execution point
+described by the invoking
+StackTraceElement.
+int getLineNumber( ) Returns the source-code line number of the
+execution point described by the invoking
+StackTraceElement. In some situations the
+line number will not be available, in which
+case a negative value is returned.
+String getMethodName( ) Returns the method name of the execution
+point described by the invoking
+StackTraceElement.
+int hashCode( ) Returns the hash code for the invoking
+StackTraceElement.
+boolean isNativeMethod( ) Returns true if the invoking
+StackTraceElement describes a native
+method. Otherwise, returns false.
+String toString( ) Returns the String equivalent of the invoking
+sequence.
+Table 14-19. The Methods Defined by StackTraceElement
+The CharSequence Interface
+Java 2, version 1.4 adds the CharSequence interface. CharSequence defines methods
+that grant read-only access to a sequence of characters. These methods are shown
+in Table 14-20. This interface is implemented by String and StringBuffer. It is also
+implemented by CharBuffer, which is in the new java.nio package (described later
+in this book).
+The Comparable Interface
+Objects of classes that implement Comparable can be ordered. In other words, classes
+that implement Comparable contain objects that can be compared in some meaningful
+manner. The Comparable interface declares one method that is used to determine what
+Java 2 calls the natural ordering of instances of a class. The signature of the method is
+shown here:
+int compareTo(Object obj)
+This method compares the invoking object with obj. It returns 0 if the values are equal.
+A negative value is returned if the invoking object has a lower value. Otherwise, a
+positive value is returned.
+This interface is implemented by several of the classes already reviewed in this
+book. Specifically, the Byte, Character, Double, Float, Long, Short, String, and Integer
+classes define a compareTo( ) method. In addition, as the next chapter explains, objects
+that implement this interface can be used in various collections. Comparable was
+added by Java 2.
+436 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+char charAt(int idx) Returns the character at the index
+specified by idx.
+int length( ) Returns the number of characters in
+the invoking sequence.
+CharSequence
+subSequence(int startIdx, int stopIdx)
+Returns a subset of the invoking
+sequence beginning at startIdx and
+ending at stopIdx–1.
+String toString( ) Returns the String equivalent of the
+invoking sequence.
+Table 14-20. The Methods Defined by CharSequence
+The java.lang.ref and java.lang.reflect
+Packages
+Java defines two subpackages of java.lang: java.lang.ref and java.lang.reflect. Each is
+briefly described here.
+java.lang.ref
+You learned earlier that the garbage collection facilities in Java automatically determine
+when no references exist to an object. The object is then assumed to be no longer
+needed and its memory is reclaimed. The classes in the java.lang.ref package, which
+was added by Java 2, provide more flexible control over the garbage collection process.
+For example, assume that your program has created numerous objects that you want to
+reuse at some later time. You can continue to hold references to these objects, but that
+may require too much memory.
+Instead, you can define “soft” references to these objects. An object that is “softly
+reachable” can be reclaimed by the garbage collector, if available memory runs low.
+In that case, the garbage collector sets the “soft” references to that object to null.
+Otherwise, the garbage collector saves the object for possible future use.
+A programmer has the ability to determine whether a “softly reachable” object has
+been reclaimed. If it has been reclaimed, it can be re-created. Otherwise, the object is
+still available for reuse. You may also create “weak” and “phantom” references to
+objects. Discussion of these and other features of the java.lang.ref package are beyond
+the scope of this book.
+java.lang.reflect
+Reflection is the ability of a program to analyze itself. The java.lang.reflect package
+provides the ability to obtain information about the fields, constructors, methods,
+and modifiers of a class. You need this information to build software tools that enable
+you to work with Java Beans components. The tools use reflection to determine
+dynamically the characteristics of a component. This topic is considered in Chapter 25.
+In addition, the java.lang.reflect package includes a class that enables you to create
+and access arrays dynamically.
+C h a p t e r 1 4 : E x p l o r i n g j a v a . l a n g 437
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+This page intentionally left blank.
+Chapter 15
+java.util Part 1: The
+Collections Framework
+439

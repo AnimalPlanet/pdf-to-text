@@ -1,0 +1,1303 @@
+Chapter 29
+The DynamicBillboard
+Applet
+1011
+Robert Temple is a software engineer who has designed several highly used applets.His work includes the ESPNET SportsZone “HitCharts” and “Batter vs. Pitcher”applets. One of his most impressive applets is DynamicBillboard, which he wrote
+while he was at Embry-Riddle Aeronautical University in Florida.
+The DynamicBillboard applet displays a sequence of images by repeatedly
+changing the image on the screen to another after a period of time. The transition
+between one image and the next is done with one of a variety of special effects. One
+example of a transition is the SmashTransition, where the new image drops down
+from above the old image and appears to smash the old image out of place. The applet
+links to other pages through a URL associated with each image. When the user presses
+the mouse button with the cursor over the applet, the browser will go to the new page
+associated with the current image. The DynamicBillboard applet provides web sites
+with an elegant way to rotate ads, banners, or billboards on a single static page.
+Robert has included many interesting optimizations. This applet would not be
+functional without the careful changes that he crafted. There are enough tips and tricks
+in this source code to help you make your applets really fly.
+The APPLET Tag
+The APPLET tag for DynamicBillboard is fairly easy to configure. You name the main
+class in the code parameter and specify the width and height, as with most applets:
+<applet code=DynamicBillboard width=392 height=72>
+There are several parameters that must be specified for the applet to function
+properly. Without them the applet does nothing. Also, you will notice that if you make
+any mistakes naming files and such, the behavior is a little unfriendly: either nothing
+happens or some of your billboards will be blank. The following parameters are
+specified as:
+<param name=parameter_name value="your value here">
+■ bgcolor This parameter is used to set the background color of the applet
+before the first image loads. You can use this to get rid of the gray applet
+square quickly.
+■ delay This parameter specifies the number of milliseconds between
+each billboard. Typically, it’s a number like 5000 or 10000, meaning five or
+ten seconds.
+1012 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+■ billboards This parameter specifies the number of billboards you wish to
+cycle through.
+■ bill# This is shorthand for bill0, bill1, bill2, and so on, up to one less than the
+number of billboards you’ve specified. (Robert is a typical programmer who
+starts counting at 0.) You will have as many of these as you specified in the
+billboards parameter. The value of each of these bill#s will be a pair of strings
+separated by a comma. The first one is the image name to display for this
+billboard. The second is the URL of where to go when the user clicks on this
+billboard. Here is an example:
+<param name="bill0" value="sample.jpg,http://www.example.com/">
+■ transitions This is a list beginning with the number of items in the list as an
+integer, followed by the list of Transition subclass names. Here is an example:
+<param name="transitions" value="2,TearTransition,SmashTransition">
+Here is an example of a complete APPLET tag with all of the transitions discussed
+in this chapter:
+<applet code=DynamicBillboard width=392 height=72>
+<param name="bgcolor" value="#ffffff">
+<param name="delay" value="5000">
+<param name="billboards" value="5">
+<param name="bill0"
+value="board1.jpg,http://www.someURL">
+<param name="bill1"
+value="board2.jpg,http://www.someURL">
+<param name="bill2"
+value="board3.jpg,http://www.someURL">
+<param name="bill3"
+value="board4.jpg,http://www.someURL">
+<param name="bill4"
+value="board5.jpg,http://www.someURL">
+<param name="transitions"
+value="5,ColumnTransition,FadeTransition,TearTransition,
+SmashTransition,UnrollTransition">
+</applet>
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1013
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Source Code Overview
+Robert designed the applet with a fast load time in mind. He tries to keep the size of
+the applet to a minimum so that there is less code to send across the network. He also
+attempts to delay some of the loading and initializing of the applet until after the first
+image is displayed. As far as the user is concerned, the applet is running after the first
+image is fully displayed, even though there is a lot more work to be done.
+The applet consists of three main classes and any number of transition classes.
+The three main classes are DynamicBillboard, BillData, and BillTransition. The
+DynamicBillboard class is a top-level Applet subclass that uses all of the other classes.
+The BillData class encapsulates a number of billboard attributes, including the image
+and the URL associated with the image. The BillTransition class is an abstract class
+that contains methods and attributes common to all transitions. The three main classes
+are described next, along with five popular transitions.
+DynamicBillboard.java
+This is the main applet class. It implements Runnable to include a thread that
+controls the continuous process of creation and animation of the transitions.
+The transition_classes array stores the names of the transition classes as strings.
+It uses strings because it loads these classes dynamically using the method
+java.lang.Class.forName(String). This allows the applet to put off the loading of
+these classes until they are first instantiated.
+init( )
+The init( ) method is called automatically when the applet is first loaded. Most applets
+use this method to perform all of their necessary initialization. Robert, however,
+decided to separate his initialization into two methods: init( ) and finishInit( ). The
+idea behind splitting up the initialization is to try to display the first image within the
+applet in the least amount of time, minimizing the time that the applet is showing a
+blank rectangle while it is loading and initializing. The only processing that is done
+in this init( ) method is that which is absolutely necessary to get initial content to the
+screen, because the browser will not call paint( ) until after init( ) returns.
+The first thing that Robert does with init( ) is to change the background color of the
+applet and the parent frame in which the applet is embedded. In the past, the space
+that an applet uses on the screen was shown as a solid gray box while the applet was
+loading and initializing. This box would tend to stand out on pages that use a background
+color other than gray, which is just about every page created since 1994. Robert discovered
+a way around this problem. He found that applets always have a parent container in
+which they are embedded. Under both Netscape Navigator and Internet Explorer, this
+container is derived from the core Java class: java.awt.Container. Robert uses the
+methods inherited from java.awt.Component—setBackground( ) and repaint( )—to
+change the background color to the value of a bgcolor applet parameter. This makes
+1014 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+the applet space stand out less than it does when it is gray. All this is done even before
+the applet begins to load the first image.
+With newer browsers, this frame no longer defaults to gray but rather uses the
+background color of the page. Thus, today applets will not benefit from changing the
+background color. However, this appoach still illustrates an interesting technique,
+which you can adapt for other purposes.
+After changing background colors, Robert’s applet reads in a parameter that tells
+how many different billboards there will be and then allocates an array of BillData
+objects based on this parameter.
+With the help of Math.random( ), a random billboard is chosen to start.
+parseBillData( ) is called to parse the parameters for this billboard.
+parseBillData( )
+This method creates and initializes the next billboard (BillData) object that the applet
+will use. It only gets called if the billboard object has not been created yet (the element
+corresponding to the next billboard object in the billboard array will be null).
+Normally, parseBillData( ) calls the BillData method initPixels( ) after creating
+the new object to initialize a pixel array within the BillData object. The first time this
+method is called, however, the applet is still concentrating on getting the first image to
+the screen as fast as possible. It knows this because the reference to the image that is
+used to paint the applet is still null. So instead it sets the image variable and waits to
+call the processor-intensive initPixel( ) method until after the first image is loaded.
+finishInit( )
+After the first image is displayed on the screen, the applet can finish the rest of its
+initialization. This includes initializing the names of all the transition classes and
+initializing the pixels array for the first billboard and reading the target parameter.
+finishInit( ) is called from the run( ) method of the applet. The run( ) method
+restarts from the top each time the user leaves and comes back to the page. When this
+happens, finishInit( ) will be called again. Since the applet has already finished its
+initialization, Robert does not want it to reinitialize everything. This is why the applet
+checks to see if the delay variable has already been initialized. If it has, then the applet
+can skip the rest of the initialization.
+start( ) and stop( )
+The start( ) and stop( ) methods respectively are called when the user comes to or
+leaves the page. They ensure that the applet thread that runs the transitions is on or off.
+If stop( ) is called while the applet is in the middle of running a transition, some
+data might be left in an improper state. Some variables are reset in start( ) to make sure
+the applet restarts with a new transition.
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1015
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+In start( ), the mouse cursor is changed to a hand so that when the mouse cursor is
+over the applet, it will appear to be a link.
+run( )
+The run( ) method starts with a loop that waits for the first image to be fully loaded
+before proceeding. It then finishes the initialization of the applet by calling
+finishInit( ). From there, it enters the main loop of the program.
+This main loop drives the transitions between billboards. Using the delay
+parameter passed in from the HTML to the applet, the applet calculates when the next
+transition is supposed to be run. While it is waiting, it prepares for the transition. It
+starts the preparation by determining which billboard is to be displayed next, parsing
+the billboard data from HTML parameters if this has not been done yet for this
+billboard. Then it randomly chooses which transition to run next, being careful not to
+let the applet run the same transition consecutively.
+Once the applet has determined what transition will be run next, it creates a new
+instance of this transition class by dynamically loading the class using the String name
+and then creating a new instance of the class. The dynamic loading of the transition
+classes has a big impact on the loading time of the applet as a whole. Instead of every
+single class having to be downloaded before the applet starts, only three classes are
+sent initially: DynamicBillboard, BillData, and BillTransition. The other transition
+classes are only downloaded by the applet the first time they are needed. This reduces
+the initial download of the applet significantly. Some class files might not even need to
+be sent if the user leaves the page quickly.
+Finally, the applet calls the init( ) method on the transition object, passing the
+applet and image pixels for the current and next billboard as parameters. This creates
+all the cell frames that are used to animate a transition. With the transition ready to go,
+the applet only need wait for the proper time to start the transition.
+The applet performs the transition by using simple frame animation—drawing each
+cell in order onto the screen, with a short delay between each frame. The applet calls
+the toolkit method sync( ) just to be sure that the drawing of one cell does not take
+place before the previous cell has been shown on the screen. After the last cell is
+displayed, the applet draws the image from the next billboard onto the screen to
+complete the transition.
+Following this, the mouse_over_applet flag is checked to see if the mouse cursor
+is currently over the applet. If so, the URL of the previous billboard is showing on the
+status bar and must be updated to reflect the URL of the new billboard. This is done
+with a call to the applet method showStatus( ). The applet has completed this
+transition and is now ready to begin the next one.
+mouseMoved( ) and mouseExited( )
+mouseMoved( ) and mouseExited( ) are used to change the text that appears on the
+status bar. When the mouse cursor is over the applet, the status bar is supposed to
+show the URL that the current billboard links to. So when mouseMoved( ) gets called,
+1016 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+the applet shows the URL on the status bar. When mouseExited( ) is called, the URL
+text is removed from the status bar. Both methods also set the Boolean mouse_inside_
+applet to the appropriate value. This variable is used in the run( ) method after a
+transition is run. If the mouse is positioned over the applet when the transition
+completes, then the applet knows to show the URL of the new billboard on the
+status bar.
+mouseReleased( )
+When the mouse button is pressed with the cursor over the applet and then released,
+the mouseReleased( ) method is called. The applet uses getAppletContext( ).show-
+Document( ) to send the browser to the URL that the current billboard points to. As
+Robert found out, sometimes browsers take a long time to display this new page. To
+keep the applet from running more transitions while the new page is waiting to load,
+stop( ) is called to force the main thread to quit. To let users know that the applet is
+loading the new page, the applet changes the mouse cursor to the wait cursor.
+It is important to remember that users can come back to this page after going to a
+new page. The wait cursor will still be present on the applet when users come back.
+The start( ) method is always called when the user comes back to a page with an
+applet, so the applet resets the cursor to the hand cursor there.
+The Code
+Here is the source code for the DynamicBillboard class:
+import java.awt.*;
+import java.awt.event.*;
+import java.net.*;
+import java.awt.*;
+import java.awt.image.*;
+public class DynamicBillboard
+extends java.applet.Applet
+implements Runnable {
+BillData[] billboards;
+int current_billboard;
+int next_billboard;
+String[] transition_classes;
+Thread thread = null;
+Image image = null;
+long delay = -1;
+boolean mouse_inside_applet;
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1017
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+String link_target_frame;
+boolean stopFlag;
+public void init() {
+String s = getParameter("bgcolor");
+if(s != null) {
+Color color = new Color(Integer.parseInt(s.substring(1), 16));
+setBackground(color);
+getParent().setBackground(color);
+getParent().repaint();
+}
+billboards = new
+BillData[Integer.parseInt(getParameter("billboards"))];
+current_billboard = next_billboard
+= (int)(Math.random() *billboards.length);
+parseBillData();
+}
+void parseBillData() {
+String s = getParameter("bill" + next_billboard);
+int field_end = s.indexOf(",");
+Image new_image = getImage(getDocumentBase(),
+s.substring(0, field_end));
+URL link;
+try {
+link = new URL(getDocumentBase(),
+s.substring(field_end + 1));
+}
+catch (java.net.MalformedURLException e) {
+e.printStackTrace();
+link = getDocumentBase();
+}
+billboards[next_billboard] = new BillData(link, new_image);
+if(image == null) {
+image = new_image;
+}
+else {
+prepareImage(new_image, this);
+billboards[next_billboard].initPixels(getSize().width,
+getSize().height);
+}
+1018 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+}void finishInit() {
+if(delay != -1) {
+return;
+}
+delay = Long.parseLong(getParameter("delay"));
+link_target_frame = getParameter("target");
+if(link_target_frame == null) {
+link_target_frame = "_top";
+}
+String s = getParameter("transitions");
+int field_end = s.indexOf(",");
+int trans_count = Integer.parseInt(s.substring(0, field_end));
+transition_classes = new String[trans_count];
+for(--trans_count; trans_count > 0; --trans_count) {
+s = s.substring(field_end + 1);
+field_end = s.indexOf(",");
+transition_classes[trans_count] = s.substring(0, field_end);
+}
+transition_classes[0] = s.substring(field_end + 1);
+billboards[next_billboard].initPixels(getSize().width,
+getSize().height);
+mouse_inside_applet = false;
+}
+public void paint(Graphics g) {
+g.drawImage(image, 0, 0, this);
+}
+public void update(Graphics g) {
+paint(g);
+}
+public void start() {
+next_billboard = current_billboard;
+image = billboards[current_billboard].image;
+setCursor(new Cursor(Cursor.HAND_CURSOR));
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1019
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+if(thread == null) {
+thread = new Thread(this);
+thread.start();
+}
+}
+public void stop() {
+if(thread != null) {
+stopFlag = true;
+}
+}
+public void run() {
+while((checkImage(image, this) & ImageObserver.ALLBITS) == 0) {
+try { Thread.sleep(600); } catch (InterruptedException e) {}
+}
+finishInit();
+addMouseListener(new MyMouseAdapter());
+addMouseMotionListener(new MyMouseMotionAdapter());
+int last_transition_type = -1;
+BillTransition transition;
+long next_billboard_time;
+while(true) {
+if(stopFlag)
+return;
+next_billboard_time = System.currentTimeMillis() + delay;
+current_billboard = next_billboard;
+if(++next_billboard >= billboards.length) {
+next_billboard = 0;
+}
+if(billboards[next_billboard] == null) {
+parseBillData();
+try { Thread.sleep(120); } catch (InterruptedException e) {}
+}
+int transition_type = (int)(Math.random() *
+(transition_classes.length - 1));
+if(transition_type >= last_transition_type) {
+++transition_type;
+1020 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+}last_transition_type = transition_type;
+try {
+String trans = transition_classes[last_transition_type];
+transition = (BillTransition)Class.forName(trans)
+.newInstance();
+}
+catch(Exception e) {
+e.printStackTrace();
+continue;
+}
+transition.init(this,billboards[current_billboard].image_pixels,
+billboards[next_billboard].image_pixels);
+if(System.currentTimeMillis() < next_billboard_time) {
+try {
+Thread.sleep(next_billboard_time -
+System.currentTimeMillis());
+} catch (InterruptedException e) { };
+}
+Graphics g = getGraphics();
+for(int c = 0; c < transition.cells.length; ++c) {
+image = transition.cells[c];
+g.drawImage(image, 0, 0, null);
+getToolkit().sync();
+try { Thread.sleep(transition.delay); }
+catch(InterruptedException e) { };
+}
+image = billboards[next_billboard].image;
+g.drawImage(image, 0, 0, null);
+getToolkit().sync();
+g.dispose();
+if(mouse_inside_applet == true) {
+showStatus(billboards[next_billboard].link.toExternalForm());
+}
+transition = null;
+try { Thread.sleep(120); } catch (InterruptedException e) {}
+}
+}
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1021
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+public class MyMouseAdapter extends MouseAdapter {
+public void mouseExited(MouseEvent me) {
+mouse_inside_applet = false;
+showStatus("");
+}
+public void mouseReleased(MouseEvent me) {
+stop();
+setCursor(new Cursor(Cursor.WAIT_CURSOR));
+getAppletContext().showDocument(billboards[current_billboard].link,
+link_target_frame);
+}
+}
+public class MyMouseMotionAdapter extends MouseMotionAdapter {
+public void mouseMoved(MouseEvent me) {
+mouse_inside_applet = true;
+showStatus(billboards[current_billboard].link.toExternalForm());
+}
+}
+}
+BillData.java
+The BillData class is mostly just a data structure for encapsulating attributes associated
+with individual billboards. It contains three variables. The first variable stores the
+URL to which the billboard is a link. The second variable has an Image that the applet
+uses to draw on the screen. The third variable includes a pixel array of the image in
+RGB format.
+The pixel array is used by transitions in combination with another BillData pixel
+array to create the cells for transition animation. The array is only one-dimensional.
+The pixels in it are arranged in such a way that the first element in this array is the
+top-left corner of the image. The second element is the pixel just to the right of this
+corner. Elements that follow are the pixels to the right of this one, and so on, until the
+rightmost pixel is reached. Then the leftmost pixel on the next line of the image is used.
+This continues until the last index in the array, which corresponds to the pixel on the
+bottom-right corner of the image.
+You might notice that Robert has made all of the variables in this class public.
+Normally, it is good programming practice to hide the data members that should be
+read only by other classes. This is done by making them protected or private and then
+creating functions to return references to the variables. Unfortunately, in Java this
+increases the size of the compiled bytecode even when the one line function is made
+1022 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+final and the code is compiled with optimizations. So to make the applet smaller and
+hence faster to download, Robert made the data members public.
+The Constructor
+The constructor for a BillData object simply initializes the URL and Image variables
+with the two parameters passed in. Initializing the pixel array is done in a separate
+method, because it is very processor-intensive. This gives the applet a chance to initialize
+the pixel array only when it needs it.
+initPixels( )
+The initPixels( ) method creates the pixel array from the image using the Java core
+class: java.awt.image.PixelGrabber.
+The Code
+Here is the source code for the BillData class:
+import java.net.*;
+import java.awt.*;
+import java.awt.image.*;
+public class BillData {
+public URL link;
+public Image image;
+public int[] image_pixels;
+public BillData(URL link, Image image) {
+this.link = link;
+this.image = image;
+}
+public void initPixels(int image_width, int image_height) {
+image_pixels = new int[image_width * image_height];
+PixelGrabber pixel_grabber = new
+PixelGrabber(image.getSource(), 0, 0,
+image_width, image_height, image_pixels, 0, image_width);
+try {
+pixel_grabber.grabPixels();
+}
+catch (InterruptedException e) {
+image_pixels = null;
+}
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1023
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+}}
+BillTransition.java
+The BillTransition class is used as a base class for other transition classes. These other
+classes create transition cells between two individual billboard images. This abstract
+class contains variables and methods that are common to all transitions.
+There are no constructors provided in the BillTransition class. This is because the
+applet does not use “new” to create new instances and instead uses the factory method,
+java.lang.Class.newInstance( ). Objects created in this way have no way to directly
+initialize themselves using parameters in constructors. This factory method indirectly
+creates objects using a default constructor, one without any parameters. The
+BillTransition class provides a number of overloaded init( ) methods to initialize
+instances with parameters.
+In previous versions of DynamicBillboard, Robert used static variables within
+different transition classes to store data that only needed to be initialized once. It was
+discovered, however, that when more than one instance of the applet ran from a web
+server, the applets would share the static variables. This led to some problems if one
+applet needed a different static value than the other when the applets were different
+sizes. An example is the FadeTransition class used to create an array whose size
+depended on the dimensions of the applet. When another DynamicBillboard was
+created with dimensions that were smaller than the previous applet, it would
+overwrite this array with an array too small for the first applet. This would cause the
+first applet to crash.
+Robert introduced the static hash table called object_table in this version of the
+applet to work around this problem. Now transition classes can store data inside this
+hash table using the transition name in conjunction with the applet size as a key. When
+this data needs to be used, the applet can look to see if it exists for the applet’s size
+within the hash table. If it does not, then it can create the data and store it in the hash
+table for later use. Now if there is more than one applet on a web server and both are
+the same size, then only one has to initialize the data.
+init( )
+The init( ) method is overloaded three times. The first method, which has three
+parameters, is abstract and must be overridden by classes derived from this class. The
+other two methods initialize data members within this class. Robert’s intention was to
+have the init( ) method of classes that are derived from this class call one of these two
+methods to initialize data members of BillTransition.
+1024 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+createCellFromWorkPixels( )
+The createCellFromWorkPixels( ) method is used to perform the common task of
+converting the work_pixels array into an Image object. Notice that it uses the owner
+variable to complete this task. This is the only reason the owner variable is needed by
+transition classes. When a transition has completed assembly of a new cell in the
+work_pixels array, it should call this method.
+The Code
+Here is the source code for the BillTransition class:
+import java.util.*;
+import java.awt.*;
+import java.awt.image.*;
+public abstract class BillTransition {
+static Hashtable object_table = new Hashtable(20);
+public Image[] cells;
+public int delay;
+Component owner;
+int cell_w;
+int cell_h;
+int pixels_per_cell;
+int[] current_pixels;
+int[] next_pixels;
+int[] work_pixels;
+public abstract void
+init(Component owner, int[] current_pixels, int[] next_pixels);
+final protected void
+init(Component owner, int[] current_pixels, int[] next_pixels,
+int number_of_cells, int delay) {
+this.delay = delay;
+this.next_pixels = next_pixels;
+this.current_pixels = current_pixels;
+this.owner = owner;
+cells = new Image[number_of_cells];
+cell_w = owner.getSize().width;
+cell_h = owner.getSize().height;
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1025
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+pixels_per_cell = cell_w * cell_h;
+work_pixels = new int[pixels_per_cell];
+}
+final protected void
+init(Component owner, int[] current_pixels, int[] next_pixels,
+int number_of_cells) {
+init(owner, current_pixels, next_pixels, number_of_cells, 120);
+}
+final void createCellFromWorkPixels(int cell) {
+cells[cell] = owner.createImage(
+new MemoryImageSource(cell_w, cell_h,
+work_pixels, 0, cell_w));
+owner.prepareImage(cells[cell], null);
+}
+}
+ColumnTransition.java
+The ColumnTransition class changes one image into another by drawing increasingly
+large columns of the new image onto the old image. The column sizes increase to the
+left, and the same pixels are always drawn on the left side of each column. This makes
+the billboard appear to be sliding in from behind the old billboard through vertical
+slots in the current billboard.
+To create the cells for this transition, the billboard space is split up into a number of
+columns, each column 24 pixels wide. Each of the seven image cells the transition will
+create will have pixels on the left side of each column from the old image and pixels
+on the right side from the new image. The first cell that is created starts out with only
+the three right pixels in each column taken from the new image. With each successive
+cell, three more pixels are filled in from the new image. The last cell has only the three
+left pixels in each column from the old image.
+Because the width of the image space is most likely not perfectly divisible by 24,
+there will be some remaining pixels remaining on the right side of the image. These
+pixels are accounted for in each cell with the rightmost_columns_max_width and
+rightmost_columns_x_start variables.
+init( )
+The init( ) function starts by calling the base class’ init( ) method to initialize the variables
+contained within this base class. It goes on to initialize the variables associated with the
+rightmost column and then copies all of the pixels from the current billboard into the
+work pixels. The loop that follows creates all of the cell frames.
+1026 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The nextCell( ) method changes work_pixels, and the method inherited from the
+BillTransition class, createCellFromWorkPixels( ), is used to convert these pixels into
+an image. Because the process of creating the cells can be very demanding on the CPU,
+Robert tells the thread to sleep occasionally to allow other threads to run.
+nextCell( )
+The nextCell( ) method modifies the work_pixels array for the next cell. It loops
+through each line of the image starting from the bottom line and fills part of each
+column by copying pixels from the next billboard onto the work_pixels array. It does
+not ever need to copy pixels from the old billboard, because these were already copied
+to the array in the init( ) method.
+It’s worth repeating that the pixel arrays used to form the images are only
+one-dimensional. Every width pixel represents one horizontal line of the image.
+The Code
+Here is the source code for the ColumnTransition class:
+import java.awt.*;
+import java.awt.image.*;
+public class ColumnTransition extends BillTransition {
+final static int CELLS = 7;
+final static int WIDTH_INCREMENT = 3;
+final static int MAX_COLUMN_WIDTH = 24;
+int rightmost_columns_max_width;
+int rightmost_columns_x_start;
+int column_width = WIDTH_INCREMENT;
+public void init(Component owner, int[] current, int[] next) {
+init(owner, current, next, CELLS, 200);
+rightmost_columns_max_width = cell_w % MAX_COLUMN_WIDTH;
+rightmost_columns_x_start = cell_w - rightmost_columns_max_ width;
+System.arraycopy(current_pixels, 0,
+work_pixels, 0, pixels_per_cell);
+for(int c = 0; c < CELLS; ++c) {
+try { Thread.sleep(100); } catch (InterruptedException e) {}
+NextCell();
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1027
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+try { Thread.sleep(100); } catch (InterruptedException e) {}
+createCellFromWorkPixels(c);
+column_width += WIDTH_INCREMENT;
+}
+work_pixels = null;
+}
+void NextCell() {
+int old_column_width = MAX_COLUMN_WIDTH - column_width;
+for(int p = pixels_per_cell - cell_w; p >= 0; p -= cell_w) {
+for (int x = 0; x < rightmost_columns_x_start; x +=
+MAX_COLUMN_WIDTH) {
+System.arraycopy(next_pixels, x + p, work_pixels,
+old_column_width + x + p, column_width);
+}
+if(old_column_width <= rightmost_columns_max_width) {
+System.arraycopy(next_pixels, rightmost_columns_x_start + p,
+work_pixels, rightmost_columns_x_start +
+old_column_width + p - 1,
+rightmost_columns_max_width -
+old_column_width + 1);
+}
+}
+}
+}
+Here is what the column transition looks like before, during, and after:
+1028 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+FadeTransition.java
+The FadeTransition class changes one image into another by randomly including a
+number of new pixels from the next billboard in each successive cell frame. This makes
+the next billboard appear to fade in over the old billboard.
+The heart of this transition is a two-dimensional array of short integers called
+random. This array holds an index for every element in the next billboard’s image pixel
+array. These indexes are randomly distributed in the two-dimensional array. The eight
+elements in the first dimension of this array will be used when cells are created, one for
+each new cell. The last element is never actually used, because there are only seven
+cells. It is included when the random array is created to ensure that the indexes are
+randomly distributed correctly.
+The FadeTransition uses this array to pick pixels from the next billboard to
+overwrite pixels of the old billboard. For the first cell, the work_pixels array contains
+nothing but pixels from the old billboard. One-eighth of these pixels get changed to
+the next billboard’s pixels. For the following cell, the same work_pixels array is used,
+and one-eighth more pixels are filled in from the next billboard. For this cell the
+result has one-fourth of the pixels from the next billboard, while the remainder are
+from the old billboard. This continues until the last cell, cell number seven, which has
+seven-eighths of its pixels from the new billboard. Remember, the DynamicBillboard
+applet simply uses the whole image from the next billboard after the last cell to
+complete the transition.
+Because the size of this two-dimensional array is dependent on the size of the
+applet, it must be unique to each applet. Using a static variable to store this array is
+unacceptable, because applets of different sizes would share this array. Since it is fairly
+time-consuming to create this array, it does not make sense to re-create it every time
+this transition is to be used.
+This is where the superclass’ static variable, object_table, first comes into play.
+Once this array is created, it can be stored in this hash table with a key that includes the
+size of the applet. When the array needs to be used, the applet can get the appropriate
+one out of the hash table. If it does not exist in the hash table, the applet can then create
+the array and store it in the hash table for future use. New applets of the same size as
+the current applet will benefit from a usable array already being there. This seems like
+a lot of effort, but in practice, web sites tend to use this applet on a large number of
+pages with a standard layout size for each banner advertisement. So, it saves an
+enormous amount of memory and CPU time to cache these tables.
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1029
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+createRandomArray( )
+The createRandomArray( ) static method creates the two-dimensional random array.
+It takes two parameters that describe the size of the applet. It is highly optimized,
+because originally it was too slow. It includes its own random-number generator that is
+very fast, but with a short cycle. Because of this, it is fairly complicated and beyond the
+scope of this book. The basic idea is that Java’s built-in random-number generator is
+better at generating truly random distribution, but it is too slow for this application.
+Plus, the user will not notice exactly how random this transition is, so Robert’s
+home-grown random-number generator is sufficient.
+init( )
+The init( ) method for this transition starts like all other transitions, with a call to the
+base class’ init( ) method. Then, like some other transitions, it copies all of the old
+billboard’s pixels into the work_pixels array.
+The two-dimensional random array is pulled out of the object_table for an applet
+of this size. If it does not exist yet, it is created and stored in the object_table. With the
+random array in hand, the method just loops through each cell and each index in the
+random array, copying pixels from the next billboard into the work pixels.
+The Code
+Here is the source code for the FadeTransition class:
+import java.awt.*;
+import java.awt.image.*;
+public class FadeTransition extends BillTransition {
+private static final int CELLS = 7;
+private static final int MULTIPLIER = 0x5D1E2F;
+private static short[][] createRandomArray(int number_pixels,
+int cell_h) {
+int total_cells = CELLS + 1;
+int new_pixels_per_cell = number_pixels / total_cells;
+short[][] random = new short[total_cells][new_pixels_per_cell];
+int random_count[] = new int[total_cells];
+for(int s = 0; s < total_cells; ++s) {
+random_count[s] = 0;
+}
+int cell;
+int rounded_new_pixels_per_cell =
+new_pixels_per_cell * total_cells;
+1030 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+int seed = (int)System.currentTimeMillis();
+int denominator = 10;
+while((new_pixels_per_cell % denominator > 0 ||
+cell_h % denominator == 0) && denominator > 1) {
+--denominator;
+}
+int new_randoms_per_cell = new_pixels_per_cell / denominator;
+int new_randoms = rounded_new_pixels_per_cell / denominator;
+for(int p = 0; p < new_randoms_per_cell; ++p) {
+seed *= MULTIPLIER;
+cell = (seed >>> 29);
+random[cell][random_count[cell]++] = (short)p;
+}
+seed += 0x5050;
+try { Thread.sleep(150); } catch (InterruptedException e) {}
+for(int p = new_randoms_per_cell; p < new_randoms; ++p) {
+seed *= MULTIPLIER;
+cell = (seed >>> 29);
+while(random_count[cell] >= new_randoms_per_cell) {
+if(++cell >= total_cells) {
+cell = 0;
+}
+}
+random[cell][random_count[cell]++] = (short)p;
+}
+for(int s = 0; s < CELLS; ++s) {
+for(int ps = new_randoms_per_cell; ps < new_pixels_per_cell;
+ps += new_randoms_per_cell) {
+int offset = ps * total_cells;
+for(int p = 0; p < new_randoms_per_cell; ++p) {
+random[s][ps + p] = (short)(random[s][p] + offset);
+}
+}
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1031
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+try { Thread.sleep(50); } catch (InterruptedException e) {}
+}
+random[CELLS] = null;
+return random;
+}
+public void init(Component owner, int[] current, int[] next) {
+init(owner, current, next, CELLS);
+System.arraycopy(current_pixels, 0, work_pixels,
+0, pixels_per_cell);
+short random[][] = (short[][])object_table.get(
+getClass().getName() + pixels_per_cell);
+if(random == null) {
+random = createRandomArray(pixels_per_cell, cell_h);
+object_table.put(getClass().getName() + pixels_per_cell,
+random);
+}
+for(int c = 0; c < CELLS; ++c) {
+try { Thread.sleep(100); } catch (InterruptedException e) {}
+int limit = random[c].length;
+for(int p = 0; p < limit; ++p) {
+int pixel_index = random[c][p];
+work_pixels[pixel_index] = next_pixels[pixel_index];
+}
+try { Thread.sleep(50); } catch (InterruptedException e) {}
+createCellFromWorkPixels(c);
+}
+work_pixels = null;
+}
+}
+Here is what the fade transition looks like before, during, and after:
+1032 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+SmashTransition.java
+The SmashTransition class changes one image into another by dropping the new
+image onto the old one. The old image appears to crumble under the weight of
+the new image.
+Two instance variables, drop_amount and location, are used to create the frames.
+The location variable keeps track of the pixel that the smashed image starts on. The
+drop_amount variable stores the number of pixels of the new image to drop onto the
+smashed image every frame. In other words, it is the number to add to the location
+variable each frame. A static array called fill_pixels is used to color a whole line of the
+work_pixels array white.
+The smash effect is done by drawing the old image in an accordion-like fashion.
+It starts out by drawing the first lines of the old image offset to the right. Each
+progressive line is offset a little bit more to the right. This continues until some
+maximum left offset is reached. At this point, the offset is reduced every line until
+an offset of zero is reached. This continues until all of the lines of the smashed image
+are drawn.
+It does not draw the lines from the old image in their entirety. It uses a length that
+is a bit shorter than the actual length.
+The number of lines to draw for the smashed image decreases each frame as the old
+billboard becomes more and more compacted. This transition uses lines that are evenly
+distributed across the old image. This ensures that the smashed image does not appear
+to be falling off the bottom of the applet or sliding under the new image.
+setupFillPixels( )
+The setupFillPixels( ) static method is used to ensure that the fill_pixels array is
+initialized and is at least as long as one whole line for this applet. If this array has not
+been initialized yet or is not long enough for this applet, then this method respectively
+re-creates or creates and fills in the array. If there is more than one instance of this
+applet running, both can share this fill_pixels array, but it must be at least as long as
+the widest applet.
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1033
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+init( )
+The init( ) method for this transition starts like all other transitions, with a call to the
+base class’ init( ) method. It follows this with a call to the method described earlier,
+setupFillPixels( ). The initial values of the drop_amount and location variables are then
+calculated. After this, the init( ) method goes into a loop to create each frame. It actually
+does this in reverse, creating the last frame first. It does not have to be done in reverse.
+However, running loops in reverse saves one byte of code in the resulting class file. After
+each cell is created, the location variable is incremented to the next proper location.
+Smash( )
+The Smash( ) method modifies the work_pixels array for the next cell. It creates the
+smashed image of the old billboard in the work_pixels array and draws in the pixels
+for the new image. This method takes one parameter, max_fold, which is used as the
+maximum right offset that the lines in the fold will have. It is also used by subtracting
+this from the line width to determine the length of the lines to draw for the folds.
+The method begins by copying the pixels from the new image onto work_ pixels.
+It then initializes a number of variables that it uses to draw the smashed image. The
+drawing of this smashed image is done line by line, in a loop. Within the loop, it first
+makes the current line totally white. It then copies a portion of the correct line from
+the old billboard over this line. To get the accordion effect, it does not start drawing
+onto the same pixel location as it did for drawing the white line. It instead offsets
+the destination pixels to the right by a few pixels. After drawing in the line, it adds a
+number to the offset counter. It follows this with a bounds check to see if the offset has
+gone beyond the minimum or maximum offset. If it has, it flips the sign of the number
+it adds to the offset counter each line. The effect of this is that the direction of the offset
+is reversed.
+The Code
+Here is the source code for the SmashTransition class:
+import java.awt.*;
+import java.awt.image.*;
+public class SmashTransition extends BillTransition {
+final static int CELLS = 8;
+final static float FOLDS = 8.0f;
+static int[] fill_pixels;
+static void setupFillPixels(int width) {
+if(fill_pixels != null && fill_pixels.length <= width) {
+return;
+1034 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+}fill_pixels = new int[width];
+for(int f = 0; f < width; ++f) {
+fill_pixels[f] = 0xFFFFFFFF;
+}
+}
+int drop_amount;
+int location;
+public void init(Component owner, int[] current, int[] next) {
+init(owner, current, next, CELLS, 160);
+setupFillPixels(cell_w);
+drop_amount =  (cell_h / CELLS) * cell_w;
+location = pixels_per_cell - ((cell_h / CELLS) / 2) * cell_w;
+for(int c = CELLS - 1; c >= 0; --c) {
+try { Thread.sleep(100); } catch (InterruptedException e) {}
+Smash(c + 1);
+try { Thread.sleep(150); } catch (InterruptedException e) {}
+createCellFromWorkPixels(c);
+location -= drop_amount;
+}
+work_pixels = null;
+}
+void Smash(int max_fold) {
+System.arraycopy(next_pixels, pixels_per_cell - location,
+work_pixels, 0, location);
+int height = cell_h - location / cell_w;
+float fold_offset_adder = (float)max_fold * FOLDS / (float)height;
+float fold_offset = 0.0f;
+int fold_width = cell_w - max_fold;
+float src_y_adder = (float)cell_h / (float)height;
+float src_y_offset = cell_h - src_y_adder / 2;
+for(int p = pixels_per_cell - cell_w; p >= location; p -=
+cell_w) {
+System.arraycopy(fill_pixels, 0, work_pixels, p, cell_w);
+System.arraycopy(current_pixels, (int)src_y_offset * cell_w,
+work_pixels, p + (int)fold_offset, fold_width);
+src_y_offset -= src_y_adder;
+fold_offset += fold_offset_adder;
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1035
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+if(fold_offset < 0.0 || fold_offset >= max_fold) {
+fold_offset_adder *= -1.0f;
+}
+}
+}
+}
+Here is what the smash transition looks like before, during, and after:
+TearTransition.java
+The TearTransition creates the illusion of the current billboard getting torn off the
+applet like a piece of paper. It gets ripped upwards and toward the left to reveal the
+next billboard image underneath.
+There is only one member variable used in this transition, x_cross. It is used as a
+multiplier to create the tear effect. The larger the value of this variable, the smaller the
+tear effect will appear to be.
+The code for this transition has many optimizations. One optimization of
+significance is to create the cell frames in reverse order, building the last cell frame first
+and the first, last. In their normal order, each subsequent cell frame reveals a little bit
+more of the new image underneath. If the frames were to be created in the normal
+order, the tear effect would have to be drawn, along with the new image pixels
+revealed in the current frame, which had been covered by the tearing effect in the
+previous frame. Doing it in reverse only requires redrawing the tearing effect each cell
+1036 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+frame. For example, the last frame, created first, starts out with the tearing effect using
+only a small portion of the upper-left corner of the image, while the rest of the pixels
+are taken from the new billboard image. In the second to the last frame, which is
+created second, the new tear effect draws over a little bit more of the upper-left corner
+of the image, while the rest of the image remains the same. The cell frames that follow
+draw the new tear effect over more and more of the image, but always covering up the
+old tear effect from the last frame.
+init( )
+The init( ) method for this transition starts like all other transitions, with a call to the
+base class’ init( ) method. It then copies all of the new billboard’s pixels into the
+work_pixels array and copies the first line of the old billboard’s pixels onto the first
+line of the work_pixels array. After the x_cross variable is initialized, the init( ) method
+loops through each cell frame in reverse order. Inside the loop, it creates each cell
+frame and decreases the value of the x_cross variable.
+Tear( )
+The Tear( ) method modifies the work_pixels array for the next cell. It draws the tear
+effect onto the work pixels. It draws the tear effect line by line. To draw one line, the
+method copies pixels from the old image pixels into the work_pixels array. It uses two
+counters, one that is an index into the work_pixels array, the destination, and one that
+references an index into the array of pixels for the old billboard, the source. Both
+counters are started at zero. The destination counter is always incremented by one.
+The source counter, however, is incremented by a floating-point number that is always
+greater than one. When the loop is run until the destination index is larger than the
+width of the line, the result is the source index growing faster than the destination
+index. The overall effect is that in the destination, only a number of pixels on the left
+side of the image will be copied from the source. The pixels taken from the source will
+skip some pixels, resulting in pixels taken from the source being evenly distributed
+across the line.
+Each line of the cell frame will use a larger value for the floating-point number on
+the line above. This makes lines toward the bottom draw on fewer pixels for the tear
+effect than lines toward the top.
+This method has one big optimization that it uses to get around the slow array
+indexing in Java. Whenever a element in an array is used, bounds checking is done
+to ensure that the index is within the bounds of the array. There is a performance hit
+involved in this bounds checking. The standard Java class, System, provides a method
+that allows you to copy sections of arrays from one array to another almost as fast or as
+fast as copying one array element into another. This method is used to speed up the
+creation lines within the cell frames. It only uses this method when the applet knows
+some of the source pixels will be adjacent to one another. If the applet skips at least
+every other pixel from the source image, then it will use the standard loop method.
+An x_increment value less than 0.5 indicates that less than 1.5 will be added to the
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1037
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+source index counter each time, and there will be a speed benefit from using the array
+copy method for a particular line.
+The Code
+Here is the source code for the TearTransition class:
+import java.awt.*;
+import java.awt.image.*;
+public class TearTransition extends BillTransition {
+static final int CELLS = 7;
+static final float INITIAL_X_CROSS = 1.6f;
+static final float X_CROSS_DIVISOR = 3.5f;
+float x_cross;
+public void init(Component owner, int[] current, int[] next) {
+init(owner, current, next, CELLS);
+System.arraycopy(next_pixels, 0, work_pixels, 0,
+pixels_per_cell);
+System.arraycopy(current_pixels, 0, work_pixels, 0, cell_w);
+x_cross = INITIAL_X_CROSS;
+for(int c = CELLS - 1; c >= 0; --c) {
+try { Thread.sleep(100); } catch (InterruptedException e) {}
+Tear();
+try { Thread.sleep(150); } catch (InterruptedException e) {}
+createCellFromWorkPixels(c);
+x_cross /= X_CROSS_DIVISOR;
+}
+work_pixels = null;
+}
+final void Tear() {
+float x_increment;
+int p, height_adder;
+p = height_adder = cell_w;
+for (int y = 1; y < cell_h; ++y) {
+x_increment = x_cross * y;
+if(x_increment >= 0.50f) {
+float fx = 0.0f;
+1038 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+x_increment += 1.0f;
+int x = 0;
+do {
+work_pixels[p++] = current_pixels[height_adder + x];
+x = (int)(fx += x_increment);
+} while(x < cell_w);
+}
+else {
+float overflow = 1.0f / x_increment;
+float dst_end = overflow / 2.0f  + 1.49999999f;
+int dst_start = 0, src_offset = 0, length = (int)dst_end;
+while(dst_start + src_offset + length < cell_w) {
+System.arraycopy(current_pixels, p + src_offset,
+work_pixels, p, length);
+++src_offset;
+dst_end += overflow;
+p += length;
+dst_start += length;
+length = (int)dst_end - dst_start;
+}
+length = cell_w - src_offset - dst_start;
+System.arraycopy(current_pixels, p + src_offset,
+work_pixels, p, length);
+}
+p = height_adder += cell_w;
+}
+}
+}
+Here is what the tear transition looks like before, during, and after:
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1039
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+UnrollTransition.java
+UnrollTransition makes it appear as if a rolled-up poster is placed on the bottom of the
+applet and then unrolled upward, gradually revealing the next image and covering
+the old image. To enhance the unroll illusion, the roll gradually decreases in size as it
+makes its way upward on the billboard.
+Two instance variables are used during the creation of unroll transitions. The
+location variable references pixels within the pixel arrays. It stores the current pixel
+that the roll first appears on. The unroll_amount array variable tells the class how
+many vertical pixels the roll should move upward each frame.
+The most difficult part of creating each cell frame is drawing the roll. The only
+other task that needs to be completed each frame is to draw the pixels from the new
+image onto the space vacated by the roll from the previous frame.
+The roll is drawn with scan lines from the new image. The first line of the roll is
+drawn with the scan line located at the Y coordinate above the roll’s Y coordinate on
+the applet. For example, if the roll is located on line ten for a particular cell frame,
+then line nine of the new image will be used to draw the first line of the roll. Each
+subsequent line of the roll is drawn using a line from the image located above the
+previous line of the new image. So, continuing the example, the second line of the roll
+will be drawn using line eight of the new image.
+The roll is painted with its 3-D appearance by drawing each line of the roll with a
+slight offset to the left. Lines closer to the center of the roll are drawn with a larger
+offset than lines close to the top and bottom. The top and bottom lines of the rolls are
+then shaded to make it look as if a light were above the applet. This results in the top
+line being a bit brighter than the rest of the roll and the bottom line being a bit darker.
+createUnrollAmountArray( )
+Each consecutive cell frame in this transition unrolls the roll onto the applet a little
+bit less than the previous cell frame. The createUnrollAmountArray( ) static method
+is used to calculate an array that indicates how much each cell frame should unroll
+the roll.
+init( )
+The init( ) method for this transition starts like all other transitions, with a call to the
+base class’ init( ) method. Then the location variable is initialized to an index past the
+last pixel in a pixel array. This is followed by copying all of the old billboard’s pixels
+into the work_pixels array.
+1040 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+An array that stores the number of pixels to unroll each frame is pulled out of the
+object_table for an applet of this height. If it does not exist in the hash table, it is
+created and stored in the object_table.
+Then the init( ) method loops through each cell, moving the roll upward by
+subtracting from the location variable and drawing each cell frame. It makes the
+current thread take a break before and after the processor-intensive cell frame
+creation, to allow other threads in Java’s multitasking environment to execute.
+After the cell frame is created from the work_pixels array with the call to the
+createCellFromWorkPixels( ) method, the area the roll was on is drawn over with
+pixels from the new image. This prepares the work_pixels array for the next cell frame.
+Unroll( )
+The Unroll( ) method modifies the work_pixels array for the next cell. It draws the roll
+onto the work pixels. This method first calculates the offset that it needs to use for
+drawing each line of the roll. It then loops through each line of the roll, copying scan
+lines from the new image onto the work_pixels array. The pixels that are exposed due
+to the left offset of each line are filled in with pixels from the static fill_pixels array.
+Another loop then increments though each pixel on the top and the bottom lines of
+the roll, brightening pixels on the top line and darkening pixels on the bottom line.
+The Code
+Here is the source code for the UnrollTransition class:
+import java.awt.*;
+import java.awt.image.*;
+public class UnrollTransition extends BillTransition {
+final static int CELLS = 9;
+static int fill_pixels[] = { 0xFFFFFFFF, 0xFF000000,
+0xFF000000, 0xFFFFFFFF };
+private static int[] createUnrollAmountArray(int cell_h) {
+float unroll_increment =
+((float)cell_h / (float)(CELLS + 1)) /
+((float)(CELLS + 2) / 2.0f);
+int total = 0;
+int unroll_amount[] = new int[CELLS + 1];
+for(int u = 0; u <= CELLS; ++u) {
+unroll_amount[u] = (int)(unroll_increment * (CELLS - u + 1));
+total += unroll_amount[u];
+}
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1041
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+if(total < 0) {
+unroll_amount[0] -= 1;
+}
+return unroll_amount;
+}
+int location;
+int[] unroll_amount;
+public void init(Component owner, int[] current, int[] next) {
+init(owner, current, next, CELLS, 220);
+location = pixels_per_cell;
+System.arraycopy(current_pixels, 0,
+work_pixels, 0, pixels_per_cell);
+unroll_amount = (int[])object_table.get(getClass().getName() +
+cell_h);
+if(unroll_amount == null) {
+unroll_amount = createUnrollAmountArray(cell_h);
+object_table.put(getClass().getName() + cell_h, unroll_amount);
+}
+for(int c = 0; c < CELLS; ++c) {
+location -= unroll_amount[c] * cell_w;
+try { Thread.sleep(150); } catch (InterruptedException e) {}
+Unroll(c);
+try { Thread.sleep(100); } catch (InterruptedException e) {}
+createCellFromWorkPixels(c);
+System.arraycopy(next_pixels, location,
+work_pixels, location,
+unroll_amount[c] * cell_w);
+}
+work_pixels = null;
+}
+void Unroll(int c) {
+int y_flip = cell_w;
+int offset[] = new int[unroll_amount[c]];
+for(int o = 0; o < unroll_amount[c]; ++o) {
+offset[o] = 4;
+}
+offset[0] = 2;
+1042 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+if(unroll_amount[c] > 1) {
+offset[1] = 3;
+}
+if(unroll_amount[c] > 2) {
+offset[unroll_amount[c] - 1] = 2;
+}
+if(unroll_amount[c] > 3) {
+offset[unroll_amount[c] - 2] = 3;
+}
+int offset_index = 0;
+int end_location = location + unroll_amount[c] * cell_w;
+for(int p = location; p < end_location; p += cell_w) {
+System.arraycopy(next_pixels,
+p - y_flip + offset[offset_index],
+work_pixels,
+p, cell_w - offset[offset_index]);
+System.arraycopy(fill_pixels, 0,
+work_pixels,
+p + cell_w - offset[offset_index],
+offset[offset_index]);
+++offset_index;
+y_flip += cell_w + cell_w;
+}
+for(int x = location + cell_w - 1; x > location; --x) {
+work_pixels[x] |= 0xFFAAAAAA;
+work_pixels[x + unroll_amount[c]] &= 0xFF555555;
+}
+}
+}
+Here is what the unroll transition looks like before, during, and after:
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1043
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Dynamic Code
+Robert has shown us how to create interactive high-performance graphics by
+working around many of the apparent limitations in Java. He shows how to use
+System.arraycopy( ) to effectively shuffle pixel data around. He shows how to properly
+use cooperative multithreading to do computation and network transfers in the
+background while the user isn’t waiting. Robert proves that high-performance direct
+pixel manipulation algorithms can be efficiently written in Java if you are careful.
+In addition to containing interesting code, DynamicBillboard is a very compelling
+applet for nonprogrammers and users alike. It is easily configured by HTML editors,
+extensible by Java programmers, and entertaining to web users. In this age of
+advertising rates being driven by “click-through,” where advertisers only want to pay
+for transfers from a content site to their site, Robert’s applet can be used to increase
+traffic and ultimately increase revenue.
+1044 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 2 9 : T h e D y n a m i c B i l l b o a r d A p p l e t 1045
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+1046 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 30
+ImageMenu: An
+Image-Based Web Menu
+1047

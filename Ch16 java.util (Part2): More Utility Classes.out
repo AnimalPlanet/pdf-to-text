@@ -1,0 +1,1222 @@
+Chapter 16
+java.util Part 2: More
+Utility Classes
+505
+This chapter continues our discussion of java.util by examining those classes andinterfaces that are not part of the collections framework. These include classesthat tokenize strings, work with dates, compute random numbers, and observe
+events. Also, the java.util.zip and java.util.jar packages are briefly mentioned at the
+end of this chapter.
+StringTokenizer
+The processing of text often consists of parsing a formatted input string. Parsing is the
+division of text into a set of discrete parts, or tokens, which in a certain sequence can
+convey a semantic meaning. The StringTokenizer class provides the first step in this
+parsing process, often called the lexer (lexical analyzer) or scanner. StringTokenizer
+implements the Enumeration interface. Therefore, given an input string, you can
+enumerate the individual tokens contained in it using StringTokenizer.
+To use StringTokenizer, you specify an input string and a string that contains
+delimiters. Delimiters are characters that separate tokens. Each character in the delimiters
+string is considered a valid delimiter—for example, “,;:” sets the delimiters to a comma,
+semicolon, and colon. The default set of delimiters consists of the whitespace characters:
+space, tab, newline, and carriage return.
+The StringTokenizer constructors are shown here:
+StringTokenizer(String str)
+StringTokenizer(String str, String delimiters)
+StringTokenizer(String str, String delimiters, boolean delimAsToken)
+In all versions, str is the string that will be tokenized. In the first version, the default
+delimiters are used. In the second and third versions, delimiters is a string that specifies
+the delimiters. In the third version, if delimAsToken is true, then the delimiters are also
+returned as tokens when the string is parsed. Otherwise, the delimiters are not returned.
+Delimiters are not returned as tokens by the first two forms.
+Once you have created a StringTokenizer object, the nextToken( ) method is used
+to extract consecutive tokens. The hasMoreTokens( ) method returns true while there
+are more tokens to be extracted. Since StringTokenizer implements Enumeration, the
+hasMoreElements( ) and nextElement( ) methods are also implemented, and they act
+the same as hasMoreTokens( ) and nextToken( ), respectively. The StringTokenizer
+methods are shown in Table 16-1.
+Here is an example that creates a StringTokenizer to parse “key=value” pairs.
+Consecutive sets of “key=value” pairs are separated by a semicolon.
+// Demonstrate StringTokenizer.
+import java.util.StringTokenizer;
+506 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 507
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+class STDemo {
+static String in = "title=Java: The Complete Reference;" +
+"author=Schildt;" +
+"publisher=Osborne/McGraw-Hill;" +
+"copyright=2002";
+public static void main(String args[]) {
+StringTokenizer st = new StringTokenizer(in, "=;");
+while(st.hasMoreTokens()) {
+String key = st.nextToken();
+String val = st.nextToken();
+System.out.println(key + "\t" + val);
+}
+}
+}
+Method Description
+int countTokens( ) Using the current set of delimiters, the
+method determines the number of tokens left
+to be parsed and returns the result.
+boolean hasMoreElements( ) Returns true if one or more tokens remain in
+the string and returns false if there are none.
+boolean hasMoreTokens( ) Returns true if one or more tokens remain in
+the string and returns false if there are none.
+Object nextElement( ) Returns the next token as an Object.
+String nextToken( ) Returns the next token as a String.
+String nextToken(String delimiters) Returns the next token as a String and
+sets the delimiters string to that specified
+by delimiters.
+Table 16-1. The Methods Defined by StringTokenizer
+The output from this program is shown here:
+title  Java: The Complete Reference
+author  Schildt
+publisher  Osborne/McGraw-Hill
+copyright  2002
+BitSet
+A BitSet class creates a special type of array that holds bit values. This array can
+increase in size as needed. This makes it similar to a vector of bits. The BitSet
+constructors are shown here:
+BitSet( )
+BitSet(int size)
+The first version creates a default object. The second version allows you to specify its
+initial size (that is, the number of bits that it can hold). All bits are initialized to zero.
+BitSet implements the Cloneable interface and defines the methods listed in
+Table 16-2. Notice that several were added by Java 2, version 1.4.
+508 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void and(BitSet bitSet) ANDs the contents of the invoking BitSet
+object with those specified by bitSet. The result
+is placed into the invoking object.
+void andNot(BitSet bitSet) For each 1 bit in bitSet, the corresponding bit in
+the invoking BitSet is cleared. (Added by Java 2)
+int cardinality( ) Returns the number of set bits in the invoking
+object. (Added by Java 2, version 1.4)
+void clear( ) Zeros all bits. (Added by Java 2, version 1.4)
+void clear(int index) Zeros the bit specified by index.
+void clear(int startIndex,
+int endIndex)
+Zeros the bits from startIndex to endIndex–1.
+(Added by Java 2, version 1.4)
+Object clone( ) Duplicates the invoking BitSet object.
+boolean equals(Object bitSet) Returns true if the invoking bit set is
+equivalent to the one passed in bitSet.
+Otherwise, the method returns false.
+Table 16-2. The Methods Defined by BitSet
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 509
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+void flip(int index) Reverses the bit specified by index. (Added by
+Java 2, version 1.4)
+void flip(int startIndex,
+int endIndex)
+Reverses the bits from startIndex to endIndex–1.
+(Added by Java 2, version 1.4)
+boolean get(int index) Returns the current state of the bit at the
+specified index.
+BitSet get(int startIndex,
+int endIndex)
+Returns a BitSet that consists of the bits from
+startIndex to endIndex–1. The invoking object is
+not changed. (Added by Java 2, version 1.4)
+int hashCode( ) Returns the hash code for the invoking object.
+boolean intersects(BitSet bitSet) Returns true if at least one pair of corresponding
+bits within the invoking object and bitSet are 1.
+(Added by Java 2, version 1.4)
+boolean isEmpty( ) Returns true if all bits in the invoking object
+are zero. (Added by Java 2, version 1.4)
+int length( ) Returns the number of bits required to hold
+the contents of the invoking BitSet. This value
+is determined by the location of the last 1 bit.
+(Added by Java 2)
+int nextClearBit(int startIndex) Returns the index of the next cleared bit, (that
+is, the next zero bit), starting from the index
+specified by startIndex. (Added by Java 2,
+version 1.4)
+int nextSetBit(int startIndex) Returns the index of the next set bit (that is, the
+next 1 bit), starting from the index specified by
+startIndex. If no bit is set, –1 is returned. (Added
+by Java 2, version 1.4)
+void or(BitSet bitSet) ORs the contents of the invoking BitSet object
+with that specified by bitSet. The result is
+placed into the invoking object.
+void set(int index) Sets the bit specified by index.
+Table 16-2. The Methods Defined by BitSet (continued)
+Here is an example that demonstrates BitSet:
+// BitSet Demonstration.
+import java.util.BitSet;
+class BitSetDemo {
+public static void main(String args[]) {
+BitSet bits1 = new BitSet(16);
+BitSet bits2 = new BitSet(16);
+// set some bits
+for(int i=0; i<16; i++) {
+if((i%2) == 0) bits1.set(i);
+if((i%5) != 0) bits2.set(i);
+}
+510 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+void set(int index, boolean v) Sets the bit specified by index to the value
+passed in v. true sets the bit, false clears the
+bit. (Added by Java 2, version 1.4)
+void set(int startIndex,
+int endIndex)
+Sets the bits from startIndex to endIndex–1.
+(Added by Java 2, version 1.4)
+void set(int startIndex,
+int endIndex, boolean v)
+Sets the bits from startIndex to endIndex–1, to
+the value passed in v. true sets the bits, false
+clears the bits. (Added by Java 2, version 1.4)
+int size( ) Returns the number of bits in the invoking
+BitSet object.
+String toString( ) Returns the string equivalent of the invoking
+BitSet object.
+void xor(BitSet bitSet) XORs the contents of the invoking BitSet
+object with that specified by bitSet. The result
+is placed into the invoking object.
+Table 16-2. The Methods Defined by BitSet (continued)
+System.out.println("Initial pattern in bits1: ");
+System.out.println(bits1);
+System.out.println("\nInitial pattern in bits2: ");
+System.out.println(bits2);
+// AND bits
+bits2.and(bits1);
+System.out.println("\nbits2 AND bits1: ");
+System.out.println(bits2);
+// OR bits
+bits2.or(bits1);
+System.out.println("\nbits2 OR bits1: ");
+System.out.println(bits2);
+// XOR bits
+bits2.xor(bits1);
+System.out.println("\nbits2 XOR bits1: ");
+System.out.println(bits2);
+}
+}
+The output from this program is shown here. When toString( ) converts a BitSet object
+to its string equivalent, each set bit is represented by its bit position. Cleared bits are
+not shown.
+Initial pattern in bits1:
+{0, 2, 4, 6, 8, 10, 12, 14}
+Initial pattern in bits2:
+{1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14}
+bits2 AND bits1:
+{2, 4, 6, 8, 12, 14}
+bits2 OR bits1:
+{0, 2, 4, 6, 8, 10, 12, 14}
+bits2 XOR bits1:
+{}
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 511
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+512 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Date
+The Date class encapsulates the current date and time. Before beginning our
+examination of Date, it is important to point out that it has changed substantially from
+its original version defined by Java 1.0. When Java 1.1 was released, many of the
+functions carried out by the original Date class were moved into the Calendar and
+DateFormat classes, and as a result, many of the original 1.0 Date methods were
+deprecated. Java 2 added a few new methods to the time and date classes, but
+otherwise implemented them in the same form as did 1.1. Since the deprecated 1.0
+methods should not be used for new code, they are not described here.
+Date supports the following constructors:
+Date( )
+Date(long millisec)
+The first constructor initializes the object with the current date and time. The second
+constructor accepts one argument that equals the number of milliseconds that have
+elapsed since midnight, January 1, 1970. The nondeprecated methods defined by Date
+are shown in Table 16-3. With the advent of Java 2, Date also implements the
+Comparable interface.
+Method Description
+boolean after(Date date) Returns true if the invoking Date object contains a
+date that is later than the one specified by date.
+Otherwise, it returns false.
+boolean before(Date date) Returns true if the invoking Date object contains a
+date that is earlier than the one specified by date.
+Otherwise, it returns false.
+Object clone( ) Duplicates the invoking Date object.
+int compareTo(Date date) Compares the value of the invoking object with
+that of date. Returns 0 if the values are equal.
+Returns a negative value if the invoking object is
+earlier than date. Returns a positive value if the
+invoking object is later than date. (Added by Java 2)
+int compareTo(Object obj) Operates identically to compareTo(Date) if obj is of
+class Date. Otherwise, it throws a
+ClassCastException. (Added by Java 2)
+Table 16-3. The Nondeprecated Methods Defined by Date
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 513
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+As you can see by examining Table 16-3, the Date features do not allow you to
+obtain the individual components of the date or time. As the following program
+demonstrates, you can only obtain the date and time in terms of milliseconds or in its
+default string representation as returned by toString( ). To obtain more-detailed
+information about the date and time, you will use the Calendar class.
+// Show date and time using only Date methods.
+import java.util.Date;
+class DateDemo {
+public static void main(String args[]) {
+// Instantiate a Date object
+Date date = new Date();
+// display time and date using toString()
+System.out.println(date);
+// Display number of milliseconds since midnight, January 1, 1970 GMT
+Method Description
+boolean equals(Object date) Returns true if the invoking Date object contains
+the same time and date as the one specified by date.
+Otherwise, it returns false.
+long getTime( ) Returns the number of milliseconds that have
+elapsed since January 1, 1970.
+int hashCode( ) Returns a hash code for the invoking object.
+void setTime(long time) Sets the time and date as specified by time, which
+represents an elapsed time in milliseconds from
+midnight, January 1, 1970.
+String toString( ) Converts the invoking Date object into a string and
+returns the result.
+Table 16-3. The Nondeprecated Methods Defined by Date (continued)
+long msec = date.getTime();
+System.out.println("Milliseconds since Jan. 1, 1970 GMT = " + msec);
+}
+}
+Sample output is shown here:
+Mon Apr 22 09:51:52 CDT 2002
+Milliseconds since Jan. 1, 1970 GMT = 1019487112894
+Date Comparison
+There are three ways to compare two Date objects. First, you can use getTime( ) to
+obtain the number of milliseconds that have elapsed since midnight, January 1, 1970,
+for both objects and then compare these two values. Second, you can use the methods
+before( ), after( ), and equals( ). Because the 12th of the month comes before the 18th,
+for example, new Date(99, 2, 12).before(new Date (99, 2, 18)) returns true. Finally, you
+can use the compareTo( ) method, which is defined by the Comparable interface and
+implemented by Date.
+Calendar
+The abstract Calendar class provides a set of methods that allows you to convert a time
+in milliseconds to a number of useful components. Some examples of the type of
+information that can be provided are: year, month, day, hour, minute, and second. It is
+intended that subclasses of Calendar will provide the specific functionality to interpret
+time information according to their own rules. This is one aspect of the Java class
+library that enables you to write programs that can operate in several international
+environments. An example of such a subclass is GregorianCalendar.
+Calendar provides no public constructors.
+Calendar defines several protected instance variables. areFieldsSet is a boolean
+that indicates if the time components have been set. fields is an array of ints that holds
+the components of the time. isSet is a boolean array that indicates if a specific time
+component has been set. time is a long that holds the current time for this object.
+isTimeSet is a boolean that indicates if the current time has been set.
+Some commonly used methods defined by Calendar are shown in Table 16-4.
+514 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Calendar defines the following int constants, which are used when you get or set
+components of the calendar:
+AM FRIDAY PM
+AM_PM HOUR SATURDAY
+APRIL HOUR_OF_DAY SECOND
+AUGUST JANUARY SEPTEMBER
+DATE JULY SUNDAY
+DAY_OF_MONTH JUNE THURSDAY
+DAY_OF_WEEK MARCH TUESDAY
+DAY_OF_WEEK_IN_MONTH MAY UNDECIMBER
+DAY_OF_YEAR MILLISECOND WEDNESDAY
+DECEMBER MINUTE WEEK_OF_MONTH
+DST_OFFSET MONDAY WEEK_OF_YEAR
+ERA MONTH YEAR
+FEBRUARY NOVEMBER ZONE_OFFSET
+FIELD_COUNT OCTOBER
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 515
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+abstract void add(int which, int val) Adds val to the time or date
+component specified by which. To
+subtract, add a negative value. which
+must be one of the fields defined by
+Calendar, such as Calendar.HOUR.
+boolean after(Object calendarObj) Returns true if the invoking Calendar
+object contains a date that is later
+than the one specified by calendarObj.
+Otherwise, it returns false.
+boolean before(Object calendarObj) Returns true if the invoking Calendar
+object contains a date that is earlier
+than the one specified by calendarObj.
+Otherwise, it returns false.
+Table 16-4. Commonly Used Methods Defined by Calendar
+516 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+final void clear( ) Zeros all time components in the
+invoking object.
+final void clear(int which) Zeros the time component specified
+by which in the invoking object.
+Object clone( ) Returns a duplicate of the invoking
+object.
+boolean equals(Object calendarObj) Returns true if the invoking Calendar
+object contains a date that is equal to
+the one specified by calendarObj.
+Otherwise, it returns false.
+int get(int calendarField) Returns the value of one component
+of the invoking object. The
+component is indicated by
+calendarField. Examples of the
+components that can be requested are
+Calendar.YEAR, Calendar.MONTH,
+Calendar.MINUTE, and so forth.
+static Locale[ ] getAvailableLocales( ) Returns an array of Locale objects
+that contains the locales for which
+calendars are available.
+static Calendar getInstance( ) Returns a Calendar object for the
+default locale and time zone.
+static Calendar getInstance(TimeZone tz) Returns a Calendar object for the
+time zone specified by tz. The default
+locale is used.
+static Calendar getInstance(Locale locale) Returns a Calendar object for the
+locale specified by locale. The default
+time zone is used.
+static Calendar getInstance(TimeZone tz,
+Locale locale)
+Returns a Calendar object for the
+time zone specified by tz and the
+locale specified by locale.
+final Date getTime( ) Returns a Date object equivalent to
+the time of the invoking object.
+Table 16-4. Commonly Used Methods Defined by Calendar (continued)
+The following program demonstrates several Calendar methods:
+// Demonstrate Calendar
+import java.util.Calendar;
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 517
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+TimeZone getTimeZone( ) Returns the time zone for the
+invoking object.
+final boolean isSet(int which) Returns true if the specified time
+component is set. Otherwise, it
+returns false.
+void set(int which, int val) Sets the date or time component
+specified by which to the value
+specified by val in the invoking object.
+which must be one of the fields
+defined by Calendar, such as
+Calendar.HOUR.
+final void set(int year, int month,
+int dayOfMonth)
+Sets various date and time
+components of the invoking object.
+final void set(int year, int month,
+int dayOfMonth, int hours,
+int minutes)
+Sets various date and time
+components of the invoking object.
+final void set(int year, int month,
+int dayOfMonth, int hours,
+int minutes, int seconds)
+Sets various date and time
+components of the invoking object.
+final void setTime(Date d) Sets various date and time
+components of the invoking object.
+This information is obtained from the
+Date object d.
+void setTimeZone(TimeZone tz) Sets the time zone for the invoking
+object to that specified by tz.
+Table 16-4. Commonly Used Methods Defined by Calendar (continued)
+class CalendarDemo {
+public static void main(String args[]) {
+String months[] = {
+"Jan", "Feb", "Mar", "Apr",
+"May", "Jun", "Jul", "Aug",
+"Sep", "Oct", "Nov", "Dec"};
+// Create a calendar initialized with the
+// current date and time in the default
+// locale and timezone.
+Calendar calendar = Calendar.getInstance();
+// Display current time and date information.
+System.out.print("Date: ");
+System.out.print(months[calendar.get(Calendar.MONTH)]);
+System.out.print(" " + calendar.get(Calendar.DATE) + " ");
+System.out.println(calendar.get(Calendar.YEAR));
+System.out.print("Time: ");
+System.out.print(calendar.get(Calendar.HOUR) + ":");
+System.out.print(calendar.get(Calendar.MINUTE) + ":");
+System.out.println(calendar.get(Calendar.SECOND));
+// Set the time and date information and display it.
+calendar.set(Calendar.HOUR, 10);
+calendar.set(Calendar.MINUTE, 29);
+calendar.set(Calendar.SECOND, 22);
+System.out.print("Updated time: ");
+System.out.print(calendar.get(Calendar.HOUR) + ":");
+System.out.print(calendar.get(Calendar.MINUTE) + ":");
+System.out.println(calendar.get(Calendar.SECOND));
+}
+}
+Sample output is shown here:
+Date: Apr 22 2002
+Time: 11:24:25
+Updated time: 10:29:22
+518 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+GregorianCalendar
+GregorianCalendar is a concrete implementation of a Calendar that implements the
+normal Gregorian calendar with which you are familiar. The getInstance( ) method of
+Calendar returns a GregorianCalendar initialized with the current date and time in the
+default locale and time zone.
+GregorianCalendar defines two fields: AD and BC. These represent the two eras
+defined by the Gregorian calendar.
+There are also several constructors for GregorianCalendar objects. The default,
+GregorianCalendar( ), initializes the object with the current date and time in the
+default locale and time zone. Three more constructors offer increasing levels of
+specificity:
+GregorianCalendar(int year, int month, int dayOfMonth)
+GregorianCalendar(int year, int month, int dayOfMonth, int hours,
+int minutes)
+GregorianCalendar(int year, int month, int dayOfMonth, int hours,
+int minutes, int seconds)
+All three versions set the day, month, and year. Here, year specifies the number of years
+that have elapsed since 1900. The month is specified by month, with zero indicating
+January. The day of the month is specified by dayOfMonth. The first version sets the
+time to midnight. The second version also sets the hours and the minutes. The third
+version adds seconds.
+You can also construct a GregorianCalendar object by specifying either the locale
+and/or time zone. The following constructors create objects initialized with the current
+date and time using the specified time zone and/or locale:
+GregorianCalendar(Locale locale)
+GregorianCalendar(TimeZone timeZone)
+GregorianCalendar(TimeZone timeZone, Locale locale)
+GregorianCalendar provides an implementation of all the abstract methods in
+Calendar. It also provides some additional methods. Perhaps the most interesting is
+isLeapYear( ), which tests if the year is a leap year. Its form is
+boolean isLeapYear(int year)
+This method returns true if year is a leap year and false otherwise.
+The following program demonstrates GregorianCalendar:
+// Demonstrate GregorianCalendar
+import java.util.*;
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 519
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+class GregorianCalendarDemo {
+public static void main(String args[]) {
+String months[] = {
+"Jan", "Feb", "Mar", "Apr",
+"May", "Jun", "Jul", "Aug",
+"Sep", "Oct", "Nov", "Dec"};
+int year;
+// Create a Gregorian calendar initialized
+// with the current date and time in the
+// default locale and timezone.
+GregorianCalendar gcalendar = new GregorianCalendar();
+// Display current time and date information.
+System.out.print("Date: ");
+System.out.print(months[gcalendar.get(Calendar.MONTH)]);
+System.out.print(" " + gcalendar.get(Calendar.DATE) + " ");
+System.out.println(year = gcalendar.get(Calendar.YEAR));
+System.out.print("Time: ");
+System.out.print(gcalendar.get(Calendar.HOUR) + ":");
+System.out.print(gcalendar.get(Calendar.MINUTE) + ":");
+System.out.println(gcalendar.get(Calendar.SECOND));
+// Test if the current year is a leap year
+if(gcalendar.isLeapYear(year)) {
+System.out.println("The current year is a leap year");
+}
+else {
+System.out.println("The current year is not a leap year");
+}
+}
+}
+Sample output is shown here:
+Date: Apr 22 2002
+Time: 11:25:27
+The current year is not a leap year
+520 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+TimeZone
+Another time-related class is TimeZone. The TimeZone class allows you to work with
+time zone offsets from Greenwich mean time (GMT), also referred to as Coordinated
+Universal Time (UTC). It also computes daylight saving time. TimeZone only supplies
+the default constructor.
+Some methods defined by TimeZone are summarized in Table 16-5.
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 521
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+Object clone( ) Returns a TimeZone-specific
+version of clone( ).
+static String[ ] getAvailableIDs( ) Returns an array of String
+objects representing the names
+of all time zones.
+static String[ ] getAvailableIDs(int timeDelta) Returns an array of String objects
+representing the names of all time
+zones that are timeDelta offset
+from GMT.
+static TimeZone getDefault( ) Returns a TimeZone object that
+represents the default time zone
+used on the host computer.
+String getID( ) Returns the name of the invoking
+TimeZone object.
+abstract int getOffset(int era, int year,
+int month,
+int dayOfMonth,
+int dayOfWeek,
+int millisec)
+Returns the offset that should be
+added to GMT to compute local
+time. This value is adjusted for
+daylight saving time. The
+parameters to the method
+represent date and time
+components.
+abstract int getRawOffset( ) Returns the raw offset that should
+be added to GMT to compute local
+time. This value is not adjusted for
+daylight saving time.
+Table 16-5. Some of the Methods Defined by TimeZone
+SimpleTimeZone
+The SimpleTimeZone class is a convenient subclass of TimeZone. It implements
+TimeZone’s abstract methods and allows you to work with time zones for a Gregorian
+calendar. It also computes daylight saving time.
+SimpleTimeZone defines four constructors. One is
+SimpleTimeZone(int timeDelta, String tzName)
+This constructor creates a SimpleTimeZone object. The offset relative to Greenwich
+mean time (GMT) is timeDelta. The time zone is named tzName.
+The second SimpleTimeZone constructor is
+SimpleTimeZone(int timeDelta, String tzId, int dstMonth0,
+int dstDayInMonth0, int dstDay0, int time0,
+int dstMonth1, int dstDayInMonth1, int dstDay1,
+int time1)
+522 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+static TimeZone getTimeZone(String tzName) Returns the TimeZone object for
+the time zone named tzName.
+abstract boolean inDaylightTime(Date d) Returns true if the date
+represented by d is in daylight
+saving time in the invoking
+object. Otherwise, it returns false.
+static void setDefault(TimeZone tz) Sets the default time zone to be
+used on this host. tz is a reference
+to the TimeZone object to be used.
+void setID(String tzName) Sets the name of the time zone
+(that is, its ID) to that specified
+by tzName.
+abstract void setRawOffset(int millis) Sets the offset in milliseconds
+from GMT.
+abstract boolean useDaylightTime( ) Returns true if the invoking
+object uses daylight saving time.
+Otherwise, it returns false.
+Table 16-5. Some of the Methods Defined by TimeZone (continued)
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 523
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Here, the offset relative to GMT is specified in timeDelta. The time zone name is passed
+in tzId. The start of daylight saving time is indicated by the parameters dstMonth0,
+dstDayInMonth0, dstDay0, and time0. The end of daylight saving time is indicated by
+the parameters dstMonth1, dstDayInMonth1, dstDay1, and time1.
+The third SimpleTimeZone constructor is
+SimpleTimeZone(int timeDelta, String tzId, int dstMonth0,
+int dstDayInMonth0, int dstDay0, int time0,
+int dstMonth1, int dstDayInMonth1, int dstDay1,
+int time1, int dstDelta)
+Here, dstDelta is the number of milliseconds saved during daylight saving time.
+The fourth SimpleTimeZone constructor is:
+SimpleTimeZone(int timeDelta, String tzId, int dstMonth0,
+int dstDayInMonth0, int dstDay0, int time0,
+int time0mode, int dstMonth1, int dstDayInMonth1,
+int dstDay1, int time1, int time1mode, int dstDelta)
+Here, time0mode specifies the mode of the starting time, and time1mode specifies the
+mode of the ending time. Valid mode values include
+STANDARD_TIME WALL_TIME UTC_TIME
+The time mode indicates how the time values are interpreted.  The default mode used
+by the other constructors is WALL_TIME. This constructor and the mode values were
+added by Java 2, version 1.4.
+Locale
+The Locale class is instantiated to produce objects that each describe a geographical or
+cultural region. It is one of several classes that provide you with the ability to write
+programs that can execute in several different international environments. For example,
+the formats used to display dates, times, and numbers are different in various regions.
+Internationalization is a large topic that is beyond the scope of this book.
+However, most programs will only need to deal with its basics, which include
+setting the current locale.
+The Locale class defines the following constants that are useful for dealing with
+the most common locales:
+CANADA GERMAN KOREAN
+CANADA_FRENCH GERMANY PRC
+CHINA ITALIAN SIMPLIFIED_CHINESE
+CHINESE ITALY TAIWAN
+ENGLISH JAPAN TRADITIONAL_CHINESE
+FRANCE JAPANESE UK
+FRENCH KOREA US
+For example, the expression Locale.CANADA represents the Locale object for Canada.
+The constructors for Locale are
+Locale(String language)
+Locale(String language, String country)
+Locale(String language, String country, String data)
+These constructors build a Locale object to represent a specific language and in the
+case of the last two, country. These values must contain ISO-standard language and
+country codes. Auxiliary browser and vendor-specific information can be provided in
+data. The first constructor was added by Java 2, version 1.4.
+Locale defines several methods. One of the most important is setDefault( ),
+shown here:
+static void setDefault(Locale localeObj)
+This sets the default locale to that specified by localeObj.
+Some other interesting methods are the following:
+final String getDisplayCountry( )
+final String getDisplayLanguage( )
+final String getDisplayName( )
+These return human-readable strings that can be used to display the name of the
+country, the name of the language, and the complete description of the locale.
+The default locale can be obtained using getDefault( ), shown here:
+static Locale getDefault( )
+Calendar and GregorianCalendar are examples of classes that operate in a locale-
+sensitive manner. DateFormat and SimpleDateFormat also depend on the locale.
+Random
+The Random class is a generator of pseudorandom numbers. These are called
+pseudorandom numbers because they are simply uniformly distributed sequences.
+Random defines the following constructors:
+Random( )
+Random(long seed)
+The first version creates a number generator that uses the current time as the starting,
+or seed, value. The second form allows you to specify a seed value manually.
+If you initialize a Random object with a seed, you define the starting point for the
+random sequence. If you use the same seed to initialize another Random object, you will
+524 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 525
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+extract the same random sequence. If you want to generate different sequences, specify
+different seed values. The easiest way to do this is to use the current time to seed a
+Random object. This approach reduces the possibility of getting repeated sequences.
+The public methods defined by Random are shown in Table 16-6.
+As you can see, there are seven types of random numbers that you can extract
+from a Random object. Random Boolean values are available from nextBoolean( ).
+Random bytes can be obtained by calling nextBytes( ). Integers can be extracted via
+the nextInt( ) method. Long integers, uniformly distributed over their range, can be
+obtained with nextLong( ). The nextFloat( ) and nextDouble( ) methods return a
+uniformly distributed float and double, respectively, between 0.0 and 1.0. Finally,
+nextGaussian( ) returns a double value centered at 0.0 with a standard deviation of 1.0.
+This is what is known as a bell curve.
+Here is an example that demonstrates the sequence produced by nextGaussian( ).
+It obtains 100 random Gaussian values and averages these values. The program also
+counts the number of values that fall within two standard deviations, plus or minus,
+using increments of 0.5 for each category. The result is graphically displayed sideways
+on the screen.
+Method Description
+boolean nextBoolean( ) Returns the next boolean random number.
+(Added by Java 2)
+void nextBytes(byte vals[ ]) Fills vals with randomly generated values.
+double nextDouble( ) Returns the next double random number.
+float nextFloat( ) Returns the next float random number.
+double nextGaussian( ) Returns the next Gaussian random number.
+int nextInt( ) Returns the next int random number.
+int nextInt(int n) Returns the next int random number within
+the range zero to n. (Added by Java 2)
+long nextLong( ) Returns the next long random number.
+void setSeed(long newSeed) Sets the seed value (that is, the starting
+point for the random number generator) to
+that specified by newSeed.
+Table 16-6. The Methods Defined by Random
+// Demonstrate random Gaussian values.
+import java.util.Random;
+class RandDemo {
+public static void main(String args[]) {
+Random r = new Random();
+double val;
+double sum = 0;
+int bell[] = new int[10];
+for(int i=0; i<100; i++) {
+val = r.nextGaussian();
+sum += val;
+double t = -2;
+for(int x=0; x<10; x++, t += 0.5)
+if(val < t) {
+bell[x]++;
+break;
+}
+}
+System.out.println("Average of values: " +
+(sum/100));
+// display bell curve, sideways
+for(int i=0; i<10; i++) {
+for(int x=bell[i]; x>0; x--)
+System.out.print("*");
+System.out.println();
+}
+}
+}
+Here is a sample program run. As you can see, a bell-like distribution of numbers
+is obtained.
+Average of values: 0.0702235271133344
+**
+*******
+******
+***************
+******************
+*****************
+*************
+**********
+********
+***
+526 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 527
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Observable
+The Observable class is used to create subclasses that other parts of your program can
+observe. When an object of such a subclass undergoes a change, observing classes are
+notified. Observing classes must implement the Observer interface, which defines the
+update( ) method. The update( ) method is called when an observer is notified of a
+change in an observed object.
+Observable defines the methods shown in Table 16-7. An object that is being
+observed must follow two simple rules. First, if it has changed, it must call
+setChanged( ). Second, when it is ready to notify observers of this change, it must call
+notifyObservers( ). This causes the update( ) method in the observing object(s) to be
+called. Be careful—if the object calls notifyObservers( ) without having previously
+called setChanged( ), no action will take place. The observed object must call both
+setChanged( ) and notifyObservers( ) before update( ) will be called.
+Method Description
+void addObserver(Observer obj) Add obj to the list of objects observing the
+invoking object.
+protected void clearChanged( ) Calling this method returns the status of the
+invoking object to “unchanged.”
+int countObservers( ) Returns the number of objects observing the
+invoking object.
+void deleteObserver(Observer obj) Removes obj from the list of objects
+observing the invoking object.
+void deleteObservers( ) Removes all observers for the invoking object.
+boolean hasChanged( ) Returns true if the invoking object has been
+modified and false if it has not.
+void notifyObservers( ) Notifies all observers of the invoking object
+that it has changed by calling update( ). A
+null is passed as the second argument to
+update( ).
+void notifyObservers(Object obj) Notifies all observers of the invoking object
+that it has changed by calling update( ). obj
+is passed as an argument to update( ).
+protected void setChanged( ) Called when the invoking object has changed.
+Table 16-7. The Methods Defined by Observable
+528 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Notice that notifyObservers( ) has two forms: one that takes an argument and
+one that does not. If you call notifyObservers( ) with an argument, this object is
+passed to the observer’s update( ) method as its second parameter. Otherwise, null
+is passed to update( ). You can use the second parameter for passing any type of
+object that is appropriate for your application.
+The Observer Interface
+To observe an observable object, you must implement the Observer interface.
+This interface defines only the one method shown here:
+void update(Observable observOb, Object arg)
+Here, observOb is the object being observed, and arg is the value passed by
+notifyObservers( ). The update( ) method is called when a change in the
+observed object takes place.
+An Observer Example
+Here is an example that demonstrates an observable object. It creates an observer class,
+called Watcher, that implements the Observer interface. The class being monitored is
+called BeingWatched. It extends Observable. Inside BeingWatched is the method
+counter( ), which simply counts down from a specified value. It uses sleep( ) to wait a
+tenth of a second between counts. Each time the count changes, notifyObservers( ) is
+called with the current count passed as its argument. This causes the update( ) method
+inside Watcher to be called, which displays the current count. Inside main( ), a
+Watcher and a BeingWatched object, called observing and observed, respectively, are
+created. Then, observing is added to the list of observers for observed. This means that
+observing.update( ) will be called each time counter( ) calls notifyObservers( ).
+/* Demonstrate the Observable class and the
+Observer interface.
+*/
+import java.util.*;
+// This is the observing class.
+class Watcher implements Observer {
+public void update(Observable obj, Object arg) {
+System.out.println("update() called, count is " +
+((Integer)arg).intValue());
+}
+}
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 529
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+/ This is the class being observed.
+class BeingWatched extends Observable {
+void counter(int period) {
+for( ; period >=0; period--) {
+setChanged();
+notifyObservers(new Integer(period));
+try {
+Thread.sleep(100);
+} catch(InterruptedException e) {
+System.out.println("Sleep interrupted");
+}
+}
+}
+}
+class ObserverDemo {
+public static void main(String args[]) {
+BeingWatched observed = new BeingWatched();
+Watcher observing = new Watcher();
+/* Add the observing to the list of observers for
+observed object.  */
+observed.addObserver(observing);
+observed.counter(10);
+}
+}
+The output from this program is shown here:
+update() called, count is 10
+update() called, count is 9
+update() called, count is 8
+update() called, count is 7
+update() called, count is 6
+update() called, count is 5
+update() called, count is 4
+update() called, count is 3
+update() called, count is 2
+update() called, count is 1
+update() called, count is 0
+More than one object can be an observer. For example, the following program
+implements two observing classes and adds an object of each class to the
+BeingWatched observer list. The second observer waits until the count reaches
+zero and then rings the bell.
+/* An object may be observed by two or more
+observers.
+*/
+import java.util.*;
+// This is the first observing class.
+class Watcher1 implements Observer {
+public void update(Observable obj, Object arg) {
+System.out.println("update() called, count is " +
+((Integer)arg).intValue());
+}
+}
+// This is the second observing class.
+class Watcher2 implements Observer {
+public void update(Observable obj, Object arg) {
+// Ring bell when done
+if(((Integer)arg).intValue() == 0)
+System.out.println("Done" + '\7');
+}
+}
+// This is the class being observed.
+class BeingWatched extends Observable {
+void counter(int period) {
+for( ; period >=0; period--) {
+setChanged();
+notifyObservers(new Integer(period));
+try {
+Thread.sleep(100);
+} catch(InterruptedException e) {
+System.out.println("Sleep interrupted");
+}
+}
+}
+}
+530 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+class TwoObservers {
+public static void main(String args[]) {
+BeingWatched observed = new BeingWatched();
+Watcher1 observing1 = new Watcher1();
+Watcher2 observing2 = new Watcher2();
+// add both observers
+observed.addObserver(observing1);
+observed.addObserver(observing2);
+observed.counter(10);
+}
+}
+The Observable class and the Observer interface allow you to implement
+sophisticated program architectures based on the document/view methodology. They
+are also useful in multithreaded situations.
+Timer and TimerTask
+Java 2, version 1.3 added an interesting and useful feature to java.util: the ability to
+schedule a task for execution at some future time.  The classes that support this are
+Timer and TimerTask.  Using these classes you can create a thread that runs in the
+background, waiting for a specific time.  When the time arrives, the task linked to
+that thread is executed.  Various options allow you to schedule a task for repeated
+execution, and to schedule a task to run on a specific date.  Although it was always
+possible to manually create a task that would be executed at a specific time using
+the Thread class, Timer and TimerTask greatly simplify this process.
+Timer and TimerTask work together. Timer is the class that you will use to
+schedule a task for execution.  The task being scheduled must be an instance of
+TimerTask.  Thus, to schedule a task, you will first create a TimerTask object and
+then schedule it for execution using an instance of Timer.
+TimerTask implements the Runnable interface; thus it can be used to create a
+thread of execution.  Its constructor is shown here:
+TimerTask( )
+TimerTask defines the methods shown in Table 16-8.  Notice that run( ) is abstract,
+which means that it must be overridden. The run( ) method, defined by the Runnable
+interface, contains the code that will be executed. Thus, the easiest way to create a timer
+task is to extend TimerTask and override run( ).
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 531
+Once a task has been created, it is scheduled for execution by an object of type
+Timer. The constructors for Timer are shown here.
+Timer( )
+Timer(boolean DThread)
+The first version creates a Timer object that runs as a normal thread.  The second
+uses a daemon thread if DThread is true.  A daemon thread will execute only as long as
+the rest of the program continues to execute. The methods defined by Timer are shown
+in Table 16-9.
+532 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Method Description
+boolean cancel( ) Terminates the task.  It returns true if
+an execution of the task is prevented.
+Otherwise, false is returned.
+abstract void run( ) Contains the code for the timer task.
+long scheduledExecutionTime( ) Returns the time at which the last
+execution of the task was scheduled to
+have occurred.
+Table 16-8. The Methods Defined by TimerTask
+Method Description
+void cancel( ) Cancels the timer thread.
+void schedule(TimerTask TTask,
+long wait)
+TTask is scheduled for execution after
+the period passed in wait has elapsed.
+The wait parameter is specified in
+milliseconds.
+void schedule(TimerTask TTask,
+long wait, long repeat)
+TTask is scheduled for execution after
+the period passed in wait has elapsed.
+The task is then executed repeatedly at
+the interval specified by repeat. Both
+wait and repeat are specified in
+milliseconds.
+Table 16-9. The Methods Defined by Timer
+Once a Timer has been created, you will schedule a task by calling schedule( )
+on the Timer that you created. As Table 16-9 shows, there are several forms of
+schedule( ) which allow you to schedule tasks in a variety of ways.
+If you create a non-daemon task, then you will want to call cancel( ) to end the task
+when your program ends.  If you don’t do this, then your program may “hang” for a
+period of time.
+The following program demonstrates Timer and TimerTask. It defines a timer
+task whose run( ) method displays the message “Timer task executed.”  This task is
+scheduled to run once very half second after an intial delay of one second.
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 533
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+void schedule(TimerTask TTask,
+Date targetTime)
+TTask is scheduled for execution at the
+time specified by targetTime.
+void schedule(TimerTask TTask,
+Date targetTime,
+long repeat)
+TTask is scheduled for execution at the
+time specified by targetTime. The task is
+then executed repeatedly at the interval
+passed in repeat. The repeat parameter is
+specified in milliseconds.
+void scheduleAtFixedRate(
+TimerTask TTask,
+long wait, long repeat)
+TTask is scheduled for execution after
+the period passed in wait has elapsed.
+The task is then executed repeatedly at
+the interval specified by repeat. Both wait
+and repeat are specified in milliseconds.
+The time of each repetition is relative to
+the first execution, not the preceding
+execution.  Thus, the overall rate of
+execution is fixed.
+void scheduleAtFixedRate(
+TimerTask TTask,
+Date targetTime,
+long repeat)
+TTask is scheduled for execution at the
+time specified by targetTime. The task is
+then executed repeatedly at the interval
+passed in repeat. The repeat parameter is
+specified in milliseconds. The time of
+each repetition is relative to the first
+execution, not the preceding execution.
+Thus, the overall rate of execution
+is fixed.
+Table 16-9. The Methods Defined by Timer (continued)
+// Demonstrate Timer and TimerTask.
+import java.util.*;
+class MyTimerTask extends TimerTask {
+public void run() {
+System.out.println("Timer task executed.");
+}
+}
+class TTest {
+public static void main(String args[]) {
+MyTimerTask myTask = new MyTimerTask();
+Timer myTimer = new Timer();
+/* Set an initial delay of 1 second,
+then repeat every half second.
+*/
+myTimer.schedule(myTask, 1000, 500);
+try {
+Thread.sleep(5000);
+} catch (InterruptedException exc) {}
+myTimer.cancel();
+}
+}
+Currency
+Java 2, version 1.4 adds the Currency class. This class encapsulates information about a
+currency. It defines no constructors. The methods supported by Currency are shown in
+Table 16-10. The following program demonstrates Currency.
+// Demonstrate Currency.
+import java.util.*;
+class CurDemo {
+public static void main(String args[]) {
+Currency c;
+534 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+c = Currency.getInstance(Locale.US);
+System.out.println("Symbol: " + c.getSymbol());
+System.out.println("Default fractional digits: " +
+c.getDefaultFractionDigits());
+}
+}
+The output is shown here.
+Symbol: $
+Default fractional digits: 2
+C h a p t e r 1 6 : j a v a . u t i l P a r t 2 : M o r e U t i l i t y C l a s s e s 535
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Method Description
+String getCurrencyCode( ) Returns the code (as defined by ISO 4217)
+that describes the invoking currency.
+int getDefaultFractionDigits( ) Returns the number of digits after the
+decimal point that are normally used by
+the invoking currency. For example, there
+are 2 fractional digits normally used for
+dollars.
+static Currency
+getInstance(Locale localeObj)
+Returns a Currency object for the locale
+specified by localeObj.
+static Currency
+getInstance(String code)
+Returns a Currency object associated
+with the currency code passed in code.
+String getSymbol( ) Returns the currency symbol (such as $)
+for the invoking object.
+String getSymbol(Locale localeObj) Returns the currency symbol (such as $)
+for the locale passed in localeObj.
+String toString( ) Returns the currency code for the
+invoking object.
+Table 16-10. The Methods Defined by Currency
+The java.util.zip Package
+The java.util.zip package provides the ability to read and write files in the popular ZIP
+and GZIP file formats. Both ZIP and GZIP input and output streams are available.
+Other classes implement the ZLIB algorithms for compression and decompression.
+The java.util.jar Package
+The java.util.jar package provides the ability to read and write Java Archive (JAR)
+files. You will see in Chapter 25 that JAR files are used to contain software components
+known as Java Beans and any associated files.
+536 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 17
+Input/Output:
+Exploring java.io
+537

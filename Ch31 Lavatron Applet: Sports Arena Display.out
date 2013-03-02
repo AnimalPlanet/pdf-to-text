@@ -1,0 +1,384 @@
+Chapter 31
+The Lavatron Applet:
+A Sports Arena Display
+1057
+Lavatron is a sports arena lightbulb display. Normally, an applet doesn’thave much of a history, but this one does. David LaVallée, the author of theImageMenu applet from Chapter 30, wanted to achieve this kind of effect for a
+long time. The history of Lavatron begins way back in 1974, when LaVallée was the
+stick boy for the California Golden Seals of the NHL. David recalls, “Our scoreboard
+just displayed, well, the score. The game was the thing; there wasn’t much to distract
+hockey fans other than the dah-dah-dah-dat-dah-dah of the organ player.”
+In 1979, LaVallée became fascinated with the idea of a graphical programmable
+scoreboard when he was the repair guy for the Digital Equipment Corporation PDP
+11/34 that ran the scoreboard at the Canadian National Exhibition Stadium (where
+the Toronto Blue Jays used to play). That scoreboard was based on plain old 100-watt
+lightbulbs like you use at home. In 1991, Toronto was treated to the Sony Jumbotron
+HDTV scoreboard at the Skydome: true color, images, video, and three times the height
+of the Hard Rock Cafe. In 1992, LaVallée wrote the first version of Lavatron in Objective-
+C and PostScript. Finally, in 1995, Lavatron was written again from scratch to run under
+Java, and it has undergone several performance tweaks and iterations since. The version
+shown here has been updated for Java 2.
+There are many possible enhancements to Lavatron (see Figure 31-1) that you
+might want to try, such as drawing the source image dynamically in memory rather
+than downloading it, or scrolling an animated sequence. But it’s an interesting
+animated display applet that you may find useful as is.
+1058 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 31-1. The Lavatron applet in action. The source image contains a bitmap
+of the title Java 2: The Complete Reference on a white background.
+How Lavatron Works
+Lavatron is able to present an interesting image onscreen because of a small trick that it
+employs, and its side effect allows the applet to load very quickly. The reason it loads
+so quickly is that there isn’t much data transmitted over the Net. The source image is a
+JPEG image that is 64 times smaller than the displayed image. Each pixel in the source
+image is scaled up to an 8×8-pixel square. Here is the trick that Lavatron uses to
+produce the lightbulb effect. An 8×8-pixel image of a transparent circle surrounded by
+a black bezel, with a white highlight for a dash of style, is painted over the scaled-up
+color pixel. As an optimization, the bulbs are preassembled into an image that can be
+painted once for each column. Figure 31-2 shows what the bulb mask looks like blown
+up. The two white pixels are the highlight. The black pixels in the corner are opaque.
+Finally, all of the gray pixels in the middle are transparent, to allow the lightbulb color
+to show through.
+Lavatron paints so fast because it doesn’t have to repaint what it has already drawn.
+The technique of copying the area of the screen that’s good and painting just the portion
+that’s new is used in many common operations involving scrolling. The awt.Graphics
+function copyArea( ) takes a portion of an image defined by a rectangle and moves it
+by an x,y offset from its starting location. As a graphics speed optimization, copyArea( )
+is hard to beat. It consistently outperforms any other technique of image rendering,
+such as the use of drawImage( ), or drawImage( ) through a clipRect( ). Building an
+C h a p t e r 3 1 : T h e L a v a t r o n A p p l e t : A S p o r t s A r e n a D i s p l a y 1059
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Figure 31-2. A blown-up light bulb image
+image much larger than your applet, which has several source images concatenated
+into a single image, and then using copyArea to move them into place and clipping the
+result onscreen is a very fast Java rendering technique.
+The Source Code
+Lavatron starts by initializing data, which includes loading the source image and
+creating the column of bulb images. The last stage of the initialization is painting the
+offscreen (double buffer) image full of dimmed (black) lightbulbs to start the display
+with a clean image. Subsequent painting of the offscreen image begins by using
+copyArea( ) to move the existing portion of the image to the left by the width of the
+column of bulbs about to be added on the right edge. Then the pixel values for the next
+column are read and used as the color to fill a column of 8×8 rectangles at the right
+edge of the applet. The transparent column of bulbs is painted, and then the whole
+backing image is drawn to the screen. Since this applet doesn’t have to do much except
+scroll the image, it avoids the normal repaint( ) loop by forking a thread that repeatedly
+calls paint( ), pausing only to call yield( ) to allow other threads to run.
+The APPLET Tag
+The source code starts with the APPLET tag for Lavatron, shown here. This applet
+looks best when the width is an even multiple of the bulb size and the height is the
+bulb size times the source image height. The only parameter is for the name of the
+source image file, named in img.
+<applet code=Lavatron.class width=560 height=128>
+<param name="img" value="swsm.jpg">
+</applet>
+Lavatron.java
+The main applet is small, about 100 lines of Java source code. However, there is also
+a support class that is required, which is described in the next section.
+init( )
+The init( ) method first determines the size of the applet by using getSize( ), and then
+rounds up the size to a multiple of the bulb size, specified by bulbS, and stores it in
+offw,offh. It then creates an image that size, called offscreen, for use as a double
+buffer for the display. The Graphics object used for drawing on offscreen is saved
+in offGraphics. The size of the applet, in bulb units rather than pixels, is stored in
+bulbsW,bulbsH.
+Next, the image of a column of bulbs is created by calling createBulbs( ), passing in
+the size of the image to create. Then the image named in the img applet parameter is
+1060 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+loaded. This is done by passing the result of getImage( ) to MediaTracker’s addImage( )
+method, and then calling waitForID( ), which waits until the image is fully loaded
+before returning.
+To draw the blown-up version of this image, init( ) needs to retrieve the color
+information for each pixel in the image. First, it obtains the size of the image, using
+getWidth( ) and getHeight( ), saving the width in pixscan. It then assigns pixels to a
+new array of pixscan * h integers. Then a PixelGrabber is created. When grabPixels( )
+is called, the array is filled in with the color values.
+The final step of init( ) is to paint black bulbs on the offscreen image, which makes
+the effect more dramatic as the image scrolls from the right side revealing lighted bulbs.
+createBulbs( )
+The createBulbs( ) method is a helper to init( ). It returns an Image of a stack of bulb
+images that can be used to mask out a column of colored squares to make them look
+like lit lightbulbs. It is a little tricky, but quite elegant.
+First, it allocates the right number of ints in an array to store the pixels. Then, it
+declares another array, which is a picture of a single bulb, represented by the numbers
+0, 1, and 2. The 0s represent black, the 1s transparent pixels, and the 2s represent the
+white highlight. Next, a short array is declared—bulbCLUT (bulb Color Look Up Table).
+This maps the 0, 1, and 2 just mentioned into full 32-bit pixel values. The 0xff000000 is
+opaque black. The high-order byte is alpha, or transparency. The 0x00c0c0c0 is a fully
+transparent light gray, and the 0xffffffff is opaque white.
+The for loop runs through each pixel, loading the appropriate 0, 1, or 2 from bulbBits
+based on the position in the column. This is achieved by use of the mod (%) operator.
+This value is then used to look up the color from bulbCLUT. Given this array of pixels,
+createBulbs( ) returns the output of createImage( ), passing in a MemoryImageSource
+object prepared with the pixels we just constructed.
+color( )
+The color( ) method returns the color of the pixel at the x,y position in the source image
+as a Color object. Since this applet runs continuously, we decided not to simply create
+a new Color object each time a single bulb was painted. This would be abusive of the
+garbage-collected heap. Instead, unique Color objects are stored in a hash table. The
+maximum number of Color objects in the hash table can be as much as the width times
+the height of the source image, but in practice, it is usually much less.
+update( )
+Lavatron overrides update( ) to do nothing, because we don’t want AWT’s implementation
+to cause flicker.
+paint( )
+The paint( ) method is quite simple. The first step calls copyArea( ) to move all of the
+columns to the left by one column’s width. Then a for loop is used to fill the rightmost
+C h a p t e r 3 1 : T h e L a v a t r o n A p p l e t : A S p o r t s A r e n a D i s p l a y 1061
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+column with rectangles in the Color of the appropriate pixel, using color( ). The bulb
+image strip is then painted over the new column. Then the current scrolled position,
+scrollX, is updated to be one more to the right, modulo the width, pixscan.
+start( ), stop( ), and run( )
+When the applet starts, it creates and starts a new Thread called t. This thread will call
+run( ), which will keep calling paint( ) as fast as possible, while maintaining the courtesy
+of calling yield( ) so that other threads can run. When the applet stop( ) method is
+called, stopFlag is set to true. This variable is checked by the infinite loop in the run( )
+method. Program control breaks from the loop when stopFlag is true.
+A useful enhancement would be to introduce a threshold frame rate, say 30 fps (frames
+per second), and change the call to the yield( ) into an appropriate call to sleep( ) if the
+rendering is too fast.
+The Code
+Here is the source code for the Lavatron class:
+import java.applet.*;
+import java.awt.* ;
+import java.awt.image.* ;
+public class Lavatron extends Applet implements Runnable {
+int scrollX;
+int bulbsW, bulbsH;
+int bulbS = 8;
+Dimension d;
+Image offscreen, bulb, img;
+Graphics offgraphics;
+int pixels[];
+int pixscan;
+IntHash clut = new IntHash();
+boolean stopFlag;
+public void init() {
+d = getSize();
+int offw = (int) Math.ceil(d.width/bulbS) * bulbS;
+int offh = (int) Math.ceil(d.height/bulbS) * bulbS;
+offscreen = createImage(offw, offh);
+offgraphics = offscreen.getGraphics();
+bulbsW = offw/bulbS;
+bulbsH = offh/bulbS;
+1062 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+bulb = createBulbs(bulbS, bulbsH*bulbS);
+try {
+img = getImage(getDocumentBase(), getParameter("img"));
+MediaTracker t = new MediaTracker(this);
+t.addImage(img, 0);
+t.waitForID(0);
+pixscan = img.getWidth(null);
+int h = img.getHeight(null);
+pixels = new int[pixscan * h];
+PixelGrabber pg = new PixelGrabber(img, 0, 0, pixscan, h,
+pixels, 0, pixscan);
+pg.grabPixels();
+} catch (InterruptedException e) { };
+scrollX = 0;
+// paint black bulbs on the offscreen image
+offgraphics.setColor(Color.black);
+offgraphics.fillRect(0, 0, d.width, d.height);
+for (int x=0; x<bulbsW; x++)
+offgraphics.drawImage(bulb, x*bulbS, 0, null);
+}
+Image createBulbs(int w, int h) {
+int pixels[] = new int[w*h];
+int bulbBits[] = {
+0,0,1,1,1,1,0,0,
+0,1,2,1,1,1,1,0,
+1,2,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,
+0,1,1,1,1,1,1,0,
+0,0,1,1,1,1,0,0
+};
+int bulbCLUT[] = { 0xff000000, 0x00c0c0c0, 0xffffffff };
+for (int i=0; i<w*h; i++)
+pixels[i] = bulbCLUT[bulbBits[i%bulbBits.length]];
+return createImage(new MemoryImageSource(w, h, pixels, 0, w));
+}
+public final Color color(int x, int y) {
+int p = pixels[y*pixscan+x];
+Color c;
+C h a p t e r 3 1 : T h e L a v a t r o n A p p l e t : A S p o r t s A r e n a D i s p l a y 1063
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+if ((c=(Color)clut.get(p)) == null)
+clut.put(p, c = new Color(p));
+return c;
+}
+public void update() {}
+public void paint(Graphics g) {
+offgraphics.copyArea(bulbS, 0, bulbsW*bulbS-bulbS, d.height,
+-bulbS, 0);
+for (int y=0; y<bulbsH; y++) {
+offgraphics.setColor(color(scrollX, y));
+offgraphics.fillRect(d.width-bulbS, y*bulbS, bulbS, bulbS);
+}
+offgraphics.drawImage(bulb, d.width-bulbS, 0, null);
+g.drawImage(offscreen, 0, 0, null);
+scrollX = (scrollX + 1) % pixscan;
+}
+Thread t;
+public void run() {
+while (true) {
+paint(getGraphics());
+try{t.yield();} catch(Exception e) { };
+if(stopFlag)
+break;
+}
+}
+public void start() {
+t = new Thread(this);
+t.setPriority(Thread.MIN_PRIORITY);
+stopFlag = false;
+t.start();
+}
+public void stop() {
+stopFlag = true;
+}
+}
+1064 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+IntHash( )
+As mentioned in the preceding section, Color objects are stored in a hash table rather
+than creating the same ones over and over. As a further optimization, we created our
+own version of Java’s Hashtable class, which uses normal ints as keys rather than
+requiring an Object handle.
+Integer data needs much less room to store in the pixel array than Color objects,
+so we use a hash table as a mechanism to look up Color objects from the integer value
+of any individual pixel. Creating Color objects on the fly from the integer value of
+each pixel is very expensive, because it creates a lot of memory garbage that must be
+collected. One possible solution would be to use a Java Hashtable, except that doing so
+would create just as much garbage, since only objects can be used as keys in a standard
+Java hash table. Thus, to store an int in Java’s hash table, you would have to create a
+new Integer object as a key to be matched. In a high duty cycle applet like Lavatron,
+garbage Integer objects would be created by the thousands per second. This is not a
+good solution.
+The proper solution was to build our own hash table, IntHash, which uses the
+integer data type values rather than the Integer object for its keys. IntHash is about 60
+lines of code. The IntHash class duplicates the interface of the java.util.Hashtable class
+with the exception that the type of the argument to put( ) and get( ) is an int data type
+rather than an Object. There’s no need to explain how a hash table works in this
+chapter, but suffice it to say that put(42, “Hello”) == get(42).
+The Code
+Here is the source code for the IntHash class:
+class IntHash {
+private int capacity;
+private int size;
+private float load = 0.7F;
+private int keys[];
+private Object vals[];
+public IntHash(int n) {
+capacity = n;
+size = 0;
+keys = new int[n];
+vals = new Object[n];
+}
+public IntHash() {
+this(101);
+C h a p t e r 3 1 : T h e L a v a t r o n A p p l e t : A S p o r t s A r e n a D i s p l a y 1065
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+}private void rehash() {
+int newcapacity = capacity * 2 + 1;
+Object newvals[] = new Object[newcapacity];
+int newkeys[] = new int[newcapacity];
+for (int i = 0; i < capacity; i++) {
+Object o = vals[i];
+if (o != null) {
+int k = keys[i];
+int newi = (k & 0x7fffffff) % newcapacity;
+while (newvals[newi] != null)
+newi = (newi + 1) % newcapacity;
+newkeys[newi] = k;
+newvals[newi] = o;
+}
+}
+capacity = newcapacity;
+keys = newkeys;
+vals = newvals;
+}
+public void put(int k, Object o) {
+int i = (k & 0x7fffffff) % capacity;
+while (vals[i] != null && k != keys[i]) // hash collision.
+i = (i + 1) % capacity;
+if (vals[i] == null)
+size++;
+keys[i] = k;
+vals[i] = o;
+if (size > (int)(capacity * load))
+rehash();
+}
+public final Object get(int k) {
+int i = (k & 0x7fffffff) % capacity;
+while (vals[i] != null && k != keys[i]) // hash miss
+i = (i + 1) % capacity;
+return vals[i];
+}
+1066 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+public final boolean contains(int k) {
+return get(k)!=null;
+}
+public int size() {
+return size;
+}
+public int capacity() {
+return capacity;
+}
+}
+Hot Lava
+This applet is another small example of the kind of amazing performance you can
+squeeze out of Java if you are careful and diligent. David LaVallée uses many tricks
+to avoid excessive memory allocation and unnecessary calls to AWT drawing
+functions. Creating the lightbulb mask image from a small array of integers rather
+than a loaded GIF image saves download time and increases flexibility. The use of
+paint(getGraphics( )) rather than repaint( ) increases frame rate significantly. The
+performance gains from using copyArea( ) over rerendering the image or calling
+drawImage( ) are profound. Finally, the creation and use of IntHash makes for that
+last performance boost by not forcing the system to garbage-collect as often.
+C h a p t e r 3 1 : T h e L a v a t r o n A p p l e t : A S p o r t s A r e n a D i s p l a y 1067
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+This page intentionally left blank.
+Chapter 32
+Scrabblet: A Multiplayer
+Word Game
+1069

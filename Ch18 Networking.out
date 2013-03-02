@@ -1,0 +1,1642 @@
+Chapter 18
+Networking
+587
+588 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+This chapter explores the java.net package, which provides support fornetworking. Its creators have called Java “programming for the Internet.” Whiletrue, there is actually very little in Java, the programming language, that
+makes it any more appropriate for writing networked programs than, say, C++ or
+FORTRAN. What makes Java a good language for networking are the classes
+defined in the java.net package.
+These networking classes encapsulate the “socket” paradigm pioneered in the
+Berkeley Software Distribution (BSD) from the University of California at Berkeley.
+No discussion of Internet networking libraries would be complete without a brief
+recounting of the history of UNIX and BSD sockets.
+Networking Basics
+Ken Thompson and Dennis Ritchie developed UNIX in concert with the C language
+at Bell Telephone Laboratories, Murray Hill, New Jersey, in 1969. For many years, the
+development of UNIX remained in Bell Labs and in a few universities and research
+facilities that had the DEC PDP machines it was designed to be run on. In 1978, Bill Joy
+was leading a project at Cal Berkeley to add many new features to UNIX, such as virtual
+memory and full-screen display capabilities. By early 1984, just as Bill was leaving to
+found Sun Microsystems, he shipped 4.2BSD, commonly known as Berkeley UNIX.
+4.2BSD came with a fast file system, reliable signals, interprocess communication,
+and, most important, networking. The networking support first found in 4.2 eventually
+became the de facto standard for the Internet. Berkeley’s implementation of TCP/IP
+remains the primary standard for communications within the Internet. The socket
+paradigm for interprocess and network communication has also been widely adopted
+outside of Berkeley. Even Windows and the Macintosh started talking “Berkeley
+sockets” in the late ‘80s.
+Socket Overview
+A network socket is a lot like an electrical socket. Various plugs around the network have
+a standard way of delivering their payload. Anything that understands the standard
+protocol can “plug in” to the socket and communicate. With electrical sockets, it doesn’t
+matter if you plug in a lamp or a toaster; as long as they are expecting 60Hz, 115-volt
+electricity, the devices will work. Think how your electric bill is created. There is a meter
+somewhere between your house and the rest of the network. For each kilowatt of power
+that goes through that meter, you are billed. The bill comes to your “address.” So even
+though the electricity flows freely around the power grid, all of the sockets in your house
+have a particular address.
+The same idea applies to network sockets, except we talk about TCP/IP packets
+and IP addresses rather than electrons and street addresses. Internet Protocol (IP) is a
+low-level routing protocol that breaks data into small packets and sends them to an
+address across a network, which does not guarantee to deliver said packets to the
+destination. Transmission Control Protocol (TCP) is a higher-level protocol that manages
+to robustly string together these packets, sorting and retransmitting them as necessary
+to reliably transmit your data. A third protocol, User Datagram Protocol (UDP), sits
+next to TCP and can be used directly to support fast, connectionless, unreliable
+transport of packets.
+Client/Server
+You often hear the term client/server mentioned in the context of networking. It seems
+complicated when you read about it in corporate marketing statements, but it is actually
+quite simple. A server is anything that has some resource that can be shared. There are
+compute servers, which provide computing power; print servers, which manage a collection
+of printers; disk servers, which provide networked disk space; and web servers, which store
+web pages. A client is simply any other entity that wants to gain access to a particular
+server. The interaction between client and server is just like the interaction between a
+lamp and an electrical socket. The power grid of the house is the server, and the lamp is
+a power client. The server is a permanently available resource, while the client is free to
+“unplug” after it is has been served.
+In Berkeley sockets, the notion of a socket allows a single computer to serve many
+different clients at once, as well as serving many different types of information. This
+feat is managed by the introduction of a port, which is a numbered socket on a
+particular machine. A server process is said to “listen” to a port until a client connects
+to it. A server is allowed to accept multiple clients connected to the same port number,
+although each session is unique. To manage multiple client connections, a server
+process must be multithreaded or have some other means of multiplexing the
+simultaneous I/O.
+Reserved Sockets
+Once connected, a higher-level protocol ensues, which is dependent on which port you
+are using. TCP/IP reserves the lower 1,024 ports for specific protocols. Many of these
+will seem familiar to you if you have spent any time surfing the Internet. Port number
+21 is for FTP, 23 is for Telnet, 25 is for e-mail, 79 is for finger, 80 is for HTTP, 119 is for
+netnews—and the list goes on. It is up to each protocol to determine how a client
+should interact with the port.
+For example, HTTP is the protocol that web browsers and servers use to transfer
+hypertext pages and images. It is quite a simple protocol for a basic page-browsing
+web server. Here’s how it works. When a client requests a file from an HTTP server,
+an action known as a hit, it simply prints the name of the file in a special format to a
+predefined port and reads back the contents of the file. The server also responds with
+a status code number to tell the client whether the request can be fulfilled and why.
+C h a p t e r 1 8 : N e t w o r k i n g 589
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+590 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Here’s an example of a client requesting a single file, /index.html, and the server
+replying that it has successfully found the file and is sending it to the client:
+Server Client
+Listens to port 80. Connects to port 80.
+Accepts the connection. Writes “GET /index.html
+HTTP/1.0\n\n”.
+Reads up until the second end-of-line (\n).
+Sees that GET is a known command and that
+HTTP/1.0 is a valid protocol version.
+Reads a local file called /index.html.
+Writes “HTTP/1.0 200 OK\n\n”. “200” means “here comes the file.”
+Copies the contents of the file into the socket. Reads the contents of the file and
+displays it.
+Hangs up. Hangs up.
+Obviously, the HTTP protocol is much more complicated than this example shows,
+but this is an actual transaction that you could have with any web server near you.
+Proxy Servers
+A proxy server speaks the client side of a protocol to another server. This is often
+required when clients have certain restrictions on which servers they can connect to.
+Thus, a client would connect to a proxy server, which did not have such restrictions,
+and the proxy server would in turn communicate for the client. A proxy server has
+the additional ability to filter certain requests or cache the results of those requests for
+future use. A caching proxy HTTP server can help reduce the bandwidth demands on
+a local network’s connection to the Internet. When a popular web site is being hit by
+hundreds of users, a proxy server can get the contents of the web server’s popular
+pages once, saving expensive internetwork transfers while providing faster access to
+those pages to the clients.
+Later in this chapter, we will actually build a complete caching proxy HTTP server.
+The interesting part about this sample program is that it is both a client and a server.
+To serve certain pages, it must act as a client to other servers to obtain a copy of the
+requested content.
+Internet Addressing
+Every computer on the Internet has an address. An Internet address is a number that
+uniquely identifies each computer on the Net. Originally, all Internet addresses
+C h a p t e r 1 8 : N e t w o r k i n g 591
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+consisted of 32-bit values. This address type was specified by IPv4 (Internet Protocol,
+version 4). However, a new addressing scheme, called IPv6 (Internet Protocol, version
+6) has come into play. IPv6 uses a 128-bit value to represent an address. Although there
+are several reasons for and advantages to IPv6, the main one is that it supports a much
+larger address space than does IPv4. Fortunately, IPv6 is downwardly compatible with
+IPv4. Currently, IPv4 is by far the most widely used scheme, but this situation is likely
+to change over time.
+Because of the emerging importance of IPv6, Java 2, version 1.4 has begun to
+add support for it. However, at the time of this writing, IPv6 is not supported by all
+environments. Furthermore, for the next few years, IPv4 will continue to be the dominant
+form of addressing. For these reasons, the form of Internet addresses discussed here,
+and used in this chapter, are the IPv4 form. As mentioned, IPv4 is, loosely, a subset
+of IPv6, and the material contained in this chapter is largely applicable to both forms
+of addressing.
+There are 32 bits in an IPv4 IP address, and we often refer to them as a sequence
+of four numbers between 0 and 255 separated by dots (.). This makes them easier to
+remember, because they are not randomly assigned—they are hierarchically assigned.
+The first few bits define which class of network, lettered A, B, C, D, or E, the address
+represents. Most Internet users are on a class C network, since there are over two
+million networks in class C. The first byte of a class C network is between 192 and 224,
+with the last byte actually identifying an individual computer among the 256 allowed
+on a single class C network. This scheme allows for half a billion devices to live on
+class C networks.
+Domain Naming Service (DNS)
+The Internet wouldn’t be a very friendly place to navigate if everyone had to
+refer to their addresses as numbers. For example, it is difficult to imagine seeing
+“http://192.9.9.1/” at the bottom of an advertisement. Thankfully, a clearinghouse
+exists for a parallel hierarchy of names to go with all these numbers. It is called the
+Domain Naming Service (DNS). Just as the four numbers of an IP address describe a
+network hierarchy from left to right, the name of an Internet address, called its domain
+name, describes a machine’s location in a name space, from right to left. For example,
+www.osborne.com is in the COM domain (reserved for U.S. commercial sites), it
+is called osborne (after the company name), and www is the name of the specific
+computer that is Osborne’s web server. www corresponds to the rightmost number
+in the equivalent IP address.
+Java and the Net
+Now that the stage has been set, let’s take a look at how Java relates to all of these
+network concepts. Java supports TCP/IP both by extending the already established
+stream I/O interface introduced in Chapter 17 and by adding the features required to
+build I/O objects across the network. Java supports both the TCP and UDP protocol
+families. TCP is used for reliable stream-based I/O across the network. UDP supports
+a simpler, hence faster, point-to-point datagram-oriented model.
+The Networking Classes and Interfaces
+The classes contained in the java.net package are listed here:
+Authenticator (Java 2) InetSocketAddress (Java 2, v1.4) SocketImpl
+ContentHandler JarURLConnection (Java 2) SocketPermission
+DatagramPacket MulticastSocket URI (Java 2, v1.4)
+DatagramSocket NetPermission URL
+DatagramSocketImpl NetworkInterface (Java 2, v1.4) URLClassLoader (Java 2)
+HttpURLConnection PasswordAuthentication (Java 2) URLConnection
+InetAddress ServerSocket URLDecoder (Java 2)
+Inet4Address (Java 2, v1.4) Socket URLEncoder
+Inet6Address (Java 2, v1.4) SocketAddress (Java 2, v1.4) URLStreamHandler
+As you can see, several new classes were added by Java 2, version 1.4. Some of
+these are to support the new IPv6 addressing scheme. Others provide some added
+flexibility to the original java.net package. Java 2, version 1.4 also added functionality,
+such as support for the new I/O classes, to several of the preexisting networking
+classes. Most of the additions made by Java 2, version 1.4 are beyond the scope of this
+chapter, but three new classes, Inet4Address, Inet6Address, and URI, are briefly
+discussed at the end. The java.net package’s interfaces are listed here:
+ContentHandlerFactory SocketImplFactory URLStreamHandlerFactory
+FileNameMap SocketOptions DatagramSocketImplFactory
+(added by Java 2, v1.3)
+In the sections that follow, we will examine the main networking classes and show
+several examples that apply them.
+InetAddress
+Whether you are making a phone call, sending mail, or establishing a connection across
+the Internet, addresses are fundamental. The InetAddress class is used to encapsulate
+both the numerical IP address we discussed earlier and the domain name for that
+address. You interact with this class by using the name of an IP host, which is more
+convenient and understandable than its IP address. The InetAddress class hides the
+number inside. As of Java 2, version 1.4, InetAddress can handle both IPv4 and IPv6
+addresses. This discussion assumes IPv4.
+592 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 8 : N e t w o r k i n g 593
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Factory Methods
+The InetAddress class has no visible constructors. To create an InetAddress object,
+you have to use one of the available factory methods. Factory methods are merely a
+convention whereby static methods in a class return an instance of that class. This
+is done in lieu of overloading a constructor with various parameter lists when
+having unique method names makes the results much clearer. Three commonly used
+InetAddress factory methods are shown here.
+static InetAddress getLocalHost( )
+throws UnknownHostException
+static InetAddress getByName(String hostName)
+throws UnknownHostException
+static InetAddress[ ] getAllByName(String hostName)
+throws UnknownHostException
+The getLocalHost( ) method simply returns the InetAddress object that represents
+the local host. The getByName( ) method returns an InetAddress for a host name
+passed to it. If these methods are unable to resolve the host name, they throw an
+UnknownHostException.
+On the Internet, it is common for a single name to be used to represent several
+machines. In the world of web servers, this is one way to provide some degree of
+scaling. The getAllByName( ) factory method returns an array of InetAddresses that
+represent all of the addresses that a particular name resolves to. It will also throw an
+UnknownHostException if it can’t resolve the name to at least one address.
+Java 2, version 1.4 also includes the factory method getByAddress( ), which takes an IP
+address and returns an InetAddress object. Either an IPv4 or an IPv6 address can be used.
+The following example prints the addresses and names of the local machine and
+two well-known Internet web sites:
+// Demonstrate InetAddress.
+import java.net.*;
+class InetAddressTest
+{
+public static void main(String args[]) throws UnknownHostException {
+InetAddress Address = InetAddress.getLocalHost();
+System.out.println(Address);
+Address = InetAddress.getByName("osborne.com");
+System.out.println(Address);
+InetAddress SW[] = InetAddress.getAllByName("www.nba.com");
+for (int i=0; i<SW.length; i++)
+System.out.println(SW[i]);
+}
+}
+594 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Here is the output produced by this program. (Of course, the output you see will be
+slightly different.)
+default/206.148.209.138
+osborne.com/198.45.24.162
+www.nba.com/64.241.238.153
+www.nba.com/64.241.238.142
+Instance Methods
+The InetAddress class also has several other methods, which can be used on the objects
+returned by the methods just discussed. Here are some of the most commonly used.
+boolean equals(Object other) Returns true if this object has the same Internet
+address as other.
+byte[ ] getAddress( ) Returns a byte array that represents the object’s
+Internet address in network byte order.
+String getHostAddress( ) Returns a string that represents the host address
+associated with the InetAddress object.
+String getHostName( ) Returns a string that represents the host name
+associated with the InetAddress object.
+boolean isMulticastAddress( ) Returns true if this Internet address is a multicast
+address. Otherwise, it returns false.
+String toString( ) Returns a string that lists the host name and the
+IP address for convenience.
+Internet addresses are looked up in a series of hierarchically cached servers. That
+means that your local computer might know a particular name-to-IP-address mapping
+automatically, such as for itself and nearby servers. For other names, it may ask a local
+DNS server for IP address information. If that server doesn’t have a particular address,
+it can go to a remote site and ask for it. This can continue all the way up to the root
+server, called InterNIC (internic.net). This process might take a long time, so it is wise
+to structure your code so that you cache IP address information locally rather than look
+it up repeatedly.
+TCP/IP Client Sockets
+TCP/IP sockets are used to implement reliable, bidirectional, persistent, point-to- point,
+stream-based connections between hosts on the Internet. A socket can be used to connect
+Java’s I/O system to other programs that may reside either on the local machine or on
+any other machine on the Internet.
+Applets may only establish socket connections back to the host from which the applet was
+downloaded. This restriction exists because it would be dangerous for applets loaded
+through a firewall to have access to any arbitrary machine.
+There are two kinds of TCP sockets in Java. One is for servers, and the other is for
+clients. The ServerSocket class is designed to be a “listener,” which waits for clients to
+connect before doing anything. The Socket class is designed to connect to server
+sockets and initiate protocol exchanges.
+The creation of a Socket object implicitly establishes a connection between the client
+and server. There are no methods or constructors that explicitly expose the details of
+establishing that connection. Here are two constructors used to create client sockets:
+Socket(String hostName, int port) Creates a socket connecting the local
+host to the named host and port; can
+throw an UnknownHostException or
+an IOException.
+Socket(InetAddress ipAddress, int port) Creates a socket using a preexisting
+InetAddress object and a port; can throw
+an IOException.
+A socket can be examined at any time for the address and port information
+associated with it, by use of the following methods:
+InetAddress getInetAddress( ) Returns the InetAddress associated with
+the Socket object.
+int getPort( ) Returns the remote port to which this
+Socket object is connected.
+int getLocalPort( ) Returns the local port to which this
+Socket object is connected.
+Once the Socket object has been created, it can also be examined to gain access to
+the input and output streams associated with it. Each of these methods can throw an
+IOException if the sockets have been invalidated by a loss of connection on the Net.
+These streams are used exactly like the I/O streams described in Chapter 17 to send
+and receive data.
+InputStream getInputStream( ) Returns the InputStream associated
+with the invoking socket.
+OutputStream getOutputStream( ) Returns the OutputStream associated
+with the invoking socket.
+C h a p t e r 1 8 : N e t w o r k i n g 595
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Java 2, version 1.4 added the getChannel( ) method to Socket. This method returns
+a channel connected to the Socket object. Channels are used by the new I/O classes
+contained in java.nio. (See Chapter 24.)
+Whois
+The very simple example that follows opens a connection to a “whois” port on the
+InterNIC server, sends the command-line argument down the socket, and then prints the
+data that is returned. InterNIC will try to look up the argument as a registered Internet
+domain name, then send back the IP address and contact information for that site.
+//Demonstrate Sockets.
+import java.net.*;
+import java.io.*;
+class Whois {
+public static void main(String args[]) throws Exception {
+int c;
+Socket s = new Socket("internic.net", 43);
+InputStream in = s.getInputStream();
+OutputStream out = s.getOutputStream();
+String str = (args.length == 0 ? "osborne.com" : args[0]) + "\n";
+byte buf[] = str.getBytes();
+out.write(buf);
+while ((c = in.read()) != -1) {
+System.out.print((char) c);
+}
+s.close();
+}
+}
+If, for example, you obtained information about osborne.com, you’d get something
+similar to the following:
+Whois Server Version 1.3
+Domain names in the .com, .net, and .org domains can now be registered
+with many different competing registrars. Go to http://www.internic.net
+for detailed information.
+Domain Name: OSBORNE.COM
+Registrar: NETWORK SOLUTIONS, INC.
+Whois Server: whois.networksolutions.com
+Referral URL: http://www.networksolutions.com
+Name Server: NS1.EPPG.COM
+Name Server: NS2.EPPG.COM
+596 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Updated Date: 16-jan-2002
+>> Last update of whois database: Thu, 25 Apr 2002 05:05:52 EDT <<
+The Registry database contains ONLY .COM, .NET, .ORG, .EDU domains and
+Registrars.
+URL
+That last example was rather obscure, because the modern Internet is not about the
+older protocols, like whois, finger, and FTP. It is about WWW, the World Wide Web.
+The Web is a loose collection of higher-level protocols and file formats, all unified in a
+web browser. One of the most important aspects of the Web is that Tim Berners-Lee
+devised a scaleable way to locate all of the resources of the Net. Once you can reliably
+name anything and everything, it becomes a very powerful paradigm. The Uniform
+Resource Locator (URL) does exactly that.
+The URL provides a reasonably intelligible form to uniquely identify or address
+information on the Internet. URLs are ubiquitous; every browser uses them to identify
+information on the Web. In fact, the Web is really just that same old Internet with all of
+its resources addressed as URLs plus HTML. Within Java’s network class library, the
+URL class provides a simple, concise API to access information across the Internet
+using URLs.
+Format
+Two examples of URLs are http://www.osborne.com/ and http://www.osborne.com:80/
+index.htm. A URL specification is based on four components. The first is the protocol
+to use, separated from the rest of the locator by a colon (:). Common protocols are http,
+ftp, gopher, and file, although these days almost everything is being done via HTTP (in
+fact, most browsers will proceed correctly if you leave off the “http://” from your URL
+specification). The second component is the host name or IP address of the host to use;
+this is delimited on the left by double slashes (//) and on the right by a slash (/) or
+optionally a colon (:). The third component, the port number, is an optional parameter,
+delimited on the left from the host name by a colon (:) and on the right by a slash (/).
+(It defaults to port 80, the predefined HTTP port; thus “:80” is redundant.) The fourth
+part is the actual file path. Most HTTP servers will append a file named index.html
+or index.htm to URLs that refer directly to a directory resource. Thus,
+http://www.osborne.com/ is the same as http://www.osborne.com/index.htm.
+Java’s URL class has several constructors, and each can throw a
+MalformedURLException. One commonly used form specifies the URL with a string
+that is identical to what you see displayed in a browser:
+URL(String urlSpecifier)
+C h a p t e r 1 8 : N e t w o r k i n g 597
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+598 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+The next two forms of the constructor allow you to break up the URL into its
+component parts:
+URL(String protocolName, String hostName, int port, String path)
+URL(String protocolName, String hostName, String path)
+Another frequently used constructor allows you to use an existing URL as a
+reference context and then create a new URL from that context. Although this sounds a
+little contorted, it’s really quite easy and useful.
+URL(URL urlObj, String urlSpecifier)
+In the following example, we create a URL to Osborne’s download page and then
+examine its properties:
+// Demonstrate URL.
+import java.net.*;
+class URLDemo {
+public static void main(String args[]) throws MalformedURLException {
+URL hp = new URL("http://www.osborne.com/downloads");
+System.out.println("Protocol: " + hp.getProtocol());
+System.out.println("Port: " + hp.getPort());
+System.out.println("Host: " + hp.getHost());
+System.out.println("File: " + hp.getFile());
+System.out.println("Ext:" + hp.toExternalForm());
+}
+}
+When you run this, you will get the following output:
+Protocol: http
+Port: -1
+Host: www.osborne.com
+File: /downloads
+Ext:http://www.osborne.com/downloads
+Notice that the port is –1; this means that one was not explicitly set. Now that we have
+created a URL object, we want to retrieve the data associated with it. To access the
+actual bits or content information of a URL, you create a URLConnection object from
+it, using its openConnection( ) method, like this:
+url.openConnection()
+openConnection( ) has the following general form:
+URLConnection openConnection( )
+It returns a URLConnection object associated with the invoking URL object. It may
+throw an IOException.
+URLConnection
+URLConnection is a general-purpose class for accessing the attributes of a remote
+resource. Once you make a connection to a remote server, you can use URLConnection
+to inspect the properties of the remote object before actually transporting it locally.
+These attributes are exposed by the HTTP protocol specification and, as such, only
+make sense for URL objects that are using the HTTP protocol. We’ll examine the most
+useful elements of URLConnection here.
+In the following example, we create a URLConnection using the openConnection( )
+method of a URL object and then use it to examine the document’s properties and content:
+// Demonstrate URLConnection.
+import java.net.*;
+import java.io.*;
+import java.util.Date;
+class UCDemo
+{
+public static void main(String args[]) throws Exception {
+int c;
+URL hp = new URL("http://www.internic.net");
+URLConnection hpCon = hp.openConnection();
+// get date
+long d = hpCon.getDate();
+if(d==0)
+System.out.println("No date information.");
+else
+System.out.println("Date: " + new Date(d));
+// get content type
+System.out.println("Content-Type: " + hpCon.getContentType());
+// get expiration date
+d = hpCon.getExpiration();
+if(d==0)
+C h a p t e r 1 8 : N e t w o r k i n g 599
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+System.out.println("No expiration information.");
+else
+System.out.println("Expires: " + new Date(d));
+// get last-modified date
+d = hpCon.getLastModified();
+if(d==0)
+System.out.println("No last-modified information.");
+else
+System.out.println("Last-Modified: " + new Date(d));
+// get content length
+int len = hpCon.getContentLength();
+if(len == -1)
+System.out.println("Content length unavailable.");
+else
+System.out.println("Content-Length: " + len);
+if(len != 0) {
+System.out.println("=== Content ===");
+InputStream input = hpCon.getInputStream();
+int i = len;
+while (((c = input.read()) != -1)) { // && (--i > 0)) {
+System.out.print((char) c);
+}
+input.close();
+} else {
+System.out.println("No content available.");
+}
+}
+}
+The program establishes an HTTP connection to www.internic.net over port 80. We
+then list out the header values and retrieve the content. Here are the first lines of the
+output (the precise output will vary over time).
+Date: Sat Apr 27 12:17:32 CDT 2002
+Content-Type: text/html
+No expiration information.
+Last-Modified: Tue Mar 19 17:52:42 CST 2002
+Content-Length: 5299
+=== Content ===
+600 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+<html>
+<head>
+<title>InterNIC | The Internet's Network Information Center</title>
+<meta name="keywords" content="internic,network information, domain registration">
+<style type="text/css">
+<!--
+p, li, td, ul {  font-family: Arial, Helvetica, sans-serif}
+-->
+</style>
+</head>
+The URL and URLConnection classes are good enough for simple programs that
+want to connect to HTTP servers to fetch content. For more complex applications,
+you’ll probably find that you are better off studying the specification of the HTTP
+protocol and implementing your own wrappers.
+TCP/IP Server Sockets
+As we mentioned earlier, Java has a different socket class that must be used for creating
+server applications. The ServerSocket class is used to create servers that listen for
+either local or remote client programs to connect to them on published ports. Since the
+Web is driving most of the activity on the Internet, this section develops an operational
+web (http) server.
+ServerSockets are quite different from normal Sockets. When you create a
+ServerSocket, it will register itself with the system as having an interest in client
+connections. The constructors for ServerSocket reflect the port number that you wish
+to accept connections on and, optionally, how long you want the queue for said port to
+be. The queue length tells the system how many client connections it can leave pending
+before it should simply refuse connections. The default is 50. The constructors might
+throw an IOException under adverse conditions. Here are the constructors:
+ServerSocket(int port) Creates server socket on the specified
+port with a queue length of 50.
+ServerSocket(int port, int maxQueue) Creates a server socket on the specified
+port with a maximum queue length of
+maxQueue.
+ServerSocket(int port, int maxQueue,
+InetAddress localAddress)
+Creates a server socket on the specified
+port with a maximum queue length of
+maxQueue. On a multihomed host,
+localAddress specifies the IP address to
+which this socket binds.
+C h a p t e r 1 8 : N e t w o r k i n g 601
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+602 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+ServerSocket has a method called accept( ), which is a blocking call that will wait
+for a client to initiate communications, and then return with a normal Socket that is
+then used for communication with the client.
+Java 2, version 1.4 added the getChannel( ) method to ServerSocket. This method
+returns a channel connected to the ServerSocket object. Channels are used by the new
+I/O classes contained in java.nio. (See Chapter 24.)
+A Caching Proxy HTTP Server
+In the remainder of this section, we will develop a simple caching proxy HTTP server,
+called http, to demonstrate client and server sockets. http supports only GET
+operations and a very limited range of hard-coded MIME types. (MIME types are the
+type descriptors for multimedia content.) The proxy HTTP server is single threaded, in
+that each request is handled in turn while all others wait. It has fairly naive strategies
+for caching—it keeps everything in RAM forever. When it is acting as a proxy server,
+http also copies every file it gets to a local cache for which it has no strategy for
+refreshing or garbage collecting. All of these caveats aside, http represents a productive
+example of client and server sockets, and it is fun to explore and easy to extend.
+Source Code
+The implementation of this HTTP server is presented here in five classes and one
+interface. A more complete implementation would likely split many of the methods
+out of the main class, httpd, in order to abstract more of the components. For space
+considerations in this book, most of the functionality is in the single class, and the small
+support classes are only acting as data structures. We will take a close look at each class
+and method to examine how this server works, starting with the support classes and
+ending with the main program.
+MimeHeader.java
+MIME is an Internet standard for communicating multimedia content over e-mail
+systems. This standard was created by Nat Borenstein in 1992. The HTTP protocol uses
+and extends the notion of MIME headers to pass general attribute/value pairs between
+the HTTP client and server.
+CONSTRUCTORS This class is a subclass of Hashtable so that it can conveniently
+store and retrieve the key/value pairs associated with a MIME header. It has two
+constructors. One creates a blank MimeHeader with no keys. The other takes a string
+formatted as a MIME header and parses it for the initial contents of the object. See
+parse( ) next.
+parse( ) The parse( ) method is used to take a raw MIME-formatted string and enter
+its key/value pairs into a given instance of MimeHeader. It uses a StringTokenizer to
+split the input data into individual lines, marked by the CRLF (\r\n) sequence. It then
+iterates through each line using the canonical while ... hasMoreTokens( ) ...
+nextToken( ) sequence.
+For each line of the MIME header, the parse( ) method splits the line into two strings
+separated by a colon (:). The two variables key and val are set by the substring( ) method
+to extract the characters before the colon, those after the colon, and its following space
+character. Once these two strings have been extracted, the put( ) method is used to store
+this association between the key and value in the Hashtable.
+toString( ) The toString( ) method (used by the String concatenation operator, +)
+is simply the reverse of parse( ). It takes the current key/value pairs stored in the
+MimeHeader and returns a string representation of them in the MIME format, where
+keys are printed followed by a colon and a space, and then the value followed by a CRLF.
+put( ), get( ), AND fix( ) The put( ) and get( ) methods in Hashtable would
+work fine for this application if not for one rather odd thing. The MIME specification
+defined several important keys, such as Content-Type and Content-Length. Some
+early implementors of MIME systems, notably web browsers, took liberties with the
+capitalization of these fields. Some use Content-type, others content-type. To avoid
+mishaps, our HTTP server tries to convert all incoming and outgoing MimeHeader keys
+to be in the canonical form, Content-Type. Thus, we override put( ) and get( ) to convert
+the values’ capitalization, using the method fix( ), before entering them into the
+Hashtable and before looking up a given key.
+THE CODE Here is the source code for MimeHeader:
+import java.util.*;
+class MimeHeader extends Hashtable {
+void parse(String data) {
+StringTokenizer st = new StringTokenizer(data, "\r\n");
+while (st.hasMoreTokens()) {
+String s = st.nextToken();
+int colon = s.indexOf(':');
+String key = s.substring(0, colon);
+String val = s.substring(colon + 2); // skip ": "
+put(key, val);
+}
+}
+MimeHeader() {}
+MimeHeader(String d) {
+C h a p t e r 1 8 : N e t w o r k i n g 603
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+parse(d);
+}
+public String toString() {
+String ret = "";
+Enumeration e = keys();
+while(e.hasMoreElements()) {
+String key = (String) e.nextElement();
+String val = (String) get(key);
+ret += key + ": " + val + "\r\n";
+}
+return ret;
+}
+// This simple function converts a mime string from
+// any variant of capitalization to a canonical form.
+// For example: CONTENT-TYPE or content-type to Content-Type,
+// or Content-length or CoNTeNT-LENgth to Content-Length.
+private String fix(String ms) {
+char chars[] = ms.toLowerCase().toCharArray();
+boolean upcaseNext = true;
+for (int i = 0; i < chars.length - 1; i++) {
+char ch = chars[i];
+if (upcaseNext && 'a' <= ch && ch <= 'z') {
+chars[i] = (char) (ch - ('a' - 'A'));
+}
+upcaseNext = ch == '-';
+}
+return new String(chars);
+}
+public String get(String key) {
+return (String) super.get(fix(key));
+}
+public void put(String key, String val) {
+super.put(fix(key), val);
+}
+}
+604 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+HttpResponse.java
+The HttpResponse class is a wrapper around everything associated with a reply from
+an HTTP server. This is used by the proxy part of our httpd class. When you send a
+request to an HTTP server, it responds with an integer status code, which we store in
+statusCode, and a textual equivalent, which we store in reasonPhrase. This single-line
+response is followed by a MIME header, which contains further information about the
+reply. We use the previously explained MimeHeader object to parse this string. The
+MimeHeader object is stored inside the HttpResponse class in the mh variable. These
+variables are not made private so that the httpd class can use them directly.
+CONSTRUCTORS If you construct an HttpResponse with a string argument, this is
+taken to be a raw response from an HTTP server and is passed to parse( ), described
+next, to initialize the object. Alternatively, you can pass in a precomputed status code,
+reason phrase, and MIME header.
+parse( ) The parse( ) method takes the raw data that was read from the HTTP
+server, parses the statusCode and reasonPhrase from the first line, and then constructs
+a MimeHeader out of the remaining lines.
+toString( ) The toString( ) method is the inverse of parse( ). It takes the current
+values of the HttpResponse object and returns a string that an HTTP client would
+expect to read back from a server.
+THE CODE Here is the source code for HttpResponse:
+import java.io.*;
+/*
+* HttpResponse
+* Parse a return message and MIME header from a server.
+* HTTP/1.0 302 Found  =  redirection, check Location for where.
+* HTTP/1.0 200 OK = file data comes after mime header.
+*/
+class HttpResponse
+{
+int statusCode;      // Status-Code in spec
+String reasonPhrase; // Reason-Phrase in spec
+MimeHeader mh;
+static String CRLF = "\r\n";
+void parse(String request) {
+C h a p t e r 1 8 : N e t w o r k i n g 605
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+606 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+int fsp = request.indexOf(' ');
+int nsp = request.indexOf(' ', fsp+1);
+int eol = request.indexOf('\n');
+String protocol = request.substring(0, fsp);
+statusCode = Integer.parseInt(request.substring(fsp+1, nsp));
+reasonPhrase = request.substring(nsp+1, eol);
+String raw_mime_header = request.substring(eol + 1);
+mh = new MimeHeader(raw_mime_header);
+}
+HttpResponse(String request) {
+parse(request);
+}
+HttpResponse(int code, String reason, MimeHeader m) {
+statusCode = code;
+reasonPhrase = reason;
+mh = m;
+}
+public String toString() {
+return "HTTP/1.0 " + statusCode + " " + reasonPhrase + CRLF +
+mh + CRLF;
+}
+}
+UrlCacheEntry.java
+To cache the contents of a document on a server, we need to make an association
+between the URL that was used to retrieve the document and the description of the
+document itself. A document is described by its MimeHeader and the raw data. For
+example, an image might be described by a MimeHeader with Content-Type:
+image/gif, and the raw image data is just an array of bytes. Similarly, a web page will
+likely have a Content-Type: text/html key/value pair in its MimeHeader, while the
+raw data is the contents of the HTML page. Again, the instance variables are not
+marked as private so that httpd can have free access to them.
+CONSTRUCTOR The constructor for a UrlCacheEntry object requires the URL to use
+as the key and a MimeHeader to associate with it. If the MimeHeader has a field in it
+called Content-Length (most do), the data area is preallocated to be large enough to
+hold such content.
+append( ) The append( ) method is used to add data to a UrlCacheEntry object. The
+reason this isn’t simply a setData( ) method is that the data might be streaming in over a
+network and need to be stored a chunk at a time. The append( ) method deals with three
+cases. In the first case, the data buffer has not been allocated at all. In the second, the data
+buffer is too small to accommodate the incoming data, so it is reallocated. In the last case,
+the incoming data fits just fine and is inserted into the buffer. At any time, the length
+member variable holds the current valid size of the data buffer.
+THE CODE Here is the source code for UrlCacheEntry:
+class UrlCacheEntry
+{
+String url;
+MimeHeader mh;
+byte data[];
+int length = 0;
+public UrlCacheEntry(String u, MimeHeader m) {
+url = u;
+mh = m;
+String cl = mh.get("Content-Length");
+if (cl != null) {
+data = new byte[Integer.parseInt(cl)];
+}
+}
+void append(byte d[], int n) {
+if (data == null) {
+data = new byte[n];
+System.arraycopy(d, 0, data, 0, n);
+length = n;
+} else if (length + n > data.length) {
+byte old[] = data;
+data = new byte[old.length + n];
+System.arraycopy(old, 0, data, 0, old.length);
+System.arraycopy(d, 0, data, old.length, n);
+} else {
+System.arraycopy(d, 0, data, length, n);
+length += n;
+}
+}
+}
+C h a p t e r 1 8 : N e t w o r k i n g 607
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+LogMessage.java
+LogMessage is a simple interface that declares one method, log( ), which takes a single
+String parameter. This is used to abstract the output of messages from the httpd. In the
+application case, this method is implemented to print to the standard output of the
+console in which the application was started. In the applet case, the data is appended to
+a windowed text buffer.
+THE CODE Here is the source code for LogMessage:
+interface LogMessage {
+public void log(String msg);
+}
+httpd.java
+This is a really big class that does a lot. We will walk through it method by method.
+CONSTRUCTOR There are five main instance variables: port, docRoot, log, cache,
+and stopFlag, and all of them are private. Three of these can be set by httpd’s lone
+constructor, shown here:
+httpd(int p, String dr, LogMessage lm)
+It initializes the port to listen on, the directory to retrieve files from, and the interface to
+send messages to.
+The fourth instance variable, cache, is the Hashtable where all of the files are
+cached in RAM, and is initialized when the object is created. stopFlag controls the
+execution of the program.
+STATIC SECTION There are several important static variables in this class. The
+version reported in the “Server” field of the MIME header is found in the variable
+version. A few constants are defined next: the MIME type for HTML files,
+mime_text_html; the MIME end-of-line sequence, CRLF; the name of the HTML file to
+return in place of raw directory requests, indexfile; and the size of the data buffer used
+in I/O, buffer_size.
+Then mt defines a list of filename extensions and the corresponding MIME types
+for those files. The types Hashtable is statically initialized in the next block to contain
+the array mt as alternating keys and values. Then the fnameToMimeType( ) method
+can be used to return the proper MIME type for each filename passed in. If the
+filename does not have one of the extensions from the mt table, the method returns the
+defaultExt, or “text/plain.”
+608 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+STATISTICAL COUNTERS Next, we declare five more instance variables. These are
+left without the private modifier so that an external monitor can inspect these values to
+display them graphically. (We will show this in action later.) These variables represent
+the usage statistics of our web server. The raw number of hits and bytes served is
+stored in hits_served and bytes_served. The number of files and bytes currently stored
+in the cache is stored in files_in_cache and bytes_in_cache. Finally, we store the
+number of hits that were successfully served out of the cache in hits_to_cache.
+toBytes( ) Next, we have a convenience routine, toBytes( ), which converts its string
+argument to an array of bytes. This is necessary, because Java String objects are stored
+as Unicode characters, while the lingua franca of Internet protocols such as HTTP is
+good old 8-bit ASCII.
+makeMimeHeader( ) The makeMimeHeader( ) method is another convenience
+routine that is used to create a MimeHeader object with a few key values filled in. The
+MimeHeader that is returned from this method has the current time and date in the
+Date field, the name and version of our server in the Server field, the type parameter
+in the Content-Type field, and the length parameter in the Content-Length field.
+error( ) The error( ) method is used to format an HTML page to send back to web
+clients who make requests that cannot be completed. The first parameter, code, is the
+error code to return. Typically, this will be between 400 and 499. Our server sends back
+404 and 405 errors. It uses the HttpResponse class to encapsulate the return code with
+the appropriate MimeHeader. The method returns the string representation of that
+response concatenated with the HTML page to show the user. The page includes a
+human-readable version of the error code, msg, and the url request that caused the error.
+getRawRequest( ) The getRawRequest( ) method is very simple. It reads data
+from a stream until it gets two consecutive newline characters. It ignores carriage
+returns and just looks for newlines. Once it has found the second newline, it turns the
+array of bytes into a String object and returns it. It will return null if the input stream
+does not produce two consecutive newlines before it ends. This is how messages from
+HTTP servers and clients are formatted. They begin with one line of status and then are
+immediately followed by a MIME header. The end of the MIME header is separated
+from the rest of the content by two newlines.
+logEntry( ) The logEntry( ) method is used to report on each hit to the HTTP server
+in a standard format. The format this method produces may seem odd, but it matches
+the current standard for HTTP log files. This method has several helper variables and
+methods that are used to format the date stamp on each log entry. The months array is
+used to convert the month to a string representation. The host variable is set by the
+main HTTP loop when it accepts a connection from a given host. The fmt02d( ) method
+formats integers between 0 and 9 as two-digit, leading-zero numbers. The resulting
+string is then passed through the LogMessage interface variable log.
+C h a p t e r 1 8 : N e t w o r k i n g 609
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+writeString( ) Another convenience method, writeString( ), is used to hide the
+conversion of a String to an array of bytes so that it can be written out to a stream.
+writeUCE( ) The writeUCE( ) method takes an OutputStream and a UrlCacheEntry.
+It extracts the information out of the cache entry in order to send a message to a web client
+containing the appropriate response code, MIME header, and content.
+serveFromCache( ) This Boolean method attempts to find a particular URL in the
+cache. If it is successful, then the contents of that cache entry are written to the client,
+the hits_to_cache variable is incremented, and the caller is returned true. Otherwise, it
+simply returns false.
+loadFile( ) This method takes an InputStream, the url that corresponds to it, and the
+MimeHeader for that URL. A new UrlCacheEntry is created with the information
+stored in the MimeHeader. The input stream is read in chunks of buffer_size bytes
+and appended to the UrlCacheEntry. The resulting UrlCacheEntry is stored in the
+cache. The files_in_cache and bytes_in_cache variables are updated, and the
+UrlCacheEntry is returned to the caller.
+readFile( ) The readFile( ) method might seem redundant with the loadFile( )
+method. It isn’t. This method is strictly for reading files out of a local file system, where
+loadFile( ) is used to talk to streams of any sort. If the File object, f, exists, then an
+InputStream is created for it. The size of the file is determined and the MIME type is
+derived from the filename. These two variables are used to create the appropriate
+MimeHeader, then loadFile( ) is called to do the actual reading and caching.
+writeDiskCache( ) The writeDiskCache( ) method takes a UrlCacheEntry object
+and writes it persistently into the local disk. It constructs a directory name out of the
+URL, making sure to replace the slash (/) characters with the system-dependent
+separatorChar. Then it calls mkdirs( ) to make sure that the local disk path exists for
+this URL. Lastly, it opens a FileOutputStream, writes all the data into it, and closes it.
+handleProxy( ) The handleProxy( ) routine is one of the two major modes of this
+server. The basic idea is this: If you set your browser to use this server as a proxy
+server, then the requests that will be sent to it will include the complete URL, where
+normal GETs remove the “http://” and host name part. We simply pick apart the
+complete URL, looking for the “://” sequence, the next slash (/), and optionally
+another colon (:) for servers using nonstandard port numbers. Once we’ve found these
+characters, we know the intended host and port number as well as the URL we need to
+fetch from there. We can then attempt to load a previously saved version of this
+document out of our RAM cache. If this fails, we can attempt to load it from the file
+system into the RAM cache and reattempt loading it from the cache. If that fails, then it
+gets interesting, because we must read the document from the remote site.
+610 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+To do this, we open a socket to the remote site and port. We send a GET request,
+asking for the URL that was passed to us. Whatever response header we get back from
+the remote site, we send on to the client. If that code was 200, for successful file transfer,
+we also read the ensuing data stream into a new UrlCacheEntry and write it onto the
+client socket. After that, we call writeDiskCache( ) to save the results of that transfer to
+the local disk. We log the transaction, close the sockets, and return.
+handleGet( ) The handleGet( ) method is called when the http daemon is acting like
+a normal web server. It has a local disk document root out of which it is serving files.
+The parameters to handleGet( ) tell it where to write the results, the URL to look up,
+and the MimeHeader from the requesting web browser. This MIME header will include
+the User-Agent string and other useful attributes. First we attempt to serve the URL out
+of the RAM cache. If this fails, we look in the file system for the URL. If the file does not
+exist or is unreadable, we report an error back to the web client. Otherwise, we just use
+readFile( ) to get the contents of the file and put them in the cache. Then writeUCE( ) is
+used to send the contents of the file down the client socket.
+doRequest( ) The doRequest( ) method is called once per connection to the server.
+It parses the request string and incoming MIME header. It decides to call either
+handleProxy( ) or handleGet( ), based on whether there is a “://” in the request string.
+If any methods are used other than GET, such as HEAD or POST, this routine returns a
+405 error to the client. Note that the HTTP request is ignored if stopFlag is true.
+run( ) The run( ) method is called when the server thread is started. It creates a new
+ServerSocket on the given port, goes into an infinite loop calling accept( ) on the server
+socket, and then passes the resulting Socket off to doRequest( ) for inspection.
+start( ) AND stop( ) These are two methods used to start and stop the server
+process. These methods set the value of stopFlag.
+main( ) You can use the main( ) method to run this application from a command
+line. It sets the LogMessage parameter to be the server itself, and then provides a
+simple console output implementation of log( ).
+THE CODE Here is the source code for httpd:
+import java.net.*;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+class httpd implements Runnable, LogMessage {
+private int port;
+C h a p t e r 1 8 : N e t w o r k i n g 611
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+private String docRoot;
+private LogMessage log;
+private Hashtable cache = new Hashtable();
+private boolean stopFlag;
+private static String version = "1.0";
+private static String mime_text_html = "text/html";
+private static String CRLF = "\r\n";
+private static String indexfile = "index.html";
+private static int buffer_size = 8192;
+static String mt[] = {  // mapping from file ext to Mime-Type
+"txt", "text/plain",
+"html", mime_text_html,
+"htm", "text/html",
+"gif", "image/gif",
+"jpg", "image/jpg",
+"jpeg", "image/jpg",
+"class", "application/octet-stream"
+};
+static String defaultExt = "txt";
+static Hashtable types = new Hashtable();
+static {
+for (int i=0; i<mt.length;i+=2)
+types.put(mt[i], mt[i+1]);
+}
+static String fnameToMimeType(String filename) {
+if (filename.endsWith("/"))      // special for index files.
+return mime_text_html;
+int dot = filename.lastIndexOf('.');
+String ext = (dot > 0) ? filename.substring(dot + 1) : defaultExt;
+String ret = (String) types.get(ext);
+return ret != null ? ret : (String)types.get(defaultExt);
+}
+int hits_served = 0;
+int bytes_served = 0;
+int files_in_cache = 0;
+int bytes_in_cache = 0;
+int hits_to_cache = 0;
+612 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+private final byte toBytes(String s)[] {
+byte b[] = s.getBytes();
+return b;
+}
+private MimeHeader makeMimeHeader(String type, int length) {
+MimeHeader mh = new MimeHeader();
+Date curDate = new Date();
+TimeZone gmtTz = TimeZone.getTimeZone("GMT");
+SimpleDateFormat sdf =
+new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz");
+sdf.setTimeZone(gmtTz);
+mh.put("Date", sdf.format(curDate));
+mh.put("Server", "JavaCompleteReference/" + version);
+mh.put("Content-Type", type);
+if (length >= 0)
+mh.put("Content-Length", String.valueOf(length));
+return mh;
+}
+private String error(int code, String msg, String url) {
+String html_page = "<body>" + CRLF +
+"<h1>" + code + " " + msg + "</h1>" + CRLF;
+if (url != null)
+html_page += "Error when fetching URL: " + url + CRLF;
+html_page += "</body>" + CRLF;
+MimeHeader mh = makeMimeHeader(mime_text_html, html_page.length());
+HttpResponse hr = new HttpResponse(code, msg, mh);
+logEntry("GET", url, code, 0);
+return hr + html_page;
+}
+// Read 'in' until you get two \n's in a row.
+// Return up to that point as a String.
+// Discard all \r's.
+private String getRawRequest(InputStream in)
+throws IOException {
+byte buf[] = new byte[buffer_size];
+int pos=0;
+int c;
+while ((c = in.read()) != -1) {
+C h a p t e r 1 8 : N e t w o r k i n g 613
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+switch (c) {
+case '\r':
+break;
+case '\n':
+if (buf[pos-1] == c) {
+return new String(buf,0,pos);
+}
+default:
+buf[pos++] = (byte) c;
+}
+}
+return null;
+}
+static String months[] = {
+"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+private String host;
+// fmt02d is the same as C's printf("%02d", i)
+private final String fmt02d(int i) {
+if(i < 0) {
+i = -i;
+return ((i < 9) ? "-0" : "-") + i;
+}
+else {
+return ((i < 9) ? "0" : "") + i;
+}
+}
+private void logEntry(String cmd, String url, int code, int size) {
+Calendar calendar = Calendar.getInstance();
+int tzmin = calendar.get(Calendar.ZONE_OFFSET)/(60*1000);
+int tzhour = tzmin / 60;
+tzmin -= tzhour * 60;
+log.log(host + " - - [" +
+fmt02d(calendar.get(Calendar.DATE) ) + "/" +
+months[calendar.get(Calendar.MONTH)] + "/" +
+calendar.get(Calendar.YEAR) + ":" +
+fmt02d(calendar.get(Calendar.HOUR) ) + ":" +
+fmt02d(calendar.get(Calendar.MINUTE) ) + ":" +
+fmt02d(calendar.get(Calendar.SECOND)) + " " +
+614 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+fmt02d(tzhour) + fmt02d(tzmin) +
+"] \"" +
+cmd + " " +
+url + " HTTP/1.0\" " +
+code + " " +
+size + "\n");
+hits_served++;
+bytes_served += size;
+}
+private void writeString(OutputStream out, String s)
+throws IOException {
+out.write(toBytes(s));
+}
+private void writeUCE(OutputStream out, UrlCacheEntry uce)
+throws IOException {
+HttpResponse hr = new HttpResponse(200, "OK", uce.mh);
+writeString(out, hr.toString());
+out.write(uce.data, 0, uce.length);
+logEntry("GET", uce.url, 200, uce.length);
+}
+private boolean serveFromCache(OutputStream out, String url)
+throws IOException {
+UrlCacheEntry uce;
+if ((uce = (UrlCacheEntry)cache.get(url)) != null) {
+writeUCE(out, uce);
+hits_to_cache++;
+return true;
+}
+return false;
+}
+private UrlCacheEntry loadFile(InputStream in, String url,
+MimeHeader mh)
+throws IOException {
+UrlCacheEntry uce;
+byte file_buf[] = new byte[buffer_size];
+uce = new UrlCacheEntry(url, mh);
+C h a p t e r 1 8 : N e t w o r k i n g 615
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+int size = 0;
+int n;
+while ((n = in.read(file_buf)) >= 0) {
+uce.append(file_buf, n);
+size += n;
+}
+in.close();
+cache.put(url, uce);
+files_in_cache++;
+bytes_in_cache += uce.length;
+return uce;
+}
+private UrlCacheEntry readFile(File f, String url)
+throws IOException {
+if (!f.exists())
+return null;
+InputStream in = new FileInputStream(f);
+int file_length = in.available();
+String mime_type = fnameToMimeType(url);
+MimeHeader mh = makeMimeHeader(mime_type, file_length);
+UrlCacheEntry uce = loadFile(in, url, mh);
+return uce;
+}
+private void writeDiskCache(UrlCacheEntry uce)
+throws IOException {
+String path = docRoot + uce.url;
+String dir = path.substring(0, path.lastIndexOf("/"));
+dir.replace('/', File.separatorChar);
+new File(dir).mkdirs();
+FileOutputStream out = new FileOutputStream(path);
+out.write(uce.data, 0, uce.length);
+out.close();
+}
+// A client asks us for a url that looks like this:
+// http://the.internet.site/the/url
+// we go get it from the site and return it...
+private void handleProxy(OutputStream out, String url,
+616 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+MimeHeader inmh) {
+try {
+int start = url.indexOf("://") + 3;
+int path = url.indexOf('/', start);
+String site = url.substring(start, path).toLowerCase();
+int port = 80;
+String server_url = url.substring(path);
+int colon = site.indexOf(':');
+if (colon > 0) {
+port = Integer.parseInt(site.substring(colon + 1));
+site = site.substring(0, colon);
+}
+url = "/cache/" + site + ((port != 80) ? (":" + port) : "") +
+server_url;
+if (url.endsWith("/"))
+url += indexfile;
+if (!serveFromCache(out, url)) {
+if (readFile(new File(docRoot + url), url) != null) {
+serveFromCache(out, url);
+return;
+}
+// If we haven't already cached this page, open a socket
+// to the site's port and send a GET command to it.
+// We modify the user-agent to add ourselves... "via".
+Socket server = new Socket(site, port);
+InputStream server_in = server.getInputStream();
+OutputStream server_out = server.getOutputStream();
+inmh.put("User-Agent", inmh.get("User-Agent") +
+" via JavaCompleteReferenceProxy/" + version);
+String req = "GET " + server_url + " HTTP/1.0" + CRLF +
+inmh + CRLF;
+writeString(server_out, req);
+String raw_request = getRawRequest(server_in);
+HttpResponse server_response =
+new HttpResponse(raw_request);
+writeString(out, server_response.toString());
+if (server_response.statusCode == 200) {
+UrlCacheEntry uce = loadFile(server_in, url,
+server_response.mh);
+C h a p t e r 1 8 : N e t w o r k i n g 617
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+out.write(uce.data, 0, uce.length);
+writeDiskCache(uce);
+logEntry("GET", site + server_url, 200, uce.length);
+}
+server_out.close();
+server.close();
+}
+} catch (IOException e) {
+log.log("Exception: " + e);
+}
+}
+private void handleGet(OutputStream out, String url,
+MimeHeader inmh) {
+byte file_buf[] = new byte[buffer_size];
+String filename = docRoot + url +
+(url.endsWith("/") ? indexfile : "");
+try {
+if (!serveFromCache(out, url)) {
+File f = new File(filename);
+if (! f.exists()) {
+writeString(out, error(404, "Not Found", filename));
+return;
+}
+if (! f.canRead()) {
+writeString(out, error(404, "Permission Denied", filename));
+return;
+}
+UrlCacheEntry uce = readFile(f, url);
+writeUCE(out, uce);
+}
+} catch (IOException e) {
+log.log("Exception: " + e);
+}
+}
+private void doRequest(Socket s) throws IOException {
+if(stopFlag)
+return;
+InputStream in = s.getInputStream();
+OutputStream out = s.getOutputStream();
+String request = getRawRequest(in);
+618 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+C h a p t e r 1 8 : N e t w o r k i n g 619
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+int fsp = request.indexOf(' ');
+int nsp = request.indexOf(' ', fsp+1);
+int eol = request.indexOf('\n');
+String method = request.substring(0, fsp);
+String url = request.substring(fsp+1, nsp);
+String raw_mime_header = request.substring(eol + 1);
+MimeHeader inmh = new MimeHeader(raw_mime_header);
+request = request.substring(0, eol);
+if (method.equalsIgnoreCase("get")) {
+if (url.indexOf("://") >= 0) {
+handleProxy(out, url, inmh);
+} else {
+handleGet(out, url, inmh);
+}
+} else {
+writeString(out, error(405, "Method Not Allowed", method));
+}
+in.close();
+out.close();
+}
+public void run() {
+try {
+ServerSocket acceptSocket;
+acceptSocket = new ServerSocket(port);
+while (true) {
+Socket s = acceptSocket.accept();
+host = s.getInetAddress().getHostName();
+doRequest(s);
+s.close();
+}
+} catch (IOException e) {
+log.log("accept loop IOException: " + e + "\n");
+} catch (Exception e) {
+log.log("Exception: " + e);
+}
+}
+private Thread t;
+public synchronized void start() {
+620 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+stopFlag = false;
+if (t == null) {
+t = new Thread(this);
+t.start();
+}
+}
+public synchronized void stop() {
+stopFlag = true;
+log.log("Stopped at " + new Date() + "\n");
+}
+public httpd(int p, String dr, LogMessage lm) {
+port = p;
+docRoot = dr;
+log = lm;
+}
+// This main and log method allow httpd to be run from the console.
+public static void main(String args[]) {
+httpd h = new httpd(80, "c:\\www", null);
+h.log = h;
+h.start();
+try {
+Thread.currentThread().join();
+} catch (InterruptedException e) {};
+}
+public void log(String m) {
+System.out.print(m);
+}
+}
+HTTP.java
+As an added bonus, here is an applet class that gives the HTTP server a functional “front
+panel.” This applet has two parameters that can be used to configure the server: port and
+docroot. This is a very simple applet. It makes an instance of the httpd, passing in itself
+as the LogMessage interface. Then it creates a panel that has a simple label at the top, a
+TextArea in the middle for displaying the LogMessages, and a panel at the bottom that
+has two buttons and another label in it. The start( ) and stop( ) methods of the applet call
+the corresponding methods on the httpd. The buttons labeled “Start” and “Stop” call
+their corresponding methods in the httpd. Any time a message is logged, the
+bottom-right Label object is updated to contain the latest statistics from the httpd.
+import java.util.*;
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+public class HTTP extends Applet implements LogMessage,
+ActionListener
+{
+private int m_port = 80;
+private String m_docroot = "c:\\www";
+private httpd m_httpd;
+private TextArea m_log;
+private Label status;
+private final String PARAM_port = "port";
+private final String PARAM_docroot = "docroot";
+public HTTP()  {
+}
+public void init()  {
+setBackground(Color.white);
+String param;
+// port: Port number to listen on
+param = getParameter(PARAM_port);
+if (param != null)
+m_port = Integer.parseInt(param);
+// docroot: web document root
+param = getParameter(PARAM_docroot);
+if (param != null)
+m_docroot = param;
+setLayout(new BorderLayout());
+Label lab = new Label("Java HTTPD");
+lab.setFont(new Font("SansSerif", Font.BOLD, 18));
+C h a p t e r 1 8 : N e t w o r k i n g 621
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+add("North", lab);
+m_log = new TextArea("", 24, 80);
+add("Center", m_log);
+Panel p = new Panel();
+p.setLayout(new FlowLayout(FlowLayout.CENTER,1,1));
+add("South", p);
+Button bstart = new Button("Start");
+bstart.addActionListener(this);
+p.add(bstart);
+Button bstop = new Button("Stop");
+bstop.addActionListener(this);
+p.add(bstop);
+status = new Label("raw");
+status.setForeground(Color.green);
+status.setFont(new Font("SansSerif", Font.BOLD, 10));
+p.add(status);
+m_httpd = new httpd(m_port, m_docroot, this);
+}
+public void destroy()  {
+stop();
+}
+public void paint(Graphics g)  {
+}
+public void start()  {
+m_httpd.start();
+status.setText("Running  ");
+clear_log("Log started on " + new Date() + "\n");
+}
+public void stop()  {
+m_httpd.stop();
+status.setText("Stopped  ");
+}
+public void actionPerformed(ActionEvent ae) {
+String label = ae.getActionCommand();
+if(label.equals("Start")) {
+start();
+622 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+}else {
+stop();
+}
+}
+public void clear_log(String msg) {
+m_log.setText(msg + "\n");
+}
+public void log(String msg) {
+m_log.append(msg);
+status.setText(m_httpd.hits_served + " hits (" +
+(m_httpd.bytes_served / 1024) + "K), " +
+m_httpd.files_in_cache + " cached files (" +
+(m_httpd.bytes_in_cache / 1024) + "K), " +
+m_httpd.hits_to_cache + " cached hits");
+status.setSize(status.getPreferredSize());
+}
+}
+In the files httpd.java and HTTP.java, the code is built assuming that the document
+root is “c:\www”. You may need to change this value for your configuration. Because
+this applet writes to a log file, it can work only if it is trusted. For example, an applet is
+trusted if it is accessible from the user’s class path.
+Datagrams
+For most of your internetworking needs, you will be happy with TCP/IP-style
+networking. It provides a serialized, predictable, reliable stream of packet data. This is
+not without its cost, however. TCP includes many complicated algorithms for dealing
+with congestion control on crowded networks, as well as pessimistic expectations
+about packet loss. This leads to a somewhat inefficient way to transport data.
+Datagrams provide an alternative.
+Datagrams are bundles of information passed between machines. They are
+somewhat like a hard throw from a well-trained but blindfolded catcher to the third
+baseman. Once the datagram has been released to its intended target, there is no
+assurance that it will arrive or even that someone will be there to catch it. Likewise,
+when the datagram is received, there is no assurance that it hasn’t been damaged in
+transit or that whoever sent it is still there to receive a response.
+C h a p t e r 1 8 : N e t w o r k i n g 623
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+Java implements datagrams on top of the UDP protocol by using two classes: The
+DatagramPacket object is the data container, while the DatagramSocket is the
+mechanism used to send or receive the DatagramPackets.
+DatagramPacket
+DatagramPacket defines several constructors. Four are described here. The first
+constructor specifies a buffer that will receive data, and the size of a packet. It is used
+for receiving data over a DatagramSocket. The second form allows you to specify an
+offset into the buffer at which data will be stored. The third form specifies a target
+address and port, which are used by a DatagramSocket to determine where the data in
+the packet will be sent. The fourth form transmits packets beginning at the specified
+offset into the data. Think of the first two forms as building an “in box,” and the second
+two forms as stuffing and addressing an envelope. Here are the four constructors:
+DatagramPacket(byte data[ ], int size)
+DatagramPacket(byte data[ ], int offset, int size)
+DatagramPacket(byte data[ ], int size, InetAddress ipAddress, int port)
+DatagramPacket(byte data[ ], int offset, int size, InetAddress ipAddress, int port)
+There are several methods for accessing the internal state of a DatagramPacket.
+They give complete access to the destination address and port number of a packet, as
+well as the raw data and its length. Here are some of the most commonly used:
+InetAddress getAddress( ) Returns the destination InetAddress, typically
+used for sending.
+int getPort( ) Returns the port number.
+byte[ ] getData( ) Returns the byte array of data contained in the
+datagram. Mostly used to retrieve data from the
+datagram after it has been received.
+int getLength( ) Returns the length of the valid data contained in
+the byte array that would be returned from the
+getData( ) method. This typically does not equal
+the length of the whole byte array.
+Datagram Server and Client
+The following example implements a very simple networked communications client
+and server. Messages are typed into the window at the server and written across the
+network to the client side, where they are displayed.
+// Demonstrate Datagrams.
+import java.net.*;
+624 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+class WriteServer {
+public static int serverPort = 998;
+public static int clientPort = 999;
+public static int buffer_size = 1024;
+public static DatagramSocket ds;
+public static byte buffer[] = new byte[buffer_size];
+public static void TheServer() throws Exception {
+int pos=0;
+while (true) {
+int c = System.in.read();
+switch (c) {
+case -1:
+System.out.println("Server Quits.");
+return;
+case '\r':
+break;
+case '\n':
+ds.send(new DatagramPacket(buffer,pos,
+InetAddress.getLocalHost(),clientPort));
+pos=0;
+break;
+default:
+buffer[pos++] = (byte) c;
+}
+}
+}
+public static void TheClient() throws Exception {
+while(true) {
+DatagramPacket p = new DatagramPacket(buffer, buffer.length);
+ds.receive(p);
+System.out.println(new String(p.getData(), 0, p.getLength()));
+}
+}
+public static void main(String args[]) throws Exception {
+if(args.length == 1) {
+ds = new DatagramSocket(serverPort);
+TheServer();
+} else {
+C h a p t e r 1 8 : N e t w o r k i n g 625
+TH
+E
+JA
+V
+A
+LIB
+R
+A
+R
+Y
+ds = new DatagramSocket(clientPort);
+TheClient();
+}
+}
+}
+This sample program is restricted by the DatagramSocket constructor to running
+between two ports on the local machine. To use the program, run
+java WriteServer
+in one window; this will be the client. Then run
+java WriteServer 1
+This will be the server. Anything that is typed in the server window will be sent to the
+client window after a newline is received.
+This example requires that your computer be connected to the Internet.
+Inet4Address and Inet6Address
+As mentioned at the start of this chapter, Java 2, version 1.4 added support for IPv6
+addresses. Because of this, two new subclasses of InetAddress were created:
+Inet4Address and Inet6Address. Inet4Address represents a traditional style, IPv4
+address. Inet6Address encapsulates a new-style IPv6 address. Because they are
+subclasses of InetAddress, an InetAddress reference can refer to either. This is one
+way that Java was able to add IPv6 functionality without breaking existing code or
+adding many more classes. For the most part, you can simply use InetAddress when
+working with IP addresses because it can accommodate both styles.
+The URI Class
+Java 2, version 1.4 added the URI class, which encapsulates a Uniform Resource
+Identifier. URIs are similar to URLs. In fact, URLs constitute a subset of URIs. A URI
+represents a standard way to identify a resource. A URL also describes how to
+access the resource.
+626 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 19
+The Applet Class
+627

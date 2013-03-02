@@ -1,0 +1,281 @@
+Chapter 30
+ImageMenu: An
+Image-Based Web Menu
+1047
+The ImageMenu applet is a simple program that presents an image-based menuwith an arbitrary number of choices in a vertical list. When the user moves themouse cursor over these choices, the one under the cursor changes appearance,
+indicating that it can be clicked on. When the user clicks on a choice, the web browser
+changes to a new document specified for that choice. ImageMenu was created by
+David LaVallée, the creator of several interesting applets. Figure 30-1 shows an
+instance of ImageMenu.
+ImageMenu uses the showDocument( ) function in AppletContext to make the
+hypertext leap to the new pages. The novelty of ImageMenu is that it uses different
+portions of a single source image to draw the menu on the screen. Basing a menu on
+an image rather than on text frees you to design menus that use any font or image you
+desire. You can also provide various types of selection feedback. You no longer need to
+rely on the AWT’s limited rendering functions.
+1048 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 30-1. An example of ImageMenu
+The ImageMenu applet was inspired by an applet called Navigation, created by
+top-notch Java programmer Sean Welch. The difference between Navigation and
+ImageMenu is efficiency in bandwidth and applet tag specification. The Navigation
+applet uses a source image that is the applet’s width times the number of possible
+selections wide to display all of its states. Both applets download a single image, which
+is much more efficient over the Internet than loading multiple files. A menu of seven
+choices for the Navigation applet (100×140 pixels) would require a source image of
+700×140. The applet described here, ImageMenu, uses a source image that is two times
+the applet width, or 200×140. Most web designers hate typing when they don’t have to,
+which leads to the second significant difference between Navigation and ImageMenu:
+abbreviated applet parameters.
+While ImageMenu is many times more efficient, using a smaller source image and
+fewer bytes of parameters, Welch’s Navigation has one inimitable trait—it can display
+individually selected “states” that bleed over into the space of the next menu item. The
+ImageMenu applet requires that each menu item be self-contained in a rectangular area
+that cannot overlap with adjacent items. This would prohibit, for example, ascending
+letters (like h) from overlapping descending letters (such as j) in the line above.
+The Source Image
+While you won’t see the code for Navigation here, looking at its GIF image shows clearly
+what it does. The source image for Navigation in Figure 30-2 shows seven columns,
+each of which provides a visual representation of a possible selection. However, each
+selectable item only has two states, so each row has five redundant copies of the
+unselected state.
+The source image for ImageMenu is shown in Figure 30-3. Given this image, it is
+simple to render any of the seven possible states of a six-choice menu. First, drawImage( )
+displays the left half of the source image. This is the state where no items are selected.
+If any of the items is selected, then the clipping rectangle is simply set to the bounds of
+the selected item, and drawImage( ) is used to display the right-hand side. This will
+paint just the selected cell through the clipping rectangle.
+C h a p t e r 3 0 : I m a g e M e n u : A n I m a g e - B a s e d W e b M e n u 1049
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Figure 30-2. The source image for the Navigation applet
+The APPLET Tag
+The APPLET tag for ImageMenu contains many pieces of information. We will
+use java.util.StringTokenizer to read the urlList and the frame targetList parameters
+whose values are plus sign–delimited lists of values. We’ll also infer the coordinates of
+each menu item by dividing the height of the applet by the number of URLs parsed in
+urlList. For readability in the APPLET tag, we also allow a prefix and suffix, which will
+be concatenated with a URL when it’s time to move to a new page.
+<applet code="ImageMenu" width=140 height=180 hspace=0 vspace=0>
+<param name="img" value="menu.jpg">
+<param name="urlPrefix"
+value="http://www.osborne.com/">
+<param name="urlList"
+value="pressroom/pressroom.shtml+aboutus/aboutus.shtml+
+1050 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Figure 30-3. The source image for ImageMenu
+downloads/downloads.shtml+errata/errata.shtml">
+<param name="targetList"
+value="_self+_self+_self+_self+_self+_self">
+<param name="urlSuffix" value="">
+</applet>
+The Methods
+This is a small applet—about 100 lines of Java source. We will walk through all eight
+methods here and then show all the source together at the end of the chapter.
+init( )
+When the applet is being initialized, init( ) saves the size in the Dimension variable d
+and parses the applet param tags. It then uses a StringTokenizer to parse strings delimited
+by the plus sign to create the string arrays url and target. The number of URLs that are
+parsed is the number that is used to divide the vertical space into menu cells. From this
+calculation, init( ) saves the number and height of the cells in cells and cellH, respectively.
+update( )
+We nullify the update( ) method of Applet to avoid flashing. As mentioned in Chapter 23,
+the update( ) method in the Applet superclass fills a rectangle with the background color
+before calling paint( ). Since we’re not going to use repaint( ), we can just eliminate
+update completely.
+lateInit( )
+The lateInit( ) private method creates the offscreen Image object that will be used for
+double buffering the display of the menu. This method also employs a MediaTracker
+object to synchronously get the source image.
+paint( )
+The paint( ) method is quite simple. First, it checks to see if the offscreen buffer has been
+created yet. If it hasn’t, lateInit( ) is called to create the buffer and load the menu image.
+After that, it draws the left half of the image on the offscreen buffer. This requires,
+of course, that the menu image be twice the width of the applet. That way, the applet
+C h a p t e r 3 0 : I m a g e M e n u : A n I m a g e - B a s e d W e b M e n u 1051
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+will simply clip away the right half of the menu image when drawImage(img, 0, 0,
+null) is called. Then, if any cell is selected (selectedCell >= 0), it sets the clip rectangle
+to the bounds of that menu item. You’ll notice that paint( ) gets the graphics context of
+the offscreen image every time. This has the effect of resetting the clipping rectangle to
+the bounds of the image. AWT’s lack of a resetClip( ) method requires some strange
+coding style.
+Next, the entire image is painted again, but this time, it is offset by the width of the
+applet to the left, via drawImage(img, -d.width, 0, null). This has the effect of placing
+just the right highlighted menu item in the clip rectangle. Lastly, the offscreen buffer is
+copied to the applet window.
+The speed of most graphic displays is largely throttled by the speed of the CPU’s
+access directly to the screen. Additionally, many modern display cards are optimized for
+copying rectangular areas from memory to the display in support of windowing systems.
+Therefore, you are much better off doing all your drawing on an offscreen buffer rather
+than copying the bits to the screen. On similar PC systems, we have seen between 10
+and 400 buffer changes a second, depending on pixel depth and display card architecture.
+mouseExited( )
+Special handling is needed for mouseExited( ), because it causes all of the menu items
+to be unselected. All we have to do is set selectedCell and oldCell to –1, which makes
+the subsequent paint( ) call show all the items as unselected. Having oldCell set to –1
+means that the next time the mouse enters the applet and causes a mouseMoved( ) call,
+the first item will paint properly.
+mouseDragged( )
+The mouseDragged( ) method is called when the mouse moves with any of its buttons
+pressed. In this applet, we want to do the same thing on drag or move, so we just call
+mouseMoved( ) directly, passing in the same parameters we received.
+mouseMoved( )
+Whenever the mouse moves, mouseMoved( ) checks the y coordinate to see which of the
+cells was selected. If the selectedCell is different from oldCell, meaning the user moved
+from one cell to another, the menu is repainted. This is an optimization that avoids the
+constant repainting of identical screen bits every time the mouse moves. You will notice
+that repaint( ) is not called here. We are taking a shortcut through the normal applet
+protocol by calling paint( ) directly after fetching the Graphics context from
+1052 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+getGraphics( ). This makes for a much snappier response. After the menu is painted,
+the status line is set to reflect the newly selected item, which is also saved in oldCell.
+mouseReleased( )
+mouseReleased( ) sends the browser to the URL that corresponds to the currently selected
+menu item. The desired URL is then constructed. If the URL was improperly formatted
+in the APPLET tag, the exception is displayed on the status line and returned without
+attempting to switch documents. The showDocument( ) method puts the document
+described in the URL into the frame listed in the target array. As a final feature, the
+state of this SHIFT key is checked by calling the isShiftDown( ) method of MouseEvent.
+If SHIFT was pressed, the URL is opened into a new blank browser window instead of
+the one specified in target.
+The Code
+The source code for ImageMenu is shown here:
+import java.awt.* ;
+import java.awt.event.*;
+import java.applet.*;
+import java.util.*;
+import java.net.*;
+public class ImageMenu extends Applet {
+Dimension d;
+Image img, off;
+Graphics offg;
+int MAXITEMS = 64;
+String url[] = new String[MAXITEMS];
+String target[] = new String[MAXITEMS];
+String urlPrefix, urlSuffix;
+int selectedCell = -1;
+int oldCell = -1;
+int cellH;
+int cells;
+public void init() {
+d = getSize();
+urlPrefix = getParameter("urlPrefix");
+C h a p t e r 3 0 : I m a g e M e n u : A n I m a g e - B a s e d W e b M e n u 1053
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+urlSuffix = getParameter("urlSuffix");
+StringTokenizer st;
+st = new StringTokenizer(getParameter("urlList"), "+");
+int i=0;
+while(st.hasMoreTokens() && i < MAXITEMS)
+url[i++] = st.nextToken();
+cells = i;
+cellH = d.height/cells;
+st = new StringTokenizer(getParameter("targetList"), "+");
+i=0;
+while(st.hasMoreTokens() && i < MAXITEMS)
+target[i++] = st.nextToken();
+addMouseListener(new MyMouseAdapter());
+addMouseMotionListener(new MyMouseMotionAdapter());
+}
+private void lateInit() {
+off = createImage(d.width, d.height);
+try {
+img = getImage(getDocumentBase(), getParameter("img"));
+MediaTracker t = new MediaTracker(this);
+t.addImage(img, 0);
+t.waitForID(0);
+} catch(Exception e) {
+showStatus("error: " + e);
+}
+}
+public void update(Graphics g) {}
+public void paint(Graphics g) {
+if(off == null)
+lateInit();
+offg = off.getGraphics();
+offg.drawImage(img, 0, 0, this);
+if (selectedCell >= 0) {
+offg.clipRect(0, selectedCell * cellH, d.width, cellH)
+offg.drawImage(img, -d.width, 0, this);
+}
+1054 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+g.drawImage(off, 0, 0, this);
+}
+class MyMouseMotionAdapter extends MouseMotionAdapter {
+public void mouseDragged(MouseEvent me) {
+mouseMoved(me);
+}
+public void mouseMoved(MouseEvent me) {
+int y = me.getY();
+selectedCell = (int)(y/(double)d.height*cells);
+if (selectedCell != oldCell) {
+paint(getGraphics());
+showStatus(urlPrefix + url[selectedCell] + urlSuffix);
+oldCell = selectedCell;
+}
+}
+}
+class MyMouseAdapter extends MouseAdapter {
+public void mouseExited(MouseEvent me) {
+selectedCell = oldCell = -1;
+paint(getGraphics());
+showStatus("");
+}
+public void mouseReleased(MouseEvent me) {
+URL u = null;
+try {
+u = new URL(urlPrefix + url[selectedCell] + urlSuffix);
+} catch(Exception e) {
+showStatus("error: " + e);
+}
+if (me.isShiftDown())
+getAppletContext().showDocument(u, "_blank");
+else
+getAppletContext().showDocument(u, target[selectedCell]);
+}
+}
+}
+C h a p t e r 3 0 : I m a g e M e n u : A n I m a g e - B a s e d W e b M e n u 1055
+A
+P
+P
+LY
+IN
+G
+JA
+V
+A
+Summary
+In use, the ImageMenu applet can look great and it provides a lot of leverage for a very
+small program. Use of the showDocument(URL u, String target) in this applet allows
+for a subtle optimization in web page design. If you put an ImageMenu applet in a
+frame in an HTML frameset and use it to send documents to a second frame, the applet
+never has to be reloaded, which makes the user’s experience better.
+1056 J a v a ™ 2 : T h e C o m p l e t e R e f e r e n c e
+Chapter 31
+The Lavatron Applet:
+A Sports Arena Display
+1057
