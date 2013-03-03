@@ -1,0 +1,316 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+puts("NULL");
+   else if(FALSE)
+puts("TRUE");
+   else
+puts("FALSE");
+   }
+Answer:
+TRUE
+Explanation:
+The input program to the compiler after processing by the preprocessor is,
+main(){
+if(0)
+puts("NULL");
+else if(-1)
+puts("TRUE");
+else
+puts("FALSE");
+}
+Preprocessor doesn't replace the values given inside the double quotes. The check by if 
+condition is boolean value false so it goes to else. In second if -1 is boolean value true hence 
+"TRUE" is printed.
+65) main()
+{
+int k=1;
+printf("%d==1 is ""%s",k,k==1?"TRUE":"FALSE");
+}
+Answer:
+1==1 is TRUE
+Explanation:
+When two strings are placed together (or separated by white-space) they are concatenated 
+(this is called as "stringization" operation). So the string is as if it is given as "%d==1 is 
+%s". The conditional operator( ?: ) evaluates to "TRUE".
+66) main()
+{
+int y;
+scanf("%d",&y); // input given is 2000
+if( (y%4==0 && y%100 != 0) || y%100 == 0 )
+     printf("%d is a leap year");
+else
+     printf("%d is not a leap year");
+}
+Answer:
+2000 is a leap year
+Explanation:
+An ordinary program to check if leap year or not.
+67)  #define max 5
+#define int arr1[max]
+main()
+{
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 20
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+typedef char arr2[max];
+arr1 list={0,1,2,3,4};
+arr2 name="name";
+printf("%d %s",list[0],name);
+}
+Answer:
+Compiler error (in the line arr1 list = {0,1,2,3,4})
+Explanation:
+arr2 is declared of type array of size 5 of characters. So it can be used to declare the variable 
+name of the type arr2. But it is not the case of arr1. Hence an error.
+Rule of Thumb: 
+#defines  are  used  for  textual  replacement  whereas  typedefs  are  used  for  declaring  new 
+types.
+68) int i=10;
+main()
+{
+  extern int i;
+            {
+     int i=20;
+{
+ const volatile unsigned i=30;
+ printf("%d",i);
+}
+      printf("%d",i);
+   }
+printf("%d",i);
+}
+Answer:
+30,20,10
+Explanation:
+'{' introduces new block and thus new scope. In the innermost block i is declared as, 
+const volatile unsigned
+which is a valid declaration. i is assumed of type int. So printf prints 30. In the next block, i 
+has value 20 and so printf prints 20. In the outermost block, i is declared as extern, so no 
+storage space is allocated for it. After compilation is over the linker resolves it to global 
+variable i (since it is the only variable visible there). So it prints i's value as 10.
+69) main()
+{
+    int *j;
+    {
+     int i=10;
+     j=&i;
+     }
+     printf("%d",*j);
+}
+Answer:
+10
+Explanation:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 21
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+The variable i is a block level variable and the visibility is inside that block only. But the 
+lifetime of i is lifetime of the function so it lives upto the exit of main function. Since the i 
+is still allocated space, *j prints the value stored in i since j points i.
+70) main()
+{
+int i=-1;
+-i;
+printf("i = %d, -i = %d \n",i,-i);
+}
+Answer:
+i = -1, -i = 1
+Explanation:
+-i is executed and this execution doesn't affect the value of i. In printf first you just print the 
+value of i. After that the value of the expression -i = -(-1) is printed.
+71) #include<stdio.h>
+main()
+ {
+   const int i=4;
+   float j;
+   j = ++i;
+   printf("%d  %f", i,++j);
+ }
+Answer:
+Compiler error 
+  Explanation:
+i is a constant. you cannot change the value of constant 
+72) #include<stdio.h>
+main()
+{
+  int a[2][2][2] = { {10,2,3,4}, {5,6,7,8}  };
+  int *p,*q;
+  p=&a[2][2][2];
+  *q=***a;
+  printf("%d..%d",*p,*q);
+}
+Answer:
+garbagevalue..1
+Explanation:
+p=&a[2][2][2]   you  declare  only two 2D arrays.  but  you  are  trying  to  access  the third 
+2D(which you are not declared) it will print garbage values. *q=***a starting address of a is 
+assigned  integer  pointer.  now  q  is  pointing  to  starting  address  of  a.if  you  print  *q 
+meAnswer:it will print first element of 3D array.
+73) #include<stdio.h>
+main()
+  {
+    register i=5;
+    char j[]= "hello";                     
+     printf("%s  %d",j,i);
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 22
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+}
+Answer:
+hello 5
+Explanation:
+if you declare i as register  compiler will treat it as ordinary integer and it will take integer 
+value. i value may be  stored  either in register  or in memory.
+74) main()
+{
+  int i=5,j=6,z;
+  printf("%d",i+++j);
+ }
+Answer:
+11
+Explanation:
+the expression i+++j is treated as (i++ + j)    
+  
+76) struct aaa{
+struct aaa *prev;
+int i;
+struct aaa *next;
+};
+main()
+{
+ struct aaa abc,def,ghi,jkl;
+ int x=100;
+ abc.i=0;abc.prev=&jkl;
+ abc.next=&def;
+ def.i=1;def.prev=&abc;def.next=&ghi;
+ ghi.i=2;ghi.prev=&def;
+ ghi.next=&jkl;
+ jkl.i=3;jkl.prev=&ghi;jkl.next=&abc;
+ x=abc.next->next->prev->next->i;
+ printf("%d",x);
+}
+Answer:
+2
+Explanation:
+above all statements form a double circular linked list;
+abc.next->next->prev->next->i 
+this one points to "ghi" node the value of at particular node is 2.
+77) struct point
+ {
+ int x;
+ int y;
+ };
+struct point origin,*pp;
+main()
+{
+pp=&origin;
+printf("origin is(%d%d)\n",(*pp).x,(*pp).y);
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 23
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+printf("origin is (%d%d)\n",pp->x,pp->y);
+} 
+Answer:
+origin is(0,0)
+origin is(0,0) 
+Explanation:
+pp is a pointer to structure. we can access the elements of the structure either with arrow 
+mark or with indirection operator. 
+Note: 
+Since structure point  is globally declared x & y are initialized as zeroes 
+78) main()
+{
+ int i=_l_abc(10);
+  printf("%d\n",--i);
+}
+int _l_abc(int i)
+{
+ return(i++);
+}
+Answer:
+9
+Explanation: 
+return(i++) it will first return i and then increments. i.e. 10 will be returned.
+79) main()
+{
+ char *p;
+ int *q;
+ long *r;
+ p=q=r=0;
+ p++;
+ q++;
+ r++;
+ printf("%p...%p...%p",p,q,r);
+}
+Answer:
+0001...0002...0004
+Explanation:
+++ operator  when applied to pointers increments address according to their corresponding 
+data-types.
+ 80) main()
+{
+ char c=' ',x,convert(z);
+ getc(c);
+ if((c>='a') && (c<='z'))
+ x=convert(c);
+ printf("%c",x);
+}
+convert(z)
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 24
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+{
+  return z-32;
+}
+Answer: 
+Compiler error
+Explanation:
+declaration of convert and format of getc() are wrong. 
+81) main(int argc, char **argv)
+{
+ printf("enter the character");
+ getchar();
+ sum(argv[1],argv[2]);
+}
+sum(num1,num2)
+int num1,num2;
+{
+ return num1+num2;
+}
+Answer:
+Compiler error.
+Explanation:
+argv[1] & argv[2] are strings. They are passed to the function sum without converting it to 
+integer values.  
+82) # include <stdio.h>
+int one_d[]={1,2,3};
+main()
+{
+ int *ptr; 
+ ptr=one_d;
+ ptr+=3;
+ printf("%d",*ptr);
+}
+Answer:
+garbage value
+Explanation:
+ptr pointer is pointing to out of the array range of one_d.
+83) # include<stdio.h>
+aaa() {
+  printf("hi");
+ }
+bbb(){
+ printf("hello");
+ }
+ccc(){
+ printf("bye");
+ }
+main()
+{
+  int (*ptr[3])();
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 25

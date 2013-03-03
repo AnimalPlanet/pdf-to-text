@@ -1,0 +1,311 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+          sizeof(i)=1
+Explanation:
+Since the #define replaces the string  int by the macro char 
+14. main()
+{
+int i=10;
+i=!i>14;
+Printf ("i=%d",i);
+}
+Answer:
+i=0
+ Explanation:
+In the expression  !i>14 , NOT (!) operator has more precedence than ‘ >’ symbol.  ! is a 
+unary logical operator. !i (!10) is 0 (not of true is false).  0>14 is false (zero). 
+15. #include<stdio.h>
+main()
+{
+char s[]={'a','b','c','\n','c','\0'};
+char *p,*str,*str1;
+p=&s[3];
+str=p;
+str1=s;
+printf("%d",++*p + ++*str1-32);
+}
+Answer:
+77
+Explanation:
+p is pointing to character '\n'. str1 is pointing to character 'a' ++*p. "p is pointing to '\n' and that is 
+incremented by one." the ASCII value of '\n' is 10, which is then incremented to 11. The value of ++*p is 
+11. ++*str1, str1 is pointing to 'a' that is incremented by 1 and it becomes 'b'. ASCII value of 'b' is 98.
+ Now performing (11 + 98 – 32), we get 77("M");
+ So we get the output 77 :: "M" (Ascii is 77).
+16. #include<stdio.h>
+main()
+{
+int a[2][2][2] = { {10,2,3,4}, {5,6,7,8}  };
+int *p,*q;
+p=&a[2][2][2];
+*q=***a;
+printf("%d----%d",*p,*q);
+}
+Answer:
+SomeGarbageValue---1
+Explanation:
+p=&a[2][2][2]   you  declare  only two 2D arrays,  but  you  are  trying  to  access  the third 
+2D(which you are not declared) it  will print garbage values. *q=***a starting address of a is assigned 
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 5
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+integer pointer. Now q is pointing to starting address of a. If you print *q, it will print first element of 3D 
+array.
+17. #include<stdio.h>
+main()
+{
+struct xx
+{
+      int x=3;
+      char name[]="hello";
+ };
+struct xx *s;
+printf("%d",s->x);
+printf("%s",s->name);
+}
+Answer:
+Compiler Error
+Explanation:
+You should not initialize variables in declaration
+18. #include<stdio.h>
+main()
+{
+struct xx
+{
+int x;
+struct yy
+{
+char s;
+struct xx *p;
+};
+struct yy *q;
+};
+}
+Answer:
+Compiler Error
+Explanation:
+The structure yy is  nested within structure xx.  Hence,  the elements  are of yy are to be 
+accessed through the instance of structure xx, which needs an instance of yy to be known. If the instance is 
+created after defining the structure the compiler will not know about the instance relative to xx. Hence for 
+nested structure yy you have to declare member.
+19. main()
+{
+printf("\nab");
+printf("\bsi");
+printf("\rha");
+}
+Answer:
+hai
+Explanation:
+\n  - newline
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 6
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+\b  - backspace
+\r  - linefeed
+20. main()
+{
+int i=5;
+printf("%d%d%d%d%d%d",i++,i--,++i,--i,i);
+}
+Answer:
+45545
+Explanation:
+The arguments in a function call are pushed into the stack from left to right. The evaluation 
+is by popping out from the stack. and the  evaluation is from right to left, hence the result.
+21. #define square(x) x*x
+main()
+{
+int i;
+i = 64/square(4);
+printf("%d",i);
+}
+Answer:
+64
+Explanation:
+the macro call square(4) will substituted by 4*4 so the expression becomes i = 64/4*4 . 
+Since / and * has equal priority the expression will be evaluated as (64/4)*4 i.e. 16*4 = 64
+  
+22. main()
+{
+char *p="hai friends",*p1;
+p1=p;
+while(*p!='\0') ++*p++;
+printf("%s   %s",p,p1);
+}
+Answer:
+ibj!gsjfoet
+Explanation:
+++*p++ will be parse in the given order
+? *p that is value at the location currently pointed by p will be taken
+? ++*p the retrieved value will be incremented 
+? when ; is encountered the location will be incremented that is p++ will be executed 
+Hence, in the while loop initial value pointed by p is ‘h’, which is changed to ‘i’ by executing ++*p and 
+pointer moves to point, ‘a’ which is similarly changed to ‘b’ and so on. Similarly blank space is converted 
+to ‘!’. Thus, we obtain value in p becomes “ibj!gsjfoet” and since p reaches ‘\0’ and p1 points to p thus 
+p1doesnot print anything. 
+23. #include <stdio.h>
+#define a 10
+main()
+{
+#define a 50
+printf("%d",a);
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 7
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+}
+Answer:
+50
+Explanation:
+The preprocessor directives can be redefined anywhere in the program. So the most recently 
+assigned value will be taken.
+24. #define clrscr() 100
+main()
+{
+clrscr();
+printf("%d\n",clrscr());
+}
+Answer:
+100
+Explanation:
+Preprocessor executes as a seperate pass before the execution of the compiler. So textual 
+replacement of clrscr() to 100 occurs.The input  program to compiler looks like this :
+main()
+{
+     100;
+     printf("%d\n",100);
+}
+Note:
+100; is an executable statement but with no action. So it doesn't give any problem
+25. main()
+{
+41printf("%p",main);
+}8Answer:
+Some address will be printed.
+Explanation:
+ Function names are just addresses (just like array names are addresses).
+main() is also a function. So the address of function main will be printed. %p in printf specifies that the 
+argument is an address. They are printed as hexadecimal numbers.
+27) main()
+{
+clrscr();
+}
+clrscr();
+Answer:
+No output/error
+Explanation:
+The first  clrscr()  occurs inside a function.  So it  becomes a  function call.  In the second 
+clrscr(); is a function declaration (because it is not inside any function).
+28) enum colors {BLACK,BLUE,GREEN}
+ main()
+{
+  
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 8
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+ printf("%d..%d..%d",BLACK,BLUE,GREEN);
+   
+ return(1);
+}
+Answer:
+0..1..2
+Explanation:
+enum assigns numbers starting from 0, if not explicitly defined.
+29) void main()
+{
+ char far *farther,*farthest;
+  
+ printf("%d..%d",sizeof(farther),sizeof(farthest));
+   
+ }
+Answer:
+4..2  
+Explanation:
+ the second pointer is of char type and not a far pointer
+30) main()
+{
+ int i=400,j=300;
+ printf("%d..%d");
+}
+Answer:
+400..300
+Explanation:
+printf takes the values of the first two assignments of the program. Any number of printf's 
+may be given. All of them take only the first two values. If more number of assignments 
+given in the program,then printf will take garbage values.
+31)  main()
+{
+ char *p;
+ p="Hello";
+ printf("%c\n",*&*p);
+}
+Answer:
+H 
+Explanation:
+* is a dereference operator & is a reference  operator. They can be    applied any number of 
+times provided it is meaningful. Here  p points to  the first character in the string "Hello". *p 
+dereferences it and so its value is H. Again  & references it to an address and * dereferences 
+it to the value H.
+32) main()
+{
+    int i=1;
+    while (i<=5)
+    {
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 9
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+       printf("%d",i);
+       if (i>2)
+  goto here;
+       i++;
+    }
+}
+fun()
+{
+   here:
+     printf("PP");
+}
+Answer:
+Compiler error: Undefined label 'here' in function main
+Explanation:
+Labels have functions scope, in other words the scope of the labels is limited to functions. 
+The label 'here' is available in function fun() Hence it is not visible in function main.
+33)  main()
+{
+   static char names[5][20]={"pascal","ada","cobol","fortran","perl"};
+    int i;
+    char *t;
+    t=names[3];
+    names[3]=names[4];
+    names[4]=t;
+    for (i=0;i<=4;i++)
+    printf("%s",names[i]);
+}
+Answer:
+Compiler error: Lvalue required in function main
+Explanation:
+Array names are pointer constants. So it cannot be modified.
+34) void main()
+{
+int i=5;
+printf("%d",i++ + ++i);
+}
+Answer:
+Output Cannot be predicted  exactly.
+Explanation:
+Side effects are involved in the evaluation of   i
+35) void main()
+{
+int i=5;
+printf("%d",i+++++i);
+}
+Answer:
+Compiler Error 
+Explanation:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 10

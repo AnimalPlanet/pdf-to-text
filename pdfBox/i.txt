@@ -1,0 +1,309 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+printf(p,65);
+}
+Answer:
+A
+Explanation:
+Due to the assignment p[1] = ‘c’ the string becomes, “%c\n”. Since this string becomes the 
+format string for printf and ASCII value of 65 is ‘A’, the same gets printed.
+ 
+129) void ( * abc( int, void ( *def) () ) ) ();
+Answer::
+ abc is a  ptr to a  function which takes 2 parameters .(a). an integer variable.(b).        a ptrto 
+a funtion which returns void. the return type of the function is  void.
+Explanation:
+Apply the clock-wise rule to find the result.
+130) main()
+{
+while (strcmp(“some”,”some\0”)) 
+printf(“Strings are not equal\n”);
+}
+Answer:
+No output
+Explanation:
+Ending the string constant with \0 explicitly makes no difference. So “some” and “some\0” 
+are equivalent. So, strcmp returns 0 (false) hence breaking out of the while loop. 
+131) main()
+{
+char str1[] = {‘s’,’o’,’m’,’e’};
+char str2[] = {‘s’,’o’,’m’,’e’,’\0’};
+while (strcmp(str1,str2)) 
+printf(“Strings are not equal\n”);
+}
+Answer:
+“Strings are not equal”
+“Strings are not equal”
+….
+Explanation:
+If  a  string  constant  is  initialized  explicitly  with  characters,  ‘\0’  is  not  appended 
+automatically to the string. Since str1 doesn’t have null termination, it treats whatever the 
+values that are in the following positions as part of the string until it randomly reaches a 
+‘\0’. So str1 and str2 are not the same, hence the result.
+ 
+132) main()
+{
+int i = 3;
+for (;i++=0;) printf(“%d”,i);
+}
+Answer:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 40
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+Compiler Error: Lvalue required.
+Explanation:
+As we know that increment operators return rvalues and  hence it cannot appear on 
+the left hand side of an assignment operation.
+ 
+133) void main()
+{
+int *mptr, *cptr;
+mptr = (int*)malloc(sizeof(int));
+printf(“%d”,*mptr);
+int *cptr = (int*)calloc(sizeof(int),1);
+printf(“%d”,*cptr);
+}
+Answer:
+garbage-value 0
+Explanation:
+The memory space allocated by malloc is uninitialized, whereas calloc returns the allocated 
+memory space initialized to zeros.
+134) void main()
+{
+static int i;
+while(i<=10)
+(i>2)?i++:i--;
+printf(“%d”, i);
+}
+Answer:
+32767
+Explanation:
+Since i is static it is initialized to 0. Inside the while loop the conditional operator evaluates 
+to false, executing i--. This continues till the integer value rotates to positive value (32767). 
+The while condition becomes false and hence, comes out of the while loop, printing the i 
+value.
+135) main()
+{
+int i=10,j=20;
+j = i, j?(i,j)?i:j:j;
+printf("%d %d",i,j);
+}
+Answer:
+10 10
+Explanation:
+The Ternary operator ( ? : ) is equivalent for if-then-else statement. So the question can be 
+written as:
+if(i,j)
+        {
+if(i,j)
+     j = i;
+else
+    j = j;
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 41
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+}
+   else
+j = j;
+136) 1. const char *a;
+2. char* const a; 
+3. char const *a;
+-Differentiate the above declarations.
+Answer:
+1. 'const' applies to char * rather than 'a' ( pointer to a constant char )
+*a='F'       : illegal
+a="Hi"       : legal
+2. 'const' applies to 'a'  rather than to the value of a (constant pointer to char )
+*a='F'       : legal
+a="Hi"       : illegal
+3. Same as 1.
+137) main()
+{
+int i=5,j=10;
+i=i&=j&&10;
+printf("%d %d",i,j);
+}
+Answer:
+1 10
+Explanation:
+The expression can be written as i=(i&=(j&&10)); The inner expression (j&&10) evaluates 
+to 1 because j==10. i is 5. i = 5&1 is 1. Hence the result. 
+138) main()
+{
+int i=4,j=7;
+j = j || i++ && printf("YOU CAN");
+printf("%d %d", i, j);
+}
+Answer:
+4 1 
+Explanation:
+The boolean expression needs to be evaluated only till the truth value of the expression is  
+not known. j is not equal to zero itself means that the expression’s truth value is 1. Because 
+it is followed by || and true || (anything) => true where (anything) will not be evaluated. So 
+the remaining expression is not evaluated and so the value of i remains the same.
+Similarly  when  && operator  is  involved  in  an  expression,  when  any  of  the  operands 
+become false, the whole expression’s truth value becomes false and hence the remaining 
+expression will not be evaluated.     
+false && (anything) => false where (anything) will not be evaluated.
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 42
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+139) main()
+{
+register int a=2;
+printf("Address of a = %d",&a);
+printf("Value of a   = %d",a);
+}
+Answer:
+Compier Error: '&' on register variable
+Rule to Remember:
+ & (address of ) operator cannot be applied on register variables.
+140) main()
+{
+float i=1.5;
+switch(i)
+{
+case 1: printf("1");
+case 2: printf("2");
+default : printf("0");
+}
+}
+Answer:
+Compiler Error: switch expression not integral
+Explanation:
+Switch statements can be applied only to integral types.
+141) main()
+{
+extern i;
+printf("%d\n",i);
+{
+int i=20;
+printf("%d\n",i);
+}
+}
+Answer:
+Linker Error : Unresolved external symbol i
+Explanation:
+The identifier i is available in the inner block and so using extern has no use in resolving it. 
+142) main()
+{
+int a=2,*f1,*f2;
+f1=f2=&a;
+*f2+=*f2+=a+=2.5;
+printf("\n%d %d %d",a,*f1,*f2);
+}
+Answer:
+16 16 16
+Explanation:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 43
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+f1 and f2 both refer to the same memory location a. So changes through f1 and f2 ultimately 
+affects only the value of a. 
+143) main()
+{
+char *p="GOOD";
+char a[ ]="GOOD";
+printf("\n sizeof(p) = %d, sizeof(*p) = %d, strlen(p) = %d", sizeof(p), sizeof(*p), strlen(p));
+printf("\n sizeof(a) = %d, strlen(a) = %d", sizeof(a), strlen(a));
+}
+Answer:
+sizeof(p) = 2, sizeof(*p) = 1, strlen(p) = 4
+sizeof(a) = 5, strlen(a) = 4
+Explanation:
+sizeof(p) => sizeof(char*) => 2
+sizeof(*p) => sizeof(char) => 1
+Similarly,
+sizeof(a) => size of the character array => 5
+When sizeof operator is applied to an array it returns the sizeof the array and it is not the 
+same as the sizeof the pointer variable. Here the sizeof(a) where a is the character array and 
+the size of the array is 5 because the space necessary for the terminating NULL character 
+should also be taken into account.
+144) #define DIM( array, type) sizeof(array)/sizeof(type)
+main()
+{
+int arr[10];
+printf(“The dimension of the array is %d”, DIM(arr, int));    
+}
+Answer:
+10   
+Explanation:
+The  size   of  integer  array  of  10  elements  is  10  *  sizeof(int).  The  macro  expands  to 
+sizeof(arr)/sizeof(int) => 10 * sizeof(int) / sizeof(int) => 10.
+145) int DIM(int array[]) 
+{
+return sizeof(array)/sizeof(int );
+}
+main()
+{
+int arr[10];
+printf(“The dimension of the array is %d”, DIM(arr));    
+}
+Answer:
+1   
+Explanation:
+Arrays cannot be passed to functions as arguments and only the pointers can be passed. So 
+the argument is equivalent to int * array (this is one of the very few places where [] and * 
+usage are equivalent). The return statement becomes, sizeof(int *)/ sizeof(int) that happens 
+to be equal in this case. 
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 44
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+146) main()
+{
+static int a[3][3]={1,2,3,4,5,6,7,8,9};
+int i,j;
+static *p[]={a,a+1,a+2};
+for(i=0;i<3;i++)
+{
+for(j=0;j<3;j++)
+printf("%d\t%d\t%d\t%d\n",*(*(p+i)+j),
+*(*(j+p)+i),*(*(i+p)+j),*(*(p+j)+i));
+}
+}
+Answer:
+1       1       1       1
+2       4       2       4
+3       7       3       7
+4       2       4       2
+5       5       5       5
+6       8       6       8
+7       3       7       3
+8       6       8       6
+9       9       9       9
+Explanation:
+*(*(p+i)+j) is equivalent to p[i][j].
+147) main()
+{
+void swap();
+int x=10,y=8;     
+swap(&x,&y);
+printf("x=%d y=%d",x,y);
+}
+void swap(int *a, int *b)
+{
+   *a ^= *b,  *b ^= *a, *a ^= *b; 
+}
+Answer:
+x=10 y=8
+Explanation:
+Using ^ like this is a way to swap two variables without using a temporary variable and that 
+too in a single statement.
+Inside main(), void swap(); means that swap is a function that may take any number of 
+arguments (not no arguments) and returns nothing. So this doesn’t issue a compiler error by 
+the call swap(&x,&y); that has two arguments. 
+This convention is historically due to pre-ANSI style (referred to as Kernighan and Ritchie 
+style)  style  of  function  declaration.  In  that  style,  the  swap function  will  be  defined  as 
+follows,
+void swap()
+int *a, int *b
+{
+   *a ^= *b,  *b ^= *a, *a ^= *b; 
+}
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 45

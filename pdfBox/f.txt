@@ -1,0 +1,321 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+{
+  return z-32;
+}
+Answer: 
+Compiler error
+Explanation:
+declaration of convert and format of getc() are wrong. 
+81) main(int argc, char **argv)
+{
+ printf("enter the character");
+ getchar();
+ sum(argv[1],argv[2]);
+}
+sum(num1,num2)
+int num1,num2;
+{
+ return num1+num2;
+}
+Answer:
+Compiler error.
+Explanation:
+argv[1] & argv[2] are strings. They are passed to the function sum without converting it to 
+integer values.  
+82) # include <stdio.h>
+int one_d[]={1,2,3};
+main()
+{
+ int *ptr; 
+ ptr=one_d;
+ ptr+=3;
+ printf("%d",*ptr);
+}
+Answer:
+garbage value
+Explanation:
+ptr pointer is pointing to out of the array range of one_d.
+83) # include<stdio.h>
+aaa() {
+  printf("hi");
+ }
+bbb(){
+ printf("hello");
+ }
+ccc(){
+ printf("bye");
+ }
+main()
+{
+  int (*ptr[3])();
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 25
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+  ptr[0]=aaa;
+  ptr[1]=bbb;
+  ptr[2]=ccc;
+  ptr[2]();
+}
+Answer:
+bye 
+Explanation:
+ptr is array of pointers to functions of return type int.ptr[0] is assigned to address of the 
+function aaa. Similarly ptr[1] and ptr[2] for bbb and ccc respectively. ptr[2]() is in effect of 
+writing ccc(), since ptr[2] points to ccc.
+85) #include<stdio.h>
+main()
+{
+FILE *ptr;
+char i;
+ptr=fopen("zzz.c","r");
+while((i=fgetch(ptr))!=EOF)
+printf("%c",i);
+}
+Answer:
+contents of zzz.c followed by an infinite loop  
+Explanation:
+The condition is checked against EOF, it should be checked against NULL.
+86) main()
+{
+ int i =0;j=0;
+ if(i && j++)
+   printf("%d..%d",i++,j);
+printf("%d..%d,i,j);
+}
+Answer:
+0..0 
+Explanation:
+The value of i is 0. Since this information is enough to determine the truth value of the 
+boolean expression. So the statement following the if statement is not executed.  The values 
+of i and j remain unchanged and get printed.
+      
+87) main()
+{
+ int i;
+ i = abc();
+ printf("%d",i);
+}
+abc()
+{
+ _AX = 1000;
+}
+Answer:
+1000
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 26
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+Explanation:
+Normally  the  return  value  from  the  function  is  through  the  information  from  the 
+accumulator. Here _AH is the pseudo global variable denoting the accumulator. Hence, the 
+value of the accumulator is set 1000 so the function returns value 1000. 
+88) int i;
+        main(){
+int t;
+for ( t=4;scanf("%d",&i)-t;printf("%d\n",i))
+             printf("%d--",t--);
+            }
+// If the inputs are 0,1,2,3 find the o/p
+Answer:
+ 4--0
+3--1
+2--2 
+Explanation:
+Let us assume some x= scanf("%d",&i)-t the values during execution 
+          will be,
+          t        i       x
+          4       0      -4
+          3       1      -2
+          2       2       0
+          
+89) main(){
+  int a= 0;int b = 20;char x =1;char y =10;
+  if(a,b,x,y)
+        printf("hello");
+ }
+Answer:
+hello 
+Explanation:
+The  comma  operator  has  associativity  from  left  to  right.  Only  the  rightmost  value  is 
+returned and the other values are evaluated and ignored. Thus the value of last variable y is 
+returned to check in if.  Since it  is a non zero value if  becomes true so, "hello" will  be 
+printed.
+90) main(){
+ unsigned int i;
+ for(i=1;i>-2;i--)
+        printf("c aptitude");
+}
+Explanation:
+i is an unsigned integer. It is compared with a signed value. Since the both types doesn't 
+match, signed is promoted to unsigned value. The unsigned equivalent of -2 is a huge value 
+so condition becomes false and control comes out of the loop. 
+91) In the following pgm add a  stmt in the function  fun such that the address of 
+'a' gets stored in 'j'.
+main(){
+  int * j;
+  void fun(int **);
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 27
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+  fun(&j);
+ }
+ void fun(int **k) {
+  int a =0;
+  /* add a stmt here*/
+ }
+Answer:
+*k = &a
+Explanation:
+       The argument of the function is a pointer to a pointer.
+      
+92) What are the following notations of defining functions known as?
+i.      int abc(int a,float b)
+        {
+                /* some code */
+ }
+ii.    int abc(a,b)
+        int a; float b;
+        {
+          /* some code*/
+        }
+Answer:
+i.  ANSI C notation
+ii. Kernighan & Ritche notation 
+93) main()
+{
+char *p;
+p="%d\n";
+           p++;
+           p++;
+           printf(p-2,300);
+}
+Answer:
+300
+Explanation:
+The pointer points to % since it is incremented twice and again decremented by 2, it points 
+to '%d\n' and 300 is printed.
+94) main(){
+ char a[100];
+ a[0]='a';a[1]]='b';a[2]='c';a[4]='d';
+ abc(a);
+}
+abc(char a[]){
+ a++; 
+    printf("%c",*a);
+ a++;
+ printf("%c",*a);
+}
+Explanation:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 28
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+The base address is  modified  only in function and as a  result  a points  to 'b'  then after 
+incrementing to 'c' so bc will be printed.
+                
+95) func(a,b)
+int a,b;
+{
+ return( a= (a==b) );
+}
+main()
+{
+int process(),func();
+printf("The value of process is %d !\n ",process(func,3,6));
+}
+process(pf,val1,val2)
+int (*pf) ();
+int val1,val2;
+{
+return((*pf) (val1,val2));
+ }
+Answer:
+The value if process is 0 !
+Explanation:
+The function 'process' has 3 parameters - 1, a pointer to another function  2 and 3, integers. 
+When this function is invoked from main, the following substitutions for formal parameters 
+take place: func for pf, 3 for val1 and 6 for val2. This function returns the result of the 
+operation performed by the function 'func'. The function func has two integer parameters. 
+The formal parameters are substituted as 3 for a and 6 for b. since 3 is not equal to 6, a==b 
+returns 0. therefore the function returns 0 which in turn is returned by the function 'process'.
+96) void main()
+{
+static int i=5;
+if(--i){
+main();
+printf("%d ",i);
+}
+}
+Answer:
+ 0 0 0 0
+Explanation:
+The variable "I" is declared as static, hence memory for I will be allocated for only once, as 
+it encounters the statement. The function main() will be called recursively unless I becomes equal 
+to 0, and since main() is recursively called, so the value of static I ie., 0 will be printed every time 
+the control is returned.
+97) void main()
+{
+int k=ret(sizeof(float));
+printf("\n here value is %d",++k);
+}
+int ret(int ret)
+{
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 29
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+ret += 2.5;
+return(ret);
+}
+Answer:
+ Here value is 7
+Explanation:
+The int ret(int ret), ie., the function name and the argument name can be the same.
+Firstly, the function ret() is called in which the sizeof(float) ie., 4 is passed,  after the first 
+expression the value in ret will be 6, as ret is integer hence the value stored in ret will have implicit 
+type conversion from float to int. The ret is returned in main() it is printed after and preincrement.
+ 
+98) void main()
+{
+char a[]="12345\0";
+int i=strlen(a);
+printf("here in 3 %d\n",++i);
+}
+Answer: 
+here in 3 6
+Explanation:
+The char array 'a' will hold the initialized string, whose length will be counted from 0 till the 
+null character. Hence the 'I'  will hold the value equal to 5, after the pre-increment in the printf 
+statement, the 6 will be printed.
+99) void main()
+{
+unsigned giveit=-1;
+int gotit;
+printf("%u ",++giveit);
+printf("%u \n",gotit=--giveit);
+}
+Answer:
+ 0 65535
+Explanation:
+100) void main()
+{
+int i;
+char a[]="\0";
+if(printf("%s\n",a))
+printf("Ok here \n");
+else
+printf("Forget it\n");
+}
+Answer:
+ Ok here 
+Explanation:
+Printf will return how many characters does it print. Hence printing a null character 
+returns 1 which makes the if statement true, thus "Ok here" is printed.
+ 
+101) void main()
+{
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 30

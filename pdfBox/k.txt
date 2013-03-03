@@ -1,0 +1,246 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+However  this  problem of  “matching  with  nearest  else”  cannot  be  solved  by  the  usual 
+method of placing the if statement inside a block like this,
+#define assert(cond) { \
+if(!(cond)) \
+  (fprintf(stderr, "assertion failed: %s, file %s, line %d \n",#cond,\
+ __FILE__,__LINE__), abort()) \
+}
+162) Is the following code legal?
+struct a
+    { 
+int x;
+ struct a b;
+    }
+Answer:
+No
+Explanation:
+Is it not legal for a structure to contain a member that is of the same
+type as in this case. Because this will cause the structure declaration to be recursive without 
+end.
+163) Is the following code legal?
+struct a
+    { 
+int x;
+            struct a *b;
+    }
+Answer:
+Yes.
+Explanation:
+*b is a pointer to type struct a and so is legal. The compiler knows, the size of the pointer to 
+a structure even before the size of the structure
+is determined(as you know the pointer to any type is of same size). This type of structures is 
+known as ‘self-referencing’ structure.
+164) Is the following code legal?
+typedef struct a
+    { 
+int x;
+ aType *b;
+    }aType
+Answer:
+No
+Explanation:
+The typename aType is not known at the point of declaring the structure (forward references 
+are not made for typedefs).
+165) Is the following code legal?
+typedef struct a aType;
+struct a
+{ 
+int x;
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 50
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+aType *b;
+};
+Answer:
+Yes
+Explanation:
+The typename aType is known at the point of declaring the structure, because it is already 
+typedefined.
+166) Is the following code legal?
+void main()
+{
+typedef struct a aType;
+aType someVariable;
+struct a
+{ 
+int x;
+      aType *b;
+              };
+}
+Answer:
+No
+Explanation:
+When the declaration,
+typedef struct a aType;
+is encountered body of struct a is not known. This is known as ‘incomplete types’.
+ 
+167) void main()
+{
+printf(“sizeof (void *) = %d \n“, sizeof( void *));
+printf(“sizeof (int *)    = %d \n”, sizeof(int *));
+printf(“sizeof (double *)  = %d \n”, sizeof(double *));
+printf(“sizeof(struct unknown *) = %d \n”, sizeof(struct unknown *));
+}
+Answer :
+sizeof (void *) = 2
+sizeof (int *)    = 2
+sizeof (double *)  =  2
+sizeof(struct unknown *) =  2
+Explanation:
+The pointer to any type is of same size.
+168) char inputString[100] = {0};
+To get string input from the keyboard which one of the following is better?
+1) gets(inputString)
+2) fgets(inputString, sizeof(inputString), fp)
+Answer & Explanation:
+The second one is better because gets(inputString) doesn't know the size of the string passed 
+and so, if a very big input (here, more than 100 chars) the charactes will be written past the 
+input string. When fgets is used with stdin performs the same operation as gets but is safe.
+169) Which version do you prefer of the following two,
+1) printf(“%s”,str); // or the more curt one
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 51
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+2) printf(str);
+Answer & Explanation:
+Prefer the first one. If the str contains any  format characters like %d then it will result in a 
+subtle bug. 
+170) void main()
+{
+int i=10, j=2;
+int *ip= &i, *jp = &j;
+int k = *ip/*jp;
+printf(“%d”,k);
+}
+Answer: 
+Compiler Error: “Unexpected end of file in comment started in line 5”.
+Explanation:
+The programmer intended to divide two integers,  but by the “maximum munch” 
+rule, the compiler treats the operator sequence / and * as /* which happens to be the 
+starting of comment. To force what is intended by the programmer,
+int k = *ip/ *jp;
+// give space explicity separating / and * 
+//or
+int k = *ip/(*jp);
+// put braces to force the intention  
+will solve the problem.  
+171) void main()
+{
+char ch;
+for(ch=0;ch<=127;ch++)
+printf(“%c   %d \n“, ch, ch);
+}
+Answer: 
+Implementaion dependent
+Explanation:
+The char type may be signed or unsigned by default. If it is signed then ch++ is executed 
+after ch reaches 127 and rotates back to -128. Thus ch is always smaller than 127.
+172) Is this code legal?
+int *ptr; 
+ptr = (int *) 0x400;
+Answer: 
+Yes
+Explanation:
+The pointer ptr will point at the integer in the memory location 0x400.
+173) main()
+{
+char a[4]="HELLO";
+printf("%s",a);
+}
+Answer: 
+Compiler error: Too many initializers
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 52
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+Explanation:
+The array a is of size 4 but the string constant requires 6 bytes to get stored.
+174) main()
+{
+char a[4]="HELL";
+printf("%s",a);
+}
+Answer: 
+HELL%@!~@!@???@~~!
+Explanation:
+The character array has the memory just enough to hold the string “HELL” and doesnt have 
+enough space to store the terminating null character. So it prints the HELL correctly and 
+continues to print garbage values till it accidentally comes across a NULL character.
+175) main()
+{ 
+int a=10,*j;
+void *k; 
+j=k=&a;
+  j++;  
+k++;
+  printf("\n %u %u ",j,k);
+} 
+Answer: 
+Compiler error: Cannot increment a void pointer
+Explanation:
+Void pointers are generic pointers and they can be used only when the type is not known 
+and as an intermediate address storage type. No pointer arithmetic can be done on it and you 
+cannot apply indirection operator (*) on void pointers.
+176) main()
+{
+extern int i;
+{ int i=20;
+ { 
+   const volatile unsigned i=30; printf("%d",i); 
+ }
+  printf("%d",i);
+}
+  printf("%d",i);
+}
+int i;
+177) Printf can be implemented by using  __________ list.
+Answer: 
+Variable length argument lists
+178) char *someFun()
+{
+char *temp = “string constant";
+return temp;
+}
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 53
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+int main()
+{
+puts(someFun());
+}
+Answer:
+string constant 
+Explanation:
+The program suffers no problem and gives the output correctly because the character constants are 
+stored in code/data area and not allocated in stack, so this doesn’t lead to dangling pointers. 
+179) char *someFun1()
+{
+char temp[ ] = “string";
+return temp;
+}
+char *someFun2()
+{
+char temp[ ] = {‘s’, ‘t’,’r’,’i’,’n’,’g’};
+return temp;
+}
+int main()
+{
+puts(someFun1());
+puts(someFun2());
+}
+Answer:
+Garbage values.
+Explanation:
+Both the functions suffer from the problem of dangling pointers. In someFun1() temp is a character 
+array and so the space for it is allocated in heap and is initialized with character string “string”. This is 
+created dynamically as the function is called, so is also deleted dynamically on exiting the function so the 
+string  data  is  not  available  in  the  calling  function  main()  leading  to  print  some garbage  values.  The 
+function someFun2() also suffers from the same problem but the problem can be easily identified in this 
+case.
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 54

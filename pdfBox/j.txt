@@ -1,0 +1,313 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+146) main()
+{
+static int a[3][3]={1,2,3,4,5,6,7,8,9};
+int i,j;
+static *p[]={a,a+1,a+2};
+for(i=0;i<3;i++)
+{
+for(j=0;j<3;j++)
+printf("%d\t%d\t%d\t%d\n",*(*(p+i)+j),
+*(*(j+p)+i),*(*(i+p)+j),*(*(p+j)+i));
+}
+}
+Answer:
+1       1       1       1
+2       4       2       4
+3       7       3       7
+4       2       4       2
+5       5       5       5
+6       8       6       8
+7       3       7       3
+8       6       8       6
+9       9       9       9
+Explanation:
+*(*(p+i)+j) is equivalent to p[i][j].
+147) main()
+{
+void swap();
+int x=10,y=8;     
+swap(&x,&y);
+printf("x=%d y=%d",x,y);
+}
+void swap(int *a, int *b)
+{
+   *a ^= *b,  *b ^= *a, *a ^= *b; 
+}
+Answer:
+x=10 y=8
+Explanation:
+Using ^ like this is a way to swap two variables without using a temporary variable and that 
+too in a single statement.
+Inside main(), void swap(); means that swap is a function that may take any number of 
+arguments (not no arguments) and returns nothing. So this doesn’t issue a compiler error by 
+the call swap(&x,&y); that has two arguments. 
+This convention is historically due to pre-ANSI style (referred to as Kernighan and Ritchie 
+style)  style  of  function  declaration.  In  that  style,  the  swap function  will  be  defined  as 
+follows,
+void swap()
+int *a, int *b
+{
+   *a ^= *b,  *b ^= *a, *a ^= *b; 
+}
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 45
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+where the arguments follow the (). So naturally the declaration for swap will look like, void 
+swap() which means the swap can take any number of arguments.
+148) main()
+{
+int i = 257;
+int *iPtr = &i;
+printf("%d %d", *((char*)iPtr), *((char*)iPtr+1) );
+}
+Answer:
+1 1 
+Explanation:
+The integer value 257 is stored in the memory as, 00000001 00000001, so the individual 
+bytes are taken by casting it to char * and get printed.
+149) main()
+{
+int i = 258;
+int *iPtr = &i;
+printf("%d %d", *((char*)iPtr), *((char*)iPtr+1) );
+}
+Answer:
+2 1 
+Explanation:
+The integer value 257 can be represented in binary as, 00000001 00000001. Remember that 
+the INTEL machines are ‘small-endian’ machines. Small-endian means that the lower order  
+bytes are stored in the higher memory addresses and the higher order bytes are stored in  
+lower addresses. The integer value 258 is stored in memory as: 00000001 00000010.   
+150) main()
+{
+int i=300;
+char *ptr = &i;
+*++ptr=2;
+printf("%d",i);
+}
+Answer:
+556
+Explanation:
+The integer value 300  in binary notation is: 00000001 00101100. It is  stored in memory 
+(small-endian)  as:  00101100 00000001.  Result  of  the expression *++ptr  = 2 makes  the 
+memory  representation  as:  00101100  00000010.  So  the  integer  corresponding  to  it   is 
+00000010 00101100 => 556.
+151) #include <stdio.h>
+main()
+{
+char * str = "hello";
+char * ptr = str;
+char least = 127;
+while (*ptr++)
+                  least = (*ptr<least ) ?*ptr :least;
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 46
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+printf("%d",least);
+}
+Answer:
+0
+Explanation:
+After ‘ptr’ reaches the end of the string the value pointed by ‘str’ is ‘\0’. So the value of ‘str’ 
+is less than that of ‘least’. So the value of ‘least’ finally is 0.
+152) Declare an array of N pointers to functions returning pointers to functions returning pointers to 
+characters?
+Answer:
+(char*(*)( )) (*ptr[N])( );
+153) main()
+{
+struct student 
+{
+char name[30];
+struct date dob;
+}stud;
+struct date
+        {
+         int day,month,year;
+         };
+     scanf("%s%d%d%d",  stud.rollno,  &student.dob.day,  &student.dob.month, 
+&student.dob.year);
+}
+Answer:
+Compiler Error: Undefined structure date
+Explanation:
+Inside  the  struct  definition  of  ‘student’  the  member  of  type  struct  date  is  given.  The 
+compiler doesn’t have the definition of date structure (forward  reference is not allowed in 
+C in this case) so it issues an error.
+154) main()
+{
+struct date;
+struct student
+{
+char name[30];
+struct date dob;
+}stud;
+struct date
+        {
+         int day,month,year;
+ };
+scanf("%s%d%d%d",  stud.rollno,  &student.dob.day,  &student.dob.month, 
+&student.dob.year);
+}
+Answer:
+Compiler Error: Undefined structure date
+Explanation:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 47
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+Only declaration of struct date is available inside the structure definition of ‘student’ but to 
+have a variable of type struct date the definition of the structure is required. 
+155) There were 10 records stored in “somefile.dat” but the following program printed 11 names. What 
+went wrong?
+void main()
+{
+struct student
+{
+char name[30], rollno[6];
+}stud;
+FILE *fp = fopen(“somefile.dat”,”r”);
+while(!feof(fp))
+ {
+     fread(&stud, sizeof(stud), 1 , fp);
+puts(stud.name);
+}
+}
+Explanation:
+fread reads 10 records and prints the names successfully.  It will return EOF only 
+when fread tries to read another record and fails reading EOF (and returning EOF). 
+So it  prints  the last  record again.  After this  only the condition feof(fp) becomes 
+false, hence comes out of the while loop. 
+156) Is there any difference between the two declarations, 
+1. int foo(int *arr[]) and
+2. int foo(int *arr[2])
+Answer:
+No 
+Explanation:
+Functions can only pass pointers and not arrays. The numbers that are allowed inside the [] 
+is just for more readability. So there is no difference between the two declarations.
+157) What is the subtle error in the following code segment?
+void fun(int n, int arr[])
+{
+int *p=0;
+int i=0;
+while(i++<n)
+p = &arr[i];
+*p = 0;
+}
+Answer & Explanation:
+If the body of the loop never executes p is assigned no address. So p remains NULL 
+where  *p  =0 may  result  in  problem (may  rise  to  runtime  error  “NULL pointer 
+assignment” and terminate the program).     
+158) What is wrong with the following code?  
+int *foo()
+{
+int *s = malloc(sizeof(int)100);
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 48
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+assert(s != NULL);
+return s;
+}
+Answer & Explanation:
+assert macro should be used for debugging and finding out bugs. The check s != NULL is 
+for  error/exception  handling  and  for  that  assert  shouldn’t  be  used.  A  plain  if  and  the 
+corresponding remedy statement has to be given.
+159) What is the hidden bug with the following  statement?
+assert(val++ != 0);
+Answer & Explanation:
+Assert macro is used for debugging and removed in release version. In assert, the experssion 
+involves  side-effects.  So  the  behavior  of  the  code  becomes  different  in  case  of  debug 
+version and the release version thus leading to a subtle bug. 
+Rule to Remember:
+Don’t use expressions that have side-effects in assert statements.  
+160) void main()
+{
+int *i = 0x400;  // i points to the address 400
+*i = 0; // set the value of memory location pointed by i;
+}
+Answer:
+Undefined behavior 
+Explanation:
+The second statement  results  in  undefined  behavior  because  it  points  to  some location 
+whose value may not be available for modification.  This type of pointer in which the non-
+availability of the implementation of the referenced location is known as 'incomplete type'.
+161) #define assert(cond) if(!(cond)) \
+  (fprintf(stderr, "assertion failed: %s, file %s, line %d \n",#cond,\
+ __FILE__,__LINE__), abort())
+void main()
+{
+int i = 10;
+if(i==0)
+    assert(i < 100); 
+else
+    printf("This statement becomes else for if in assert macro");
+}
+Answer:
+No output
+Explanation:
+The else part in which the printf is there becomes the else for if in the assert macro. Hence nothing 
+is printed. 
+The solution is to use conditional operator instead of if statement,
+#define assert(cond) ((cond)?(0): (fprintf (stderr, "assertion failed: \ %s, file %s, line %d \n",#cond, 
+__FILE__,__LINE__), abort()))
+Note:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 49
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+However  this  problem of  “matching  with  nearest  else”  cannot  be  solved  by  the  usual 
+method of placing the if statement inside a block like this,
+#define assert(cond) { \
+if(!(cond)) \
+  (fprintf(stderr, "assertion failed: %s, file %s, line %d \n",#cond,\
+ __FILE__,__LINE__), abort()) \
+}
+162) Is the following code legal?
+struct a
+    { 
+int x;
+ struct a b;
+    }
+Answer:
+No
+Explanation:
+Is it not legal for a structure to contain a member that is of the same
+type as in this case. Because this will cause the structure declaration to be recursive without 
+end.
+163) Is the following code legal?
+struct a
+    { 
+int x;
+            struct a *b;
+    }
+Answer:
+Yes.
+Explanation:
+*b is a pointer to type struct a and so is legal. The compiler knows, the size of the pointer to 
+a structure even before the size of the structure
+is determined(as you know the pointer to any type is of same size). This type of structures is 
+known as ‘self-referencing’ structure.
+164) Is the following code legal?
+typedef struct a
+    { 
+int x;
+ aType *b;
+    }aType
+Answer:
+No
+Explanation:
+The typename aType is not known at the point of declaring the structure (forward references 
+are not made for typedefs).
+165) Is the following code legal?
+typedef struct a aType;
+struct a
+{ 
+int x;
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 50

@@ -1,0 +1,253 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+‘C’ Language Aptitude Test Paper
+Note : All the programs are tested under Turbo C/C++ compilers.  
+It is assumed that,
+? Programs run under DOS environment,
+? The underlying machine is an x86 system,
+? Program is compiled using Turbo C/C++ compiler.
+The  program output  may  depend  on  the  information  based  on  this  assumptions  (for  example 
+sizeof(int) == 2 may be assumed). 
+Predict the output or error(s) for the following:
+1. void main()
+{
+int  const * p=5;
+printf("%d",++(*p));
+}
+Answer:
+Compiler error: Cannot modify a constant value. 
+Explanation:    
+p is a pointer to a "constant integer". But we tried to change the value of the "constant 
+integer".
+2. main()
+{
+char s[ ]="man";
+int i;
+for(i=0;s[ i ];i++)
+printf("\n%c%c%c%c",s[ i ],*(s+i),*(i+s),i[s]);
+}
+Answer:
+            mmmm
+                       aaaa
+                       nnnn
+Explanation:
+s[i], *(i+s), *(s+i), i[s] are all different ways of expressing the same idea. Generally  array 
+name is the base address for that array. Here s is the base address. i is the index number/displacement from 
+the base address. So, indirecting it with * is same as s[i]. i[s] may be surprising. But in the  case of  C  it is 
+same as s[i].
+3. main()
+{
+float me = 1.1;
+double you = 1.1;
+if(me==you)
+printf("I love U");
+else
+printf("I hate U");
+}
+Answer: 
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 1
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+I hate U
+Explanation:
+For  floating  point  numbers  (float,  double,  long  double) the  values  cannot  be  predicted 
+exactly.  Depending on the number of bytes, the precession with of the value  represented varies. Float 
+takes 4 bytes and long double takes 10 bytes. So float stores 0.9 with less precision than long double.
+Rule of Thumb: 
+Never compare or at-least be cautious when using floating point numbers with relational 
+operators (== , >, <, <=, >=,!= ) .  
+4. main()
+{
+static int var = 5;
+printf("%d ",var--);
+if(var)
+main();
+}
+Answer:
+5 4 3 2 1
+        Explanation:
+When static storage class is given, it is initialized once. The change in the value of a static  
+variable is retained even between the function calls. Main is also treated like any other ordinary function, 
+which can be called recursively.  
+5. main()
+{
+ int c[ ]={2.8,3.4,4,6.7,5};
+ int j,*p=c,*q=c;
+ for(j=0;j<5;j++) {
+printf(" %d ",*c);
+   ++q;   }
+ for(j=0;j<5;j++){
+printf(" %d ",*p);
+++p;   }
+}
+Answer:
+            2 2 2 2 2 2 3 4 6 5
+         Explanation: 
+Initially pointer c is assigned to both p and q. In the first loop, since only q is incremented 
+and not c , the value 2 will be printed 5 times. In second loop p itself is incremented. So the values 2 3 4 6 
+5 will be printed. 
+6. main()
+{
+extern int i;
+i=20;
+printf("%d",i);
+}
+Answer:  
+Linker Error : Undefined symbol '_i'
+Explanation: 
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 2
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+             extern storage class in the following declaration,
+                       extern int i;
+specifies to the compiler that the memory for i is allocated in some other program and that address will be 
+given to the current program at the time of linking. But linker finds that no other variable of name  i is 
+available in any other program with memory space allocated for it. Hence a linker error has occurred .
+7. main()
+{
+int i=-1,j=-1,k=0,l=2,m;
+m=i++&&j++&&k++||l++;
+printf("%d %d %d %d %d",i,j,k,l,m);
+}
+Answer:
+            0 0 1 3 1
+Explanation :
+Logical operations always give a result of 1 or 0 . And also the logical AND (&&) operator 
+has higher priority over the logical OR (||) operator. So the expression  ‘i++ && j++ && k++’ is executed 
+first. The result of this expression is 0    (-1 && -1 && 0 = 0). Now the expression is 0 || 2 which evaluates 
+to 1 (because OR operator always gives 1 except for ‘0 || 0’ combination- for which it gives 0). So the 
+value of m is 1. The values of other variables are also incremented by 1.
+8. main()
+{
+char *p;
+printf("%d %d ",sizeof(*p),sizeof(p));
+}
+Answer: 
+            1 2
+Explanation:
+The sizeof()  operator  gives  the  number  of  bytes  taken  by its  operand.  P is  a  character 
+pointer, which needs one byte for storing its value (a character). Hence sizeof(*p) gives a value of 1. Since 
+it needs two bytes to store the address of the character pointer sizeof(p) gives 2.
+9. main()
+{
+int i=3;
+switch(i)
+ {
+    default:printf("zero");
+    case 1: printf("one");
+   break;
+   case 2:printf("two");
+  break;
+  case 3: printf("three");
+  break;
+  }  
+}
+Answer :
+three
+Explanation :
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 3
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+The default case can be placed anywhere inside the loop. It is executed only when all other 
+cases doesn't match.
+10. main()
+{
+  printf("%x",-1<<4);
+}
+Answer: 
+fff0
+Explanation :
+-1 is internally represented as all 1's. When left shifted four times the least significant 4 bits 
+are filled with 0's.The %x format specifier specifies that the integer value be printed as a hexadecimal 
+value.
+11. main()
+{
+            char string[]="Hello World";
+display(string);
+}
+void display(char *string)
+{
+printf("%s",string);
+}
+          Answer:
+Compiler Error : Type mismatch in redeclaration of function display 
+          Explanation :
+In third line, when the function display is encountered, the compiler doesn't know anything 
+about the function display. It assumes the arguments and return types to be integers, (which is the default 
+type).  When it  sees  the  actual  function  display, the arguments  and type  contradicts  with what  it  has 
+assumed previously. Hence a compile time error occurs.
+12. main()
+{
+int c=- -2;
+printf("c=%d",c);
+}
+Answer:
+             c=2;
+          Explanation:
+Here unary minus (or negation) operator is used twice. Same maths  rules applies, ie. minus 
+* minus= plus.
+Note: 
+However you cannot give like --2. Because -- operator can  only be applied to variables as a 
+decrement operator (eg., i--). 2 is a constant and not a variable.
+13. #define int char
+main()
+{
+int i=65;
+printf("sizeof(i)=%d",sizeof(i));
+}
+Answer:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 4
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+          sizeof(i)=1
+Explanation:
+Since the #define replaces the string  int by the macro char 
+14. main()
+{
+int i=10;
+i=!i>14;
+Printf ("i=%d",i);
+}
+Answer:
+i=0
+ Explanation:
+In the expression  !i>14 , NOT (!) operator has more precedence than ‘ >’ symbol.  ! is a 
+unary logical operator. !i (!10) is 0 (not of true is false).  0>14 is false (zero). 
+15. #include<stdio.h>
+main()
+{
+char s[]={'a','b','c','\n','c','\0'};
+char *p,*str,*str1;
+p=&s[3];
+str=p;
+str1=s;
+printf("%d",++*p + ++*str1-32);
+}
+Answer:
+77
+Explanation:
+p is pointing to character '\n'. str1 is pointing to character 'a' ++*p. "p is pointing to '\n' and that is 
+incremented by one." the ASCII value of '\n' is 10, which is then incremented to 11. The value of ++*p is 
+11. ++*str1, str1 is pointing to 'a' that is incremented by 1 and it becomes 'b'. ASCII value of 'b' is 98.
+ Now performing (11 + 98 – 32), we get 77("M");
+ So we get the output 77 :: "M" (Ascii is 77).
+16. #include<stdio.h>
+main()
+{
+int a[2][2][2] = { {10,2,3,4}, {5,6,7,8}  };
+int *p,*q;
+p=&a[2][2][2];
+*q=***a;
+printf("%d----%d",*p,*q);
+}
+Answer:
+SomeGarbageValue---1
+Explanation:
+p=&a[2][2][2]   you  declare  only two 2D arrays,  but  you  are  trying  to  access  the third 
+2D(which you are not declared) it  will print garbage values. *q=***a starting address of a is assigned 
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 5

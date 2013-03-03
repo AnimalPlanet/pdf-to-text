@@ -1,0 +1,37 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+int main()
+{
+puts(someFun());
+}
+Answer:
+string constant 
+Explanation:
+The program suffers no problem and gives the output correctly because the character constants are 
+stored in code/data area and not allocated in stack, so this doesn’t lead to dangling pointers. 
+179) char *someFun1()
+{
+char temp[ ] = “string";
+return temp;
+}
+char *someFun2()
+{
+char temp[ ] = {‘s’, ‘t’,’r’,’i’,’n’,’g’};
+return temp;
+}
+int main()
+{
+puts(someFun1());
+puts(someFun2());
+}
+Answer:
+Garbage values.
+Explanation:
+Both the functions suffer from the problem of dangling pointers. In someFun1() temp is a character 
+array and so the space for it is allocated in heap and is initialized with character string “string”. This is 
+created dynamically as the function is called, so is also deleted dynamically on exiting the function so the 
+string  data  is  not  available  in  the  calling  function  main()  leading  to  print  some garbage  values.  The 
+function someFun2() also suffers from the same problem but the problem can be easily identified in this 
+case.
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 54

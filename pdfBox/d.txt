@@ -1,0 +1,314 @@
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+Explanation:
+Error is in line with statement a++. The operand must be an lvalue and may be of any of 
+scalar type for the any operator, array name only when subscripted is an lvalue. Simply 
+array name is a non-modifiable lvalue.
+**49) main( )
+{
+ static int  a[ ]   = {0,1,2,3,4};
+ int  *p[ ] = {a,a+1,a+2,a+3,a+4};
+ int  **ptr =  p;
+ ptr++;
+ printf(“\n %d  %d  %d”, ptr-p, *ptr-a, **ptr); 
+ *ptr++;
+ printf(“\n %d  %d  %d”, ptr-p, *ptr-a, **ptr); 
+ *++ptr;
+ printf(“\n %d  %d  %d”, ptr-p, *ptr-a, **ptr); 
+ ++*ptr;
+ printf(“\n %d  %d  %d”, ptr-p, *ptr-a, **ptr); 
+}
+Answer:
+111
+222
+333
+344
+Explanation:
+Let us consider the array and the two pointers with some address
+a
+0 1 2 3 4
+   100      102      104      106      108
+     p
+100 102 104 106 108
+     1000    1002    1004    1006    1008
+     ptr
+1000
+2000
+After execution of the instruction ptr++ value in ptr becomes 1002, if scaling factor for 
+integer is 2 bytes. Now ptr – p is value in ptr – starting location of array p, (1002 – 1000) / 
+(scaling factor) = 1,  *ptr – a = value at address pointed by ptr – starting value of array a, 
+1002 has a value 102  so the value is (102 – 100)/(scaling factor) = 1,  **ptr is the value 
+stored in the location pointed by  the pointer of ptr = value pointed by value pointed by 
+1002 = value pointed by 102 = 1. Hence the output of the firs printf is  1, 1, 1.
+After  execution  of  *ptr++ increments  value  of  the  value  in  ptr  by scaling  factor,  so it 
+becomes1004. Hence, the outputs for the second printf are ptr – p = 2, *ptr – a = 2, **ptr = 
+2. 
+After  execution  of  *++ptr  increments  value  of  the  value  in  ptr  by scaling  factor,  so it 
+becomes1004. Hence, the outputs for the third printf are ptr – p = 3, *ptr – a = 3, **ptr = 3. 
+After execution of ++*ptr value in ptr remains the same, the value pointed by the value is 
+incremented by the scaling factor. So the value in array p at location 1006 changes from 106 
+10 108,. Hence, the outputs for the fourth printf are ptr – p = 1006 – 1000 = 3, *ptr – a = 
+108 – 100 = 4, **ptr = 4. 
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 15
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+50) main( )
+{
+ char  *q;
+ int  j;
+ for (j=0; j<3; j++) scanf(“%s” ,(q+j));
+ for (j=0; j<3; j++) printf(“%c” ,*(q+j));
+ for (j=0; j<3; j++) printf(“%s” ,(q+j));
+}
+Explanation:
+Here we have only one pointer to type char and since we take input in the same pointer thus 
+we keep  writing  over  in  the  same  location,  each  time  shifting  the  pointer  value  by  1. 
+Suppose the inputs are MOUSE,  TRACK and VIRTUAL. Then for the first input suppose 
+the pointer starts at location 100 then the input one is stored as
+M O U S E \0
+When the second input is given the pointer is incremented as j value becomes 1, so the input 
+is filled in memory starting from 101.
+M T R A C K \0
+The third input  starts filling from the location 102
+M T V I R T U A L \0
+This is the final value stored .
+The first printf prints the values at the position q, q+1 and q+2  = M T V
+The second printf prints three strings starting from locations q, q+1, q+2
+ i.e  MTVIRTUAL, TVIRTUAL and VIRTUAL.
+   
+51) main( )
+{
+ void *vp;
+ char ch = ‘g’, *cp = “goofy”;
+ int j = 20;
+ vp = &ch;
+ printf(“%c”, *(char *)vp);
+ vp = &j;
+ printf(“%d”,*(int *)vp);
+ vp = cp;
+ printf(“%s”,(char *)vp + 3);
+}
+Answer:
+g20fy
+Explanation:
+Since a void pointer is used it can be type casted to any  other type pointer. vp = &ch  stores 
+address of char ch and the next statement prints the value stored in vp after type casting it to 
+the proper data type pointer. the output is ‘g’. Similarly  the output from second printf is 
+‘20’. The third printf statement type casts it to print the string from the 4 th value hence the 
+output is ‘fy’.
+52) main ( )
+{
+ static char *s[ ]  = {“black”, “white”, “yellow”, “violet”};
+ char **ptr[ ] = {s+3, s+2, s+1, s}, ***p;
+ p = ptr;
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 16
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+ **++p;
+ printf(“%s”,*--*++p + 3);
+}
+Answer:
+ck
+Explanation:
+In this problem we have an array of char pointers pointing to start of 4 strings. Then we 
+have ptr which is a pointer to a pointer of type char and a variable p which is a pointer to a 
+pointer to a pointer  of type char.  p hold the initial  value of ptr,  i.e.  p = s+3. The next 
+statement increment value in p by 1 , thus now value of p =  s+2. In the printf statement the 
+expression is evaluated *++p causes gets value s+1 then the pre decrement is executed and 
+we get s+1 – 1 = s . the indirection operator now gets the value from the array of s and adds 
+3 to the starting address. The string is printed starting from this position. Thus, the output is 
+‘ck’.
+53) main()
+{
+ int  i, n;
+ char *x = “girl”;
+ n = strlen(x);
+ *x = x[n];
+ for(i=0; i<n; ++i)
+   {
+printf(“%s\n”,x);
+x++;
+   }
+ }
+Answer:
+(blank space)
+irl
+rl
+l
+Explanation:
+Here a string (a pointer to char) is initialized with a value “girl”.  The strlen function returns 
+the length of the string, thus n has a value 4. The next statement assigns value at the nth 
+location  (‘\0’)  to  the  first  location.  Now  the  string  becomes  “\0irl”  .  Now  the  printf 
+statement prints the string after each iteration it increments it starting position.  Loop starts 
+from  0  to  4.  The  first  time  x[0]  =  ‘\0’  hence  it  prints  nothing  and  pointer  value  is 
+incremented. The second time it prints from x[1] i.e “irl” and the third time it prints “rl” and 
+the last time it prints “l” and the loop terminates.
+54) int i,j;
+for(i=0;i<=10;i++)
+{
+j+=5;
+assert(i<5);
+}
+Answer: 
+Runtime error: Abnormal program termination. 
+assert failed (i<5), <file name>,<line number> 
+Explanation:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 17
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+asserts  are  used  during  debugging to  make  sure  that  certain  conditions  are  satisfied.  If 
+assertion fails, the program will terminate reporting the same. After debugging use,
+#undef NDEBUG
+and this will disable all the assertions from the source code. Assertion
+is a good debugging tool to make use of.  
+  
+55) main()
+{
+int i=-1;
++i;
+printf("i = %d, +i = %d \n",i,+i);
+}
+Answer:
+ i = -1, +i = -1
+Explanation:
+Unary + is the only dummy operator in C. Where-ever it comes you can just ignore it just 
+because it has no effect in the expressions (hence the name dummy operator).
+56) What are the files which are automatically opened when a C file is executed?
+Answer:
+stdin, stdout, stderr (standard input,standard output,standard error).
+57) what will be the position of the file marker?
+a: fseek(ptr,0,SEEK_SET);
+b: fseek(ptr,0,SEEK_CUR);
+Answer :
+a: The SEEK_SET sets the file position marker to the starting of the file.
+b: The SEEK_CUR sets the file position marker to the current position
+of the file.
+58) main()
+{
+char name[10],s[12];
+scanf(" \"%[^\"]\"",s);
+}
+How scanf will execute? 
+Answer:
+First it checks for the leading white space and discards it.Then it matches with a quotation 
+mark and then it  reads all character upto another quotation mark.
+59) What is the problem with the following code segment?
+while ((fgets(receiving array,50,file_ptr)) != EOF)
+;
+Answer & Explanation:
+fgets returns a pointer. So the correct end of file check is checking for != NULL.
+60) main()
+{
+main();
+}
+Answer:
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 18
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+ Runtime error : Stack overflow.
+Explanation:
+main function calls itself again and again. Each time the function is called its return address 
+is stored in the call stack. Since there is no condition to terminate the function call, the call 
+stack overflows at runtime. So it terminates the program and results in an error.
+61) main()
+{
+char *cptr,c;
+void *vptr,v;
+c=10;  v=0;
+cptr=&c; vptr=&v;
+printf("%c%v",c,v);
+}
+Answer:
+Compiler error (at line number 4): size of v is Unknown.
+Explanation:
+You can create a variable of type void * but not of type void, since void is an empty type. In 
+the second line you are creating variable vptr of type void * and v of type void hence an 
+error.
+62) main()
+{
+char *str1="abcd";
+char str2[]="abcd";
+printf("%d %d %d",sizeof(str1),sizeof(str2),sizeof("abcd"));
+}
+Answer:
+2 5 5
+Explanation:
+In first sizeof, str1 is a character pointer so it gives you the size of the pointer variable. In 
+second sizeof the name str2 indicates the name of the array whose size is 5 (including the 
+'\0' termination character). The third sizeof is similar to the second one.
+63) main()
+{
+char not;
+not=!2;
+printf("%d",not);
+}
+Answer:
+0
+Explanation:
+! is a logical operator. In C the value 0 is considered to be the boolean value FALSE, and 
+any non-zero value is considered to be the boolean value TRUE. Here 2 is a non-zero value 
+so TRUE. !TRUE is FALSE (0) so it prints 0.
+64) #define FALSE -1
+#define TRUE   1
+#define NULL   0
+main() {
+   if(NULL)
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 19
+Visit  http://www.placementpapers.net/ 
+::: Original Website For Placement Papers. :::
+puts("NULL");
+   else if(FALSE)
+puts("TRUE");
+   else
+puts("FALSE");
+   }
+Answer:
+TRUE
+Explanation:
+The input program to the compiler after processing by the preprocessor is,
+main(){
+if(0)
+puts("NULL");
+else if(-1)
+puts("TRUE");
+else
+puts("FALSE");
+}
+Preprocessor doesn't replace the values given inside the double quotes. The check by if 
+condition is boolean value false so it goes to else. In second if -1 is boolean value true hence 
+"TRUE" is printed.
+65) main()
+{
+int k=1;
+printf("%d==1 is ""%s",k,k==1?"TRUE":"FALSE");
+}
+Answer:
+1==1 is TRUE
+Explanation:
+When two strings are placed together (or separated by white-space) they are concatenated 
+(this is called as "stringization" operation). So the string is as if it is given as "%d==1 is 
+%s". The conditional operator( ?: ) evaluates to "TRUE".
+66) main()
+{
+int y;
+scanf("%d",&y); // input given is 2000
+if( (y%4==0 && y%100 != 0) || y%100 == 0 )
+     printf("%d is a leap year");
+else
+     printf("%d is not a leap year");
+}
+Answer:
+2000 is a leap year
+Explanation:
+An ordinary program to check if leap year or not.
+67)  #define max 5
+#define int arr1[max]
+main()
+{
+Visit  http://www.placementpapers.net/jobs 
+::: Latest Fresher Jobs ::: 20
