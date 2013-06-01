@@ -1,3 +1,5 @@
+*NOTE* This repo's code has been merged into and improved upon in the repository textrank, under this same organization. Those interested are advised to look at the AccessBookmarks.java class in textrank repository rather than here for pdf to text conversion java code.
+
 Java code using Apache PDFBox API. 
 Converts pdf with bookmarks to chapterwise text files.
 
